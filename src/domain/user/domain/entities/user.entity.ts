@@ -1,0 +1,116 @@
+import * as bcrypt from 'bcrypt';
+import { User as IUser } from './user.interface';
+
+/**
+ * UserEntity 클래스
+ */
+export class User implements IUser {
+  constructor(
+    private _id: string,
+    private _email: string,
+    private _password: string,
+    private _name: string,
+    private _createdAt?: Date,
+    private _updatedAt?: Date,
+  ) {
+    this.password = _password; // 암호화 로직 호출
+  }
+
+  /**
+   * ID getter
+   * @returns string 사용자 ID
+   */
+  get id(): string {
+    return this._id;
+  }
+
+  /**
+   * 이메일 getter
+   * @returns string 이메일 주소
+   */
+  get email(): string {
+    return this._email;
+  }
+
+  /**
+   * 이메일 setter
+   * @param email 설정할 이메일 주소
+   */
+  set email(email: string) {
+    this._email = email;
+    this._updatedAt = new Date();
+  }
+
+  /**
+   * 비밀번호 setter
+   * @param password 설정할 비밀번호
+   */
+  set password(password: string) {
+    this._password = bcrypt.hashSync(password, 10);
+    this._updatedAt = new Date();
+  }
+
+  /**
+   * 비밀번호를 기본값으로 재설정합니다.
+   */
+  resetPassword(): void {
+    this.password = '12345678a';
+  }
+
+  /**
+   * 비밀번호를 검증합니다.
+   * @param password 검증할 비밀번호
+   * @returns boolean 비밀번호가 일치하면 true, 아니면 false를 반환합니다.
+   */
+  validatePassword(password: string): boolean {
+    return bcrypt.compareSync(password, this._password);
+  }
+
+  /**
+   * 이름 getter
+   * @returns string 사용자 이름
+   */
+  get name(): string {
+    return this._name;
+  }
+
+  /**
+   * 이름 setter
+   * @param name 설정할 이름
+   * @throws Error 이름 형식이 올바르지 않을 때 에러를 던집니다.
+   */
+  set name(name: string) {
+    const nameRegex = /^[가-힣a-zA-Z0-9]{2,8}$/;
+    if (!nameRegex.test(name)) {
+      throw new Error(
+        '이름 형식이 올바르지 않습니다. 이름은 2-8자 길이여야 하며 한글, 영어, 숫자만 포함할 수 있습니다.',
+      );
+    }
+    this._name = name;
+    this._updatedAt = new Date();
+  }
+
+  /**
+   * 생성일 getter
+   * @returns Date 생성일
+   */
+  get createdAt(): Date {
+    return this._createdAt;
+  }
+
+  /**
+   * 수정일 getter
+   * @returns Date 수정일
+   */
+  get updatedAt(): Date {
+    return this._updatedAt;
+  }
+
+  /**
+   * 도메인 객체의 유효성을 검증합니다.
+   * @throws Error 유효성 검증 실패 시 에러를 던집니다.
+   */
+  validate(): void {
+    throw new Error('아직 구현체 없음');
+  }
+}
