@@ -85,7 +85,7 @@ describe('UserController', () => {
     });
 
     it('필터와 정렬이 포함된 페이징된 유저 목록을 성공적으로 반환해야 합니다.', async () => {
-      const pagingDto: UserPagingDto = { page: 1, take: 10, where__email: 'test1@example.com', like__name: 'Test', orderby: 'name', direction: 'ASC' };
+      const pagingDto: UserPagingDto = { page: 1, take: 10, where__email: 'test1@example.com', like__name: 'Test', orderby: 'name', direction: 'asc' };
       const users = [new User('1', 'test1@example.com', 'password123', 'Test User 1')];
       const total = 1;
       userService.getUsers.mockResolvedValue({ data: users, total });

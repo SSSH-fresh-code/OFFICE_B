@@ -34,10 +34,11 @@ export class PagingService<T> {
     where: WhereClause = {},
     orderBy: OrderByClause = {}
   ): Promise<{ data: T[]; total: number }> {
-    const { page, take, orderby, direction } = pagingDto;
+    const { page, orderby, direction } = pagingDto;
 
+    const take = Number(pagingDto.take);
     const skip = (page - 1) * take;
-    const order = orderby ? { [orderby]: direction } : { id: 'DESC' };
+    const order = orderby ? { [orderby]: direction } : { id: 'desc' };
 
     const [data, total] = await this.prisma.$transaction([
       this.prisma[model].findMany({

@@ -97,7 +97,7 @@ describe('UserService', () => {
       pagingDto.where__email = 'test1@example.com';
       pagingDto.like__name = 'Test';
       pagingDto.orderby = 'name';
-      pagingDto.direction = 'ASC';
+      pagingDto.direction = 'asc';
 
       pagingService.getPagedResults.mockResolvedValue({ data: users, total });
 
@@ -106,7 +106,7 @@ describe('UserService', () => {
         name: { contains: 'Test' },
       };
       const orderBy = {
-        name: 'ASC',
+        name: 'asc',
       };
 
       const result = await userService.getUsers(pagingDto);

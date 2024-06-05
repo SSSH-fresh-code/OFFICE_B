@@ -44,7 +44,7 @@ describe('PagingService', () => {
           where: {},
           skip: 0,
           take: 10,
-          orderBy: { id: 'DESC' },
+          orderBy: { id: 'desc' },
         }),
         prismaService['User'].count({ where: {} }),
       ]);
@@ -65,14 +65,14 @@ describe('PagingService', () => {
           where,
           skip: 0,
           take: 10,
-          orderBy: { id: 'DESC' },
+          orderBy: { id: 'desc' },
         }),
         prismaService['User'].count({ where }),
       ]);
     });
 
     it('orderBy 조건을 적용하여 페이징된 결과를 반환해야 합니다.', async () => {
-      const pagingDto: PagingDto = { page: 1, take: 10, orderby: 'email', direction: 'ASC' };
+      const pagingDto: PagingDto = { page: 1, take: 10, orderby: 'email', direction: 'asc' };
       const users = [{ id: '1', email: 'test1@example.com', name: 'TestUser1' }];
       const total = 1;
 
@@ -85,7 +85,7 @@ describe('PagingService', () => {
           where: {},
           skip: 0,
           take: 10,
-          orderBy: { email: 'ASC' },
+          orderBy: { email: 'asc' },
         }),
         prismaService['User'].count({ where: {} }),
       ]);
@@ -105,7 +105,7 @@ describe('PagingService', () => {
           where: {},
           skip: 5,
           take: 5,
-          orderBy: { id: 'DESC' },
+          orderBy: { id: 'desc' },
         }),
         prismaService['User'].count({ where: {} }),
       ]);
@@ -125,7 +125,7 @@ describe('PagingService', () => {
           where: {},
           skip: 0,
           take: 10,
-          orderBy: { id: 'DESC' },
+          orderBy: { id: 'desc' },
         }),
         prismaService['User'].count({ where: {} }),
       ]);
