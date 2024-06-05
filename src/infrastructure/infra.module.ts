@@ -4,6 +4,8 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ClassSerializerInterceptor } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { PagingService } from './services/paging.service';
+import { PrismaService } from './prisma/prisma.service';
 
 @Module({
   imports: [
@@ -17,8 +19,10 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
     },
+    PagingService,
+    PrismaService,
   ],
-  exports: [PrismaModule, ConfigModule],
+  exports: [PrismaModule, ConfigModule, PagingService, PrismaService],
 })
 export class InfraModule {
   configureSwagger(app: any) {

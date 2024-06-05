@@ -1,19 +1,22 @@
-import { Controller, Post, Body, Param, Put } from '@nestjs/common';
+import { Controller, Post, Body, Param, Put, Query, Get } from '@nestjs/common';
 import { UserService } from '../application/user.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { User } from '../domain/entities/user.entity';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { UserPagingDto } from './dto/user-paging.dto';
+import { User } from '../domain/user.entity';
+
 @ApiTags('users')
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) { }
+
   @Post()
-  @ApiOperation({ summary: 'Create a new user' })
+  @ApiOperation({ summary: '신규 유저 생성' })
   @ApiResponse({
     status: 201,
-    description: 'The user has been successfully created.',
+    description: '유저가 정상적으로 생성 됨',
   })
-  @ApiResponse({ status: 400, description: 'Invalid input.' })
+  @ApiResponse({ status: 400, description: '잘못된 파라미터 값' })
   @ApiBody({ type: CreateUserDto })
   async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
     const { email, password, name } = createUserDto;
@@ -21,17 +24,27 @@ export class UserController {
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Update user name' })
+  @ApiOperation({ summary: '기존 유저 수정' })
   @ApiResponse({
     status: 200,
-    description: 'The user name has been successfully updated.',
+    description: '유저가 정상적으로 수정됨',
   })
-  @ApiResponse({ status: 404, description: 'User not found.' })
+  @ApiResponse({ status: 404, description: '존재하지 않는 유저' })
   @ApiBody({ type: CreateUserDto })
   async updateUser(
     @Param('id') id: string,
     @Body() createUserDto: CreateUserDto,
   ): Promise<User | null> {
     return this.userService.updateUser(id, createUserDto.name);
+  }
+
+  @Get()
+  @ApiOperation({ summary: '유저 목록 조회' })
+  @ApiResponse({
+    status: 200,
+    description: '유저 목록이 정상적으로 조회됨',
+  })
+  async getUsers(@Query() pagingDto: UserPagingDto): Promise<{ data: User[]; total: number }> {
+    return this.userService.getUsers(pagingDto);
   }
 }

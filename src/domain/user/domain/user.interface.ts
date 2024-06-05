@@ -1,9 +1,9 @@
-import { AggregateRoot } from 'src/domain/aggregate-root.interface';
+import { AggregateRoot } from "../../../domain/aggregate-root.interface";
 
 /**
  * User 인터페이스
  */
-export interface User extends AggregateRoot {
+export interface iUser extends AggregateRoot {
   /**
    * 비밀번호를 기본값으로 재설정합니다.
    */

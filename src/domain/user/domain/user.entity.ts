@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt';
-import { User as IUser } from './user.interface';
+import { iUser as IUser } from './user.interface';
 
 /**
  * UserEntity 클래스
