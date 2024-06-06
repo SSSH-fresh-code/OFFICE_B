@@ -114,4 +114,25 @@ describe('UserService', () => {
       expect(pagingService.getPagedResults).toHaveBeenCalledWith('User', pagingDto, where, orderBy);
     });
   });
+  describe('getUserById', () => {
+    it('ID로 유저를 성공적으로 조회해야 합니다.', async () => {
+      const user = new User('1', 'test@example.com', 'password123', 'Test User');
+      userRepository.findById.mockResolvedValue(user);
+
+      const result = await userService.getUserById('1');
+      expect(result).toEqual({
+        id: '1',
+        email: 'test@example.com',
+        name: 'Test User',
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      });
+    });
+
+    it('유저를 찾을 수 없으면 에러를 던져야 합니다.', async () => {
+      userRepository.findById.mockResolvedValue(null);
+
+      await expect(userService.getUserById('1')).rejects.toThrow('User not found');
+    });
+  });
 });

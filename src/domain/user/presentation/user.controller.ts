@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserPagingDto } from './dto/user-paging.dto';
 import { User } from '../domain/user.entity';
+import { ReadUserDto } from './dto/read-user.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -46,5 +47,16 @@ export class UserController {
   })
   async getUsers(@Query() pagingDto: UserPagingDto): Promise<{ data: User[]; total: number }> {
     return this.userService.getUsers(pagingDto);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: '유저 상세 조회' })
+  @ApiResponse({
+    status: 200,
+    description: '유저 정보가 정상적으로 조회됨',
+  })
+  @ApiResponse({ status: 404, description: '존재하지 않는 유저' })
+  async getUserById(@Param('id') id: string): Promise<ReadUserDto> {
+    return this.userService.getUserById(id);
   }
 }

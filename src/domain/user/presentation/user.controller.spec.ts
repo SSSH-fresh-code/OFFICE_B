@@ -13,6 +13,7 @@ const mockUserService = () => ({
   createUser: jest.fn(),
   updateUser: jest.fn(),
   getUsers: jest.fn(),
+  getUserById: jest.fn()
 });
 
 describe('UserController', () => {
@@ -93,6 +94,36 @@ describe('UserController', () => {
       const result = await userController.getUsers(pagingDto);
       expect(result).toEqual({ data: users, total });
       expect(userService.getUsers).toHaveBeenCalledWith(pagingDto);
+    });
+  });
+
+  describe('getUserById', () => {
+    it('ID로 유저를 성공적으로 조회해야 합니다.', async () => {
+      const user = new User('1', 'test@example.com', 'password123', 'Test User');
+
+      userService.getUserById.mockResolvedValue({
+        id: '1',
+        email: 'test@example.com',
+        name: 'Test User',
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      });
+
+      const result = await userController.getUserById('1');
+      expect(result).toEqual({
+        id: '1',
+        email: 'test@example.com',
+        name: 'Test User',
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      });
+      expect(userService.getUserById).toHaveBeenCalledWith('1');
+    });
+
+    it('유저를 찾을 수 없으면 에러를 던져야 합니다.', async () => {
+      userService.getUserById.mockRejectedValue(new Error('User not found'));
+
+      await expect(userController.getUserById('1')).rejects.toThrow('User not found');
     });
   });
 });

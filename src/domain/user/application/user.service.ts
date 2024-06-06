@@ -5,6 +5,7 @@ import { USER_REPOSITORY } from '../user.const';
 import { PagingService } from '../../../infrastructure/services/paging.service'; // 상대 경로로 수정
 import { UserPagingDto } from '../presentation/dto/user-paging.dto';
 import { User } from '../domain/user.entity';
+import { ReadUserDto } from '../presentation/dto/read-user.dto';
 
 /**
  * 유저 서비스 클래스
@@ -66,5 +67,20 @@ export class UserService {
     }
 
     return this.pagingService.getPagedResults('User', pagingDto, where, orderBy);
+  }
+
+  async getUserById(id: string): Promise<ReadUserDto> {
+    const user = await this.userRepository.findById(id);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
   }
 }
