@@ -42,6 +42,13 @@ export class User implements IUser {
   }
 
   /**
+   * 이메일 getter
+   * @returns string 이메일 주소
+   */
+  get password(): string {
+    return this._password;
+  }
+  /**
    * 비밀번호 setter
    * @param password 설정할 비밀번호
    */

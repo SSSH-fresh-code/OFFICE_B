@@ -8,31 +8,16 @@ export class PrismaUserRepository implements UserRepository {
   constructor(private readonly prisma: PrismaService) { }
 
   async findAll(): Promise<User[]> {
-    const users = await this.prisma.user.findMany({
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        createdAt: true,
-        updatedAt: true,
-      }
-    });
-    return users.map(user => new User(user.id, user.email, "", user.name, user.createdAt, user.updatedAt));
+    const users = await this.prisma.user.findMany({});
+    return users.map(user => new User(user.id, user.email, user.password, user.name, user.createdAt, user.updatedAt));
   }
 
   async findById(id: string): Promise<User | null> {
     const user = await this.prisma.user.findUniqueOrThrow({
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        createdAt: true,
-        updatedAt: true,
-      },
       where: { id }
     });
     if (!user) return null;
-    return new User(user.id, user.email, "", user.name, user.createdAt, user.updatedAt);
+    return new User(user.id, user.email, user.password, user.name, user.createdAt, user.updatedAt);
   }
 
   async save(user: User): Promise<User> {
