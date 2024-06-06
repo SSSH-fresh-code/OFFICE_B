@@ -6,7 +6,7 @@
 ## 기술 구성
 - **프레임워크**: Nest.js
 - **ORM**: Prisma
-- **데이터베이스**: PostgreSQL
+- **데이터베이스**: PostgreSQL, SQLite (테스트용)
 - **언어**: TypeScript
 - **테스트**: Jest
 
@@ -30,3 +30,56 @@ PORT=3000
 - **Notification Module**: 알람 관리
 
 모든 모듈은 도메인 레이어, 애플리케이션 레이어, 인프라스트럭처 레이어로 나누어져 있어, 코드의 응집도와 유지보수성을 높였습니다.
+
+## 프로젝트 구조
+```
+src
+│   ├── app.controller.spec.ts
+│   ├── app.controller.ts
+│   ├── app.module.ts
+│   ├── app.service.ts
+│   ├── domain
+│   │   ├── aggregate-root.interface.ts
+│   │   └── user
+│   │       ├── application
+│   │       │   ├── user.service.spec.ts
+│   │       │   └── user.service.ts
+│   │       ├── domain
+│   │       │   ├── user.entity.spec.ts
+│   │       │   ├── user.entity.ts
+│   │       │   └── user.interface.ts
+│   │       ├── infrastructure
+│   │       │   └── user.repository.ts
+│   │       ├── presentation
+│   │       │   ├── dto
+│   │       │   │   ├── create-user.dto.ts
+│   │       │   │   ├── read-user.dto.ts
+│   │       │   │   └── user-paging.dto.ts
+│   │       │   ├── user.controller.spec.ts
+│   │       │   └── user.controller.ts
+│   │       ├── user.const.ts
+│   │       └── user.module.ts
+│   ├── infrastructure
+│   │   ├── dto
+│   │   │   └── paging.dto.ts
+│   │   ├── exception
+│   │   │   ├── exception.enum.ts
+│   │   │   ├── http-exception.filter.ts
+│   │   │   ├── prisma-exception.filter.ts
+│   │   │   └── sssh.exception.ts
+│   │   ├── infra.module.ts
+│   │   ├── prisma
+│   │   │   ├── prisma.module.ts
+│   │   │   └── prisma.service.ts
+│   │   ├── repositories
+│   │   │   ├── prisma-user.repository.spec.ts
+│   │   │   └── prisma-user.repository.ts
+│   │   ├── services
+│   │   │   ├── paging.service.spec.ts
+│   │   │   └── paging.service.ts
+│   │   └── util
+│   │       └── message.util.ts
+│   └── main.ts
+test
+│   └── setup-env.ts
+```
