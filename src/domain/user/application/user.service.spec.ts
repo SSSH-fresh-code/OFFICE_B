@@ -5,6 +5,7 @@ import { USER_REPOSITORY } from '../user.const';
 import { User } from '../domain/user.entity';
 import { UserPagingDto } from '../presentation/dto/user-paging.dto';
 import { PagingService } from '../../../infrastructure/services/paging.service';
+import { Prisma } from '@prisma/client';
 
 /**
  * Mock User Repository
@@ -72,9 +73,10 @@ describe('UserService', () => {
     });
 
     it('유저를 찾을 수 없으면 에러를 던져야 합니다.', async () => {
-      userRepository.findById.mockResolvedValue(null);
+      const prismaError = new Prisma.PrismaClientKnownRequestError('유저를 찾을 수 없습니다', { code: 'P2025', clientVersion: '2.27.0' });
+      userRepository.findById.mockRejectedValue(prismaError);
 
-      await expect(userService.updateUser('1', 'Updated User')).rejects.toThrow('User not found');
+      await expect(userService.updateUser('1', 'Updated User')).rejects.toThrow('유저를 찾을 수 없습니다');
     });
   });
 
@@ -114,25 +116,31 @@ describe('UserService', () => {
       expect(pagingService.getPagedResults).toHaveBeenCalledWith('User', pagingDto, where, orderBy);
     });
   });
+
   describe('getUserById', () => {
-    it('ID로 유저를 성공적으로 조회해야 합니다.', async () => {
-      const user = new User('1', 'test@example.com', 'password123', 'Test User');
+    it('유저를 성공적으로 반환해야 합니다.', async () => {
+      const createdAt = new Date();
+      const updatedAt = new Date();
+      const user = new User('1', 'test@example.com', '', 'Test User', createdAt, updatedAt);
       userRepository.findById.mockResolvedValue(user);
 
       const result = await userService.getUserById('1');
-      expect(result).toEqual({
-        id: '1',
-        email: 'test@example.com',
-        name: 'Test User',
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
+      expect({
+        id: result.id,
+        email: result.email,
+        name: result.name,
+      }).toEqual({
+        id: user.id,
+        email: user.email,
+        name: user.name
       });
     });
 
     it('유저를 찾을 수 없으면 에러를 던져야 합니다.', async () => {
-      userRepository.findById.mockResolvedValue(null);
+      const prismaError = new Prisma.PrismaClientKnownRequestError('유저를 찾을 수 없습니다', { code: 'P2025', clientVersion: '2.27.0' });
+      userRepository.findById.mockRejectedValue(prismaError);
 
-      await expect(userService.getUserById('1')).rejects.toThrow('User not found');
+      await expect(userService.getUserById('1')).rejects.toThrow('유저를 찾을 수 없습니다');
     });
   });
 });

@@ -123,7 +123,7 @@ describe('UserController', () => {
     it('유저를 찾을 수 없으면 에러를 던져야 합니다.', async () => {
       userService.getUserById.mockRejectedValue(new Error('User not found'));
 
-      await expect(userController.getUserById('1')).rejects.toThrow('User not found');
+      await expect(userController.getUserById('1')).rejects.toThrow("User not found");
     });
   });
 });
