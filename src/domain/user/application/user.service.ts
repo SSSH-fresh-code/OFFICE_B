@@ -20,12 +20,15 @@ export class UserService {
     name: string,
   ): Promise<User> {
     const user = new User(uuidv4(), email, password, name);
+    user.encryptPassword();
+
     return this.userRepository.save(user);
   }
 
   async updateUser(id: string, name: string): Promise<User | null> {
     const user = await this.userRepository.findById(id);
     user.name = name;
+
     return this.userRepository.save(user);
   }
 
@@ -55,5 +58,17 @@ export class UserService {
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
+  }
+
+  async getUserByEmail(email: string): Promise<User | null> {
+    return this.userRepository.findByEmail(email);
+  }
+
+  serializeUser(user: User): string {
+    return user.id;
+  }
+
+  async deserializeUser(userId: string): Promise<User | null> {
+    return this.userRepository.findById(userId);
   }
 }

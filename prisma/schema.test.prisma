@@ -15,3 +15,13 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Session {
+  sid       String    @id @default(uuid())
+  expires   DateTime?
+  data      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([expires], name: "idx_session_expires")
+}

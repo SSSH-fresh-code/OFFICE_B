@@ -6,23 +6,17 @@ describe('UserEntity', () => {
 
   beforeEach(() => {
     user = new User('1', 'test@example.com', 'password123', 'username');
-  });
-
-  it('비밀번호를 올바르게 설정하고 해시화해야 한다', () => {
-    const plainPassword = 'newPassword123';
-    user.password = plainPassword;
-    expect(user.validatePassword(plainPassword)).toBe(true);
+    user.encryptPassword();
   });
 
   it('비밀번호를 기본값으로 재설정하고 해시화해야 한다', () => {
     user.resetPassword();
+
     expect(user.validatePassword('12345678a')).toBe(true);
   });
 
   it('비밀번호를 올바르게 검증해야 한다', () => {
-    const plainPassword = 'password123';
-    user.password = plainPassword;
-    expect(user.validatePassword(plainPassword)).toBe(true);
+    expect(user.validatePassword('password123')).toBe(true);
     expect(user.validatePassword('wrongPassword')).toBe(false);
   });
 

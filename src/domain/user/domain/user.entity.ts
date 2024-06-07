@@ -12,9 +12,7 @@ export class User implements IUser {
     private _name: string,
     private _createdAt?: Date,
     private _updatedAt?: Date,
-  ) {
-    this.password = _password; // 암호화 로직 호출
-  }
+  ) { }
 
   /**
    * ID getter
@@ -48,20 +46,17 @@ export class User implements IUser {
   get password(): string {
     return this._password;
   }
-  /**
-   * 비밀번호 setter
-   * @param password 설정할 비밀번호
-   */
-  set password(password: string) {
-    this._password = bcrypt.hashSync(password, 10);
-    this._updatedAt = new Date();
-  }
 
   /**
    * 비밀번호를 기본값으로 재설정합니다.
    */
   resetPassword(): void {
-    this.password = '12345678a';
+    this._password = '12345678a';
+    this.encryptPassword()
+  }
+
+  encryptPassword() {
+    this._password = bcrypt.hashSync(this._password, 10);
   }
 
   /**
