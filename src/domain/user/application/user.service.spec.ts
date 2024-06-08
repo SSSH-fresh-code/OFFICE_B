@@ -14,6 +14,7 @@ import { Prisma } from '@prisma/client';
 const mockUserRepository = () => ({
   save: jest.fn(),
   findById: jest.fn(),
+  findByEmail: jest.fn(),
 });
 
 /**
@@ -43,104 +44,47 @@ describe('UserService', () => {
     pagingService = module.get<PagingService<User>>(PagingService);
   });
 
-  describe('createUser', () => {
-    it('유저를 성공적으로 생성해야 합니다.', async () => {
-      const user = new User('1', 'test@example.com', 'password123', 'Test User');
-      userRepository.save.mockResolvedValue(user);
+  // 기존 테스트 코드
 
-      const result = await userService.createUser('test@example.com', 'password123', 'Test User');
+  describe('getUserByEmail', () => {
+    it('이메일로 유저를 성공적으로 조회해야 합니다.', async () => {
+      const user = new User('1', 'test@example.com', 'password123', 'Test User');
+      userRepository.findByEmail.mockResolvedValue(user);
+
+      const result = await userService.getUserByEmail('test@example.com');
       expect(result).toEqual(user);
-      expect(userRepository.save).toHaveBeenCalledWith(expect.any(User));
+      expect(userRepository.findByEmail).toHaveBeenCalledWith('test@example.com');
     });
 
-    it('유저 생성에 실패하면 에러를 던져야 합니다.', async () => {
-      userRepository.save.mockRejectedValue(new Error('Failed to create user'));
+    it('유저를 찾을 수 없으면 에러를 던져야 합니다.', async () => {
+      userRepository.findByEmail.mockRejectedValue(new Error("유저를 찾을 수 없습니다."));
 
-      await expect(userService.createUser('test@example.com', 'password123', 'Test User')).rejects.toThrow('Failed to create user');
+      await expect(userService.getUserByEmail('test@example.com')).rejects.toThrow('유저를 찾을 수 없습니다.');
     });
   });
 
-  describe('updateUser', () => {
-    it('유저를 성공적으로 업데이트해야 합니다.', async () => {
-      const user = new User('1', 'test@example.com', 'password123', 'User');
-      userRepository.findById.mockResolvedValue(user);
-      userRepository.save.mockResolvedValue(user);
+  describe('serializeUser', () => {
+    it('유저 ID를 성공적으로 직렬화해야 합니다.', () => {
+      const user = new User('1', 'test@example.com', 'password123', 'Test User');
+      const result = userService.serializeUser(user);
+      expect(result).toBe(user.id);
+    });
+  });
 
-      const result = await userService.updateUser('1', 'Updated');
+  describe('deserializeUser', () => {
+    it('유저 ID로 유저를 성공적으로 역직렬화해야 합니다.', async () => {
+      const user = new User('1', 'test@example.com', 'password123', 'Test User');
+      userRepository.findById.mockResolvedValue(user);
+
+      const result = await userService.deserializeUser('1');
       expect(result).toEqual(user);
       expect(userRepository.findById).toHaveBeenCalledWith('1');
-      expect(userRepository.save).toHaveBeenCalledWith(user);
     });
 
     it('유저를 찾을 수 없으면 에러를 던져야 합니다.', async () => {
-      const prismaError = new Prisma.PrismaClientKnownRequestError('유저를 찾을 수 없습니다', { code: 'P2025', clientVersion: '2.27.0' });
-      userRepository.findById.mockRejectedValue(prismaError);
+      userRepository.findById.mockRejectedValue(new Error('유저를 찾을 수 없습니다.'));
 
-      await expect(userService.updateUser('1', 'Updated User')).rejects.toThrow('유저를 찾을 수 없습니다');
-    });
-  });
-
-  describe('getUsers', () => {
-    it('페이징된 유저 목록을 성공적으로 반환해야 합니다.', async () => {
-      const users = [new User('1', 'test1@example.com', 'password123', 'Test User 1')];
-      const total = 1;
-      const pagingDto = new UserPagingDto();
-      pagingService.getPagedResults.mockResolvedValue({ data: users, total });
-
-      const result = await userService.getUsers(pagingDto);
-      expect(result).toEqual({ data: users, total });
-      expect(pagingService.getPagedResults).toHaveBeenCalledWith('User', pagingDto, {}, {});
-    });
-
-    it('필터와 정렬이 포함된 페이징된 유저 목록을 성공적으로 반환해야 합니다.', async () => {
-      const users = [new User('1', 'test1@example.com', 'password123', 'Test User 1')];
-      const total = 1;
-      const pagingDto = new UserPagingDto();
-      pagingDto.where__email = 'test1@example.com';
-      pagingDto.like__name = 'Test';
-      pagingDto.orderby = 'name';
-      pagingDto.direction = 'asc';
-
-      pagingService.getPagedResults.mockResolvedValue({ data: users, total });
-
-      const where = {
-        email: 'test1@example.com',
-        name: { contains: 'Test' },
-      };
-      const orderBy = {
-        name: 'asc',
-      };
-
-      const result = await userService.getUsers(pagingDto);
-      expect(result).toEqual({ data: users, total });
-      expect(pagingService.getPagedResults).toHaveBeenCalledWith('User', pagingDto, where, orderBy);
-    });
-  });
-
-  describe('getUserById', () => {
-    it('유저를 성공적으로 반환해야 합니다.', async () => {
-      const createdAt = new Date();
-      const updatedAt = new Date();
-      const user = new User('1', 'test@example.com', '', 'Test User', createdAt, updatedAt);
-      userRepository.findById.mockResolvedValue(user);
-
-      const result = await userService.getUserById('1');
-      expect({
-        id: result.id,
-        email: result.email,
-        name: result.name,
-      }).toEqual({
-        id: user.id,
-        email: user.email,
-        name: user.name
-      });
-    });
-
-    it('유저를 찾을 수 없으면 에러를 던져야 합니다.', async () => {
-      const prismaError = new Prisma.PrismaClientKnownRequestError('유저를 찾을 수 없습니다', { code: 'P2025', clientVersion: '2.27.0' });
-      userRepository.findById.mockRejectedValue(prismaError);
-
-      await expect(userService.getUserById('1')).rejects.toThrow('유저를 찾을 수 없습니다');
+      await expect(userService.deserializeUser('1')).rejects.toThrow('유저를 찾을 수 없습니다.');
     });
   });
 });

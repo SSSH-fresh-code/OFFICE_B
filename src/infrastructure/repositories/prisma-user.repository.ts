@@ -16,7 +16,6 @@ export class PrismaUserRepository implements UserRepository {
     const user = await this.prisma.user.findUniqueOrThrow({
       where: { id }
     });
-    if (!user) return null;
     return new User(user.id, user.email, user.password, user.name, user.createdAt, user.updatedAt);
   }
 
@@ -24,7 +23,6 @@ export class PrismaUserRepository implements UserRepository {
     const user = await this.prisma.user.findUniqueOrThrow({
       where: { email }
     });
-    if (!user) return null;
     return new User(user.id, user.email, user.password, user.name, user.createdAt, user.updatedAt);
   }
 

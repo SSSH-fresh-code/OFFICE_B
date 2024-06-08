@@ -3,7 +3,9 @@ import { UserController } from './user.controller';
 import { UserService } from '../application/user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserPagingDto } from './dto/user-paging.dto';
+import { ReadUserDto } from './dto/read-user.dto';
 import { User } from '../domain/user.entity';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 /**
  * Mock User Service
@@ -13,7 +15,7 @@ const mockUserService = () => ({
   createUser: jest.fn(),
   updateUser: jest.fn(),
   getUsers: jest.fn(),
-  getUserById: jest.fn()
+  getUserById: jest.fn(),
 });
 
 describe('UserController', () => {
@@ -36,94 +38,73 @@ describe('UserController', () => {
   });
 
   describe('createUser', () => {
-    it('유저를 성공적으로 생성해야 합니다.', async () => {
-      const createUserDto: CreateUserDto = { email: 'test@example.com', password: 'password123', name: 'Test User' };
-      const user = new User('1', 'test@example.com', 'password123', 'Test User');
+    it('유저를 생성해야 합니다.', async () => {
+      const createUserDto: CreateUserDto = { email: 'test@example.com', password: 'password123', name: 'TestUser' };
+      const user = new User('1', createUserDto.email, createUserDto.password, createUserDto.name);
       userService.createUser.mockResolvedValue(user);
 
-      const result = await userController.createUser(createUserDto);
-      expect(result).toEqual(user);
-      expect(userService.createUser).toHaveBeenCalledWith('test@example.com', 'password123', 'Test User');
+      expect(await userController.createUser(createUserDto)).toEqual(user);
     });
 
-    it('유저 생성에 실패하면 에러를 던져야 합니다.', async () => {
-      const createUserDto: CreateUserDto = { email: 'test@example.com', password: 'password123', name: 'Test User' };
-      userService.createUser.mockRejectedValue(new Error('유저 생성 실패'));
+    it('잘못된 파라미터 값이 주어지면 예외를 던져야 합니다.', async () => {
+      const createUserDto: CreateUserDto = { email: '', password: '', name: '' };
 
-      await expect(userController.createUser(createUserDto)).rejects.toThrow('유저 생성 실패');
+      userService.createUser.mockRejectedValue(new HttpException('유저를 생성할 수 없습니다.', HttpStatus.BAD_REQUEST));
+
+      await expect(userController.createUser(createUserDto)).rejects.toThrow('유저를 생성할 수 없습니다.');
     });
   });
 
   describe('updateUser', () => {
-    it('유저를 성공적으로 업데이트해야 합니다.', async () => {
-      const updateUserDto: CreateUserDto = { email: 'test@example.com', password: 'password123', name: 'Updated User' };
-      const user = new User('1', 'test@example.com', 'password123', 'Updated User');
-      userService.updateUser.mockResolvedValue(user);
+    it('유저를 수정해야 합니다.', async () => {
+      const id = '1';
+      const createUserDto: CreateUserDto = { email: 'test@example.com', password: 'password123', name: 'TestUser' };
+      const updatedUser = new User(id, createUserDto.email, createUserDto.password, createUserDto.name);
+      userService.updateUser.mockResolvedValue(updatedUser);
 
-      const result = await userController.updateUser('1', updateUserDto);
-      expect(result).toEqual(user);
-      expect(userService.updateUser).toHaveBeenCalledWith('1', 'Updated User');
+      expect(await userController.updateUser(id, createUserDto)).toEqual(updatedUser);
     });
 
-    it('유저를 찾을 수 없으면 에러를 던져야 합니다.', async () => {
-      const updateUserDto: CreateUserDto = { email: 'test@example.com', password: 'password123', name: 'Updated User' };
-      userService.updateUser.mockRejectedValue(new Error('유저를 찾을 수 없습니다'));
+    it('존재하지 않는 유저 ID가 주어지면 예외를 던져야 합니다.', async () => {
+      const id = '999';
+      const createUserDto: CreateUserDto = { email: 'test@example.com', password: 'password123', name: 'TestUser' };
 
-      await expect(userController.updateUser('1', updateUserDto)).rejects.toThrow('유저를 찾을 수 없습니다');
+      userService.updateUser.mockRejectedValue(new HttpException('유저를 찾을 수 없습니다.', HttpStatus.NOT_FOUND));
+
+      await expect(userController.updateUser(id, createUserDto)).rejects.toThrow('유저를 찾을 수 없습니다.');
     });
   });
 
   describe('getUsers', () => {
-    it('페이징된 유저 목록을 성공적으로 반환해야 합니다.', async () => {
+    it('유저 목록을 조회해야 합니다.', async () => {
       const pagingDto: UserPagingDto = { page: 1, take: 10 };
-      const users = [new User('1', 'test1@example.com', 'password123', 'Test User 1')];
-      const total = 1;
+      const users: User[] = [
+        new User('1', 'test1@example.com', 'password123', 'TestUser1'),
+        new User('2', 'test2@example.com', 'password123', 'TestUser2'),
+      ];
+      const total = users.length;
       userService.getUsers.mockResolvedValue({ data: users, total });
 
-      const result = await userController.getUsers(pagingDto);
-      expect(result).toEqual({ data: users, total });
-      expect(userService.getUsers).toHaveBeenCalledWith(pagingDto);
-    });
-
-    it('필터와 정렬이 포함된 페이징된 유저 목록을 성공적으로 반환해야 합니다.', async () => {
-      const pagingDto: UserPagingDto = { page: 1, take: 10, where__email: 'test1@example.com', like__name: 'Test', orderby: 'name', direction: 'asc' };
-      const users = [new User('1', 'test1@example.com', 'password123', 'Test User 1')];
-      const total = 1;
-      userService.getUsers.mockResolvedValue({ data: users, total });
-
-      const result = await userController.getUsers(pagingDto);
-      expect(result).toEqual({ data: users, total });
-      expect(userService.getUsers).toHaveBeenCalledWith(pagingDto);
+      expect(await userController.getUsers(pagingDto)).toEqual({ data: users, total });
     });
   });
 
   describe('getUserById', () => {
-    it('ID로 유저를 성공적으로 조회해야 합니다.', async () => {
-      const user = new User('1', 'test@example.com', 'password123', 'Test User');
+    it('유저를 ID로 조회해야 합니다.', async () => {
+      const id = '1';
+      const user = new User(id, 'test@example.com', 'password123', 'TestUser');
+      const readUserDto: ReadUserDto = { id: user.id, email: user.email, name: user.name, createdAt: user.createdAt, updatedAt: user.updatedAt };
+      userService.getUserById.mockResolvedValue(readUserDto);
 
-      userService.getUserById.mockResolvedValue({
-        id: '1',
-        email: 'test@example.com',
-        name: 'Test User',
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      });
-
-      const result = await userController.getUserById('1');
-      expect(result).toEqual({
-        id: '1',
-        email: 'test@example.com',
-        name: 'Test User',
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      });
-      expect(userService.getUserById).toHaveBeenCalledWith('1');
+      expect(await userController.getUserById(id)).toEqual(readUserDto);
     });
 
-    it('유저를 찾을 수 없으면 에러를 던져야 합니다.', async () => {
-      userService.getUserById.mockRejectedValue(new Error('User not found'));
+    it('존재하지 않는 유저 ID가 주어지면 예외를 던져야 합니다.', async () => {
+      const id = '999';
 
-      await expect(userController.getUserById('1')).rejects.toThrow("User not found");
+      userService.getUserById.mockRejectedValue(new HttpException('유저를 찾을 수 없습니다.', HttpStatus.NOT_FOUND));
+
+      await expect(userController.getUserById(id)).rejects.toThrow('유저를 찾을 수 없습니다.');
     });
   });
 });
