@@ -25,3 +25,11 @@ model Session {
 
   @@index([expires], name: "idx_session_expires")
 }
+
+model Permission {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
