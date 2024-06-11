@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsEmail } from 'class-validator';
+import { IsString, IsEmail, IsArray, IsOptional } from 'class-validator';
 
 export class CreateUserDto {
   @ApiProperty({
@@ -22,4 +22,11 @@ export class CreateUserDto {
   })
   @IsString()
   name: string;
+
+  @ApiProperty({
+    description: '생성과 동시에 필요한 권한 리스트',
+    example: '["1", "2"]',
+  })
+  @IsOptional()
+  permissions?: string[];
 }

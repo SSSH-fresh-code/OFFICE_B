@@ -9,25 +9,53 @@ export class PrismaUserRepository implements UserRepository {
 
   async findAll(): Promise<User[]> {
     const users = await this.prisma.user.findMany({});
-    return users.map(user => new User(user.id, user.email, user.password, user.name, user.createdAt, user.updatedAt));
+    return users.map(user => new User(
+      user.id,
+      user.email,
+      user.password,
+      user.name,
+      [],
+      user.createdAt,
+      user.updatedAt
+    ));
   }
 
   async findById(id: string): Promise<User | null> {
     const user = await this.prisma.user.findUniqueOrThrow({
-      where: { id }
+      where: { id },
+      include: { permissions: true }
     });
-    return new User(user.id, user.email, user.password, user.name, user.createdAt, user.updatedAt);
+
+    return new User(
+      user.id,
+      user.email,
+      user.password,
+      user.name,
+      [],
+      user.createdAt,
+      user.updatedAt,
+    );
   }
 
   async findByEmail(email: string): Promise<User | null> {
     const user = await this.prisma.user.findUniqueOrThrow({
-      where: { email }
+      where: { email },
+      include: { permissions: true }
     });
-    return new User(user.id, user.email, user.password, user.name, user.createdAt, user.updatedAt);
+    return new User(
+      user.id,
+      user.email,
+      user.password,
+      user.name,
+      [],
+      user.createdAt,
+      user.updatedAt
+    );
   }
 
   async save(user: User): Promise<User> {
     const upsertUser = await this.prisma.user.upsert({
+      include: { permissions: true },
       where: { id: user.id },
       update: {
         password: user.password,
@@ -39,8 +67,31 @@ export class PrismaUserRepository implements UserRepository {
         email: user.email,
         password: user.password,
         name: user.name,
-      },
+        permissions: {
+          create: user.permissions.map(i => ({ permissionId: i }))
+        },
+      }
     });
-    return new User(upsertUser.id, upsertUser.email, upsertUser.password, upsertUser.name, upsertUser.createdAt, upsertUser.updatedAt);
+
+    return new User(
+      upsertUser.id,
+      upsertUser.email,
+      upsertUser.password,
+      upsertUser.name,
+      [],
+      upsertUser.createdAt,
+      upsertUser.updatedAt
+    );
+  }
+
+  async setPermissionByUser(user: User): Promise<User> {
+    const { permissions } = await this.prisma.user.findUniqueOrThrow({
+      where: { id: user.id },
+      select: { permissions: true },
+    });
+
+    user.assignPermissions(permissions);
+
+    return user;
   }
 }

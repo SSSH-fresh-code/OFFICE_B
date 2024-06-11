@@ -22,6 +22,8 @@ describe('PrismaUserRepository', () => {
 
     repository = module.get<PrismaUserRepository>(PrismaUserRepository);
     prisma = module.get<PrismaService>(PrismaService);
+
+    await prisma.$executeRaw`PRAGMA foreign_keys = OFF;`;
   });
 
   beforeEach(async () => {
@@ -100,4 +102,23 @@ describe('PrismaUserRepository', () => {
       expect(updatedUser.name).toBe('Updated');
     });
   });
+
+  // describe('setPermissionByUser', () => {
+  //   it('해당 user의 permission을 가져와야 합니다.', async () => {
+  //     const user = new User(uuidv4(), 'test@example.com', 'password123', 'TestUser', []);
+  //     const savedUser = await repository.save(user);
+  //     expect(savedUser).toEqual(expect.objectContaining({
+  //       email: 'test@example.com',
+  //       name: 'TestUser',
+  //     }));
+  //   });
+
+  //   it('유저를 성공적으로 업데이트해야 합니다.', async () => {
+  //     const user = new User(uuidv4(), 'test@example.com', 'password123', 'TestUser');
+  //     const savedUser = await repository.save(user);
+  //     savedUser.name = 'Updated';
+  //     const updatedUser = await repository.save(savedUser);
+  //     expect(updatedUser.name).toBe('Updated');
+  //   });
+  // });
 });

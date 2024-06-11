@@ -6,6 +6,7 @@ import { UserPagingDto } from './dto/user-paging.dto';
 import { ReadUserDto } from './dto/read-user.dto';
 import { User } from '../domain/user.entity';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 /**
  * Mock User Service
@@ -13,7 +14,7 @@ import { HttpException, HttpStatus } from '@nestjs/common';
  */
 const mockUserService = () => ({
   createUser: jest.fn(),
-  updateUser: jest.fn(),
+  updateUserName: jest.fn(),
   getUsers: jest.fn(),
   getUserById: jest.fn(),
 });
@@ -55,23 +56,23 @@ describe('UserController', () => {
     });
   });
 
-  describe('updateUser', () => {
+  describe('updateUserName', () => {
     it('유저를 수정해야 합니다.', async () => {
-      const id = '1';
-      const createUserDto: CreateUserDto = { email: 'test@example.com', password: 'password123', name: 'TestUser' };
-      const updatedUser = new User(id, createUserDto.email, createUserDto.password, createUserDto.name);
-      userService.updateUser.mockResolvedValue(updatedUser);
+      const id = '08598930-6cc6-4e96-a064-1f3c5c2da943';
+      const updateUserDto: UpdateUserDto = { id, name: 'TestUser' };
+      const updatedUser = new User(id, "", "", updateUserDto.name);
+      userService.updateUserName.mockResolvedValue(updatedUser);
 
-      expect(await userController.updateUser(id, createUserDto)).toEqual(updatedUser);
+      expect(await userController.updateUserName(updatedUser)).toEqual(updatedUser);
     });
 
     it('존재하지 않는 유저 ID가 주어지면 예외를 던져야 합니다.', async () => {
       const id = '999';
-      const createUserDto: CreateUserDto = { email: 'test@example.com', password: 'password123', name: 'TestUser' };
+      const updatedUser = new User(id, "", "", "");
 
-      userService.updateUser.mockRejectedValue(new HttpException('유저를 찾을 수 없습니다.', HttpStatus.NOT_FOUND));
+      userService.updateUserName.mockRejectedValue(new HttpException('유저를 찾을 수 없습니다.', HttpStatus.NOT_FOUND));
 
-      await expect(userController.updateUser(id, createUserDto)).rejects.toThrow('유저를 찾을 수 없습니다.');
+      await expect(userController.updateUserName(updatedUser)).rejects.toThrow('유저를 찾을 수 없습니다.');
     });
   });
 

@@ -3,7 +3,7 @@ import { PermissionController } from './presentation/permission.controller';
 import { InfraModule } from 'src/infrastructure/infra.module';
 import { PrismaPermissionRepository } from 'src/infrastructure/repositories/prisma-permission.repository';
 import { PERMISSION_REPOSITORY } from './permission.const';
-import { PermissionService } from './\bapplication/permission.service';
+import { PermissionService } from './application/permission.service';
 
 @Module({
   imports: [InfraModule],

@@ -9,9 +9,10 @@ import { LocalStrategy } from './application/local.strategy';
 import { LocalAuthGuard } from './application/local-auth.guard';
 import { AuthController } from './presentation/auth.controller';
 import { PassportModule } from '@nestjs/passport';
+import { PermissionModule } from '../permission/permission.module';
 
 @Module({
-  imports: [InfraModule, PassportModule],
+  imports: [InfraModule, PassportModule, PermissionModule],
   providers: [
     UserService,
     AuthService,

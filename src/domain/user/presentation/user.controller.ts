@@ -5,6 +5,7 @@ import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserPagingDto } from './dto/user-paging.dto';
 import { User } from '../domain/user.entity';
 import { ReadUserDto } from './dto/read-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -20,8 +21,8 @@ export class UserController {
   @ApiResponse({ status: 400, description: '잘못된 파라미터 값' })
   @ApiBody({ type: CreateUserDto })
   async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
-    const { email, password, name } = createUserDto;
-    return this.userService.createUser(email, password, name);
+    const { email, password, name, permissions = [] } = createUserDto;
+    return this.userService.createUser(email, password, name, permissions);
   }
 
   @Put(':id')
@@ -31,12 +32,11 @@ export class UserController {
     description: '유저가 정상적으로 수정됨',
   })
   @ApiResponse({ status: 404, description: '존재하지 않는 유저' })
-  @ApiBody({ type: CreateUserDto })
-  async updateUser(
-    @Param('id') id: string,
-    @Body() createUserDto: CreateUserDto,
+  @ApiBody({ type: UpdateUserDto })
+  async updateUserName(
+    @Body() updateUserDto: UpdateUserDto,
   ): Promise<User | null> {
-    return this.userService.updateUser(id, createUserDto.name);
+    return this.userService.updateUserName(updateUserDto);
   }
 
   @Get()
