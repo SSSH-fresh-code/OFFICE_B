@@ -22,11 +22,4 @@ export class CreateUserDto {
   })
   @IsString()
   name: string;
-
-  @ApiProperty({
-    description: '생성과 동시에 필요한 권한 리스트',
-    example: '["1", "2"]',
-  })
-  @IsOptional()
-  permissions?: string[];
 }

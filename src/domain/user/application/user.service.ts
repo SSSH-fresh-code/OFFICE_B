@@ -19,9 +19,8 @@ export class UserService {
     email: string,
     password: string,
     name: string,
-    permissions: string[], // 추가된 권한 파라미터
   ): Promise<User> {
-    const user = new User(uuidv4(), email, password, name, permissions);
+    const user = new User(uuidv4(), email, password, name);
     user.encryptPassword();
 
     return this.userRepository.save(user);

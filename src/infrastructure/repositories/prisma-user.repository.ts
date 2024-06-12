@@ -67,8 +67,6 @@ export class PrismaUserRepository implements UserRepository {
         email: user.email,
         password: user.password,
         name: user.name,
-        permissions: {
-        },
       }
     });
 

@@ -21,8 +21,8 @@ export class UserController {
   @ApiResponse({ status: 400, description: '잘못된 파라미터 값' })
   @ApiBody({ type: CreateUserDto })
   async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
-    const { email, password, name, permissions = [] } = createUserDto;
-    return this.userService.createUser(email, password, name, permissions);
+    const { email, password, name } = createUserDto;
+    return this.userService.createUser(email, password, name);
   }
 
   @Put(':id')

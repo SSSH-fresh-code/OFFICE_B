@@ -3,12 +3,16 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  // await prisma.permission.create({
-  //   data: {
-  //     name: "LOGIN001",
-  //     description: "백오피스 로그인 권한"
-  //   }
-  // });
+  await prisma.permission.upsert({
+    where: { name: "LOGIN001" },
+    create: {
+      name: "LOGIN001",
+      description: "로그인 권한"
+    },
+    update: {
+      description: "로그인 권한"
+    }
+  });
 }
 
 main()
