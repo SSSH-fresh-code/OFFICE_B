@@ -28,7 +28,7 @@ describe('PrismaPermissionRepository', () => {
   });
 
   beforeEach(async () => {
-    await prisma.permission.deleteMany({});
+    await prisma.cleanDatabase(['Permission']);
   });
 
   afterAll(async () => {

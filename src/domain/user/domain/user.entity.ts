@@ -116,7 +116,7 @@ export class User implements IUser {
      * @param permissions 할당할 권한들
      */
   public assignPermissions(permissions) {
-    this._permissions = permissions.map(n => n.permissionName);
+    this._permissions = permissions.map(n => n.name);
   }
 
   /**

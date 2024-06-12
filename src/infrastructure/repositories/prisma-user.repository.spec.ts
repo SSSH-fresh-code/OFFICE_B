@@ -1,3 +1,4 @@
+import { permission } from 'process';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
@@ -23,6 +24,7 @@ describe('PrismaUserRepository', () => {
     repository = module.get<PrismaUserRepository>(PrismaUserRepository);
     prisma = module.get<PrismaService>(PrismaService);
 
+    await prisma.$executeRaw`PRAGMA foreign_keys = OFF;`;
   });
 
   beforeEach(async () => {
@@ -103,22 +105,61 @@ describe('PrismaUserRepository', () => {
     });
   });
 
-  // describe('setPermissionByUser', () => {
-  //   it('해당 user의 permission을 가져와야 합니다.', async () => {
-  //     const user = new User(uuidv4(), 'test@example.com', 'password123', 'TestUser', []);
-  //     const savedUser = await repository.save(user);
-  //     expect(savedUser).toEqual(expect.objectContaining({
-  //       email: 'test@example.com',
-  //       name: 'TestUser',
-  //     }));
-  //   });
+  describe('getPermissionByUser', () => {
+    it('해당 유저의 권한을 가져와야 합니다.', async () => {
+      const permissionName = "LOGIN001";
 
-  //   it('유저를 성공적으로 업데이트해야 합니다.', async () => {
-  //     const user = new User(uuidv4(), 'test@example.com', 'password123', 'TestUser');
-  //     const savedUser = await repository.save(user);
-  //     savedUser.name = 'Updated';
-  //     const updatedUser = await repository.save(savedUser);
-  //     expect(updatedUser.name).toBe('Updated');
-  //   });
-  // });
+      await prisma.permission.create({
+        data: {
+          name: permissionName,
+          description: "로그인 권한"
+        },
+      });
+
+      const user = new User(uuidv4(), 'test@example.com', 'password123', 'TestUser', [permissionName]);
+
+      const savedUser = await repository.save(user);
+
+      await prisma.user.update({
+        where: { id: savedUser.id },
+        data: {
+          permissions: {
+            set: {
+              name: permissionName
+            }
+          }
+        },
+      });
+
+      const hasPermissionUser = await repository.getPermissionByUser(savedUser);
+
+      expect(hasPermissionUser).toEqual(expect.objectContaining({
+        email: 'test@example.com',
+        name: 'TestUser',
+      }));
+      expect(hasPermissionUser.permissions).toEqual([permissionName]);
+    });
+
+    it('해당 유저의 권한이 없다면 빈 배열을 가진 유저를 반환합니다.', async () => {
+      const user = new User(uuidv4(), 'test@example.com', 'password123', 'TestUser', []);
+
+      const savedUser = await repository.save(user);
+
+      const hasPermissionUser = await repository.getPermissionByUser(savedUser);
+
+      expect(hasPermissionUser).toEqual(expect.objectContaining({
+        email: 'test@example.com',
+        name: 'TestUser',
+      }));
+      expect(hasPermissionUser.permissions).toEqual([]);
+    });
+
+    it('해당 유저가 없다면 에러를 반환합니다.', async () => {
+      const user = new User(uuidv4(), 'test@example.com', 'password123', 'TestUser', ["LOGIN001"]);
+
+      await expect(async () => {
+        await repository.getPermissionByUser(user);
+      }).rejects.toThrow(Prisma.PrismaClientKnownRequestError);
+    });
+  });
 });
