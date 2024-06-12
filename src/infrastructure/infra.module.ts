@@ -25,7 +25,7 @@ import { PrismaService } from './prisma/prisma.service';
   exports: [PrismaModule, ConfigModule, PagingService, PrismaService],
 })
 export class InfraModule {
-  configureSwagger(app: any) {
+  async configureSwagger(app: any) {
     const config = new DocumentBuilder()
       .setTitle('API Documentation')
       .setDescription('API description')

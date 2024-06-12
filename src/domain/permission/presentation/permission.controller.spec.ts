@@ -41,7 +41,7 @@ describe('PermissionController', () => {
   describe('createPermission', () => {
     it('권한을 성공적으로 생성해야 합니다.', async () => {
       const createPermissionDto: CreatePermissionDto = { name: 'create_user', description: '새 유저를 생성할 수 있습니다.' };
-      const permission = new Permission(uuidv4(), 'create_user', '새 유저를 생성할 수 있습니다.');
+      const permission = new Permission('create_user', '새 유저를 생성할 수 있습니다.');
       permissionService.createPermission.mockResolvedValue(permission);
 
       const result = await permissionController.createPermission(createPermissionDto);
@@ -60,50 +60,33 @@ describe('PermissionController', () => {
   describe('updatePermission', () => {
     it('권한을 성공적으로 수정해야 합니다.', async () => {
       const updatePermissionDto: UpdatePermissionDto = { name: 'update_user', description: '유저를 업데이트할 수 있습니다.' };
-      const permission = new Permission(uuidv4(), 'update_user', '유저를 업데이트할 수 있습니다.');
+      const permission = new Permission('update_user', '유저를 업데이트할 수 있습니다.');
       permissionService.updatePermission.mockResolvedValue(permission);
 
-      const result = await permissionController.updatePermission('1', updatePermissionDto);
+      const result = await permissionController.updatePermission(updatePermissionDto);
       expect(result).toEqual(new ReadPermissionDto(permission));
-      expect(permissionService.updatePermission).toHaveBeenCalledWith('1', updatePermissionDto);
+      expect(permissionService.updatePermission).toHaveBeenCalledWith(updatePermissionDto);
     });
 
     it('존재하지 않는 권한 ID로 수정 시 에러를 던져야 합니다.', async () => {
       const updatePermissionDto: UpdatePermissionDto = { name: 'update_user', description: '유저를 업데이트할 수 있습니다.' };
       permissionService.updatePermission.mockRejectedValue(new Error('권한을 찾을 수 없습니다.'));
 
-      await expect(permissionController.updatePermission('1', updatePermissionDto)).rejects.toThrow('권한을 찾을 수 없습니다.');
+      await expect(permissionController.updatePermission(updatePermissionDto)).rejects.toThrow('권한을 찾을 수 없습니다.');
     });
   });
 
   describe('getPermissions', () => {
     it('모든 권한을 성공적으로 조회해야 합니다.', async () => {
       const permissions = [
-        new Permission(uuidv4(), 'create_user', '새 유저를 생성할 수 있습니다.'),
-        new Permission(uuidv4(), 'update_user', '유저를 업데이트할 수 있습니다.'),
+        new Permission('create_user', '새 유저를 생성할 수 있습니다.'),
+        new Permission('update_user', '유저를 업데이트할 수 있습니다.'),
       ];
       permissionService.getPermissions.mockResolvedValue(permissions);
 
       const result = await permissionController.getPermissions();
       expect(result).toEqual(permissions.map(permission => new ReadPermissionDto(permission)));
       expect(permissionService.getPermissions).toHaveBeenCalled();
-    });
-  });
-
-  describe('getPermissionById', () => {
-    it('ID로 권한을 성공적으로 조회해야 합니다.', async () => {
-      const permission = new Permission(uuidv4(), 'create_user', '새 유저를 생성할 수 있습니다.');
-      permissionService.getPermissionById.mockResolvedValue(permission);
-
-      const result = await permissionController.getPermissionById('1');
-      expect(result).toEqual(new ReadPermissionDto(permission));
-      expect(permissionService.getPermissionById).toHaveBeenCalledWith('1');
-    });
-
-    it('존재하지 않는 권한 ID로 조회 시 에러를 던져야 합니다.', async () => {
-      permissionService.getPermissionById.mockRejectedValue(new Error('권한을 찾을 수 없습니다.'));
-
-      await expect(permissionController.getPermissionById('1')).rejects.toThrow('권한을 찾을 수 없습니다.');
     });
   });
 

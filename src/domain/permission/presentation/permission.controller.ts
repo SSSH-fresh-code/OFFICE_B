@@ -34,10 +34,10 @@ export class PermissionController {
   @ApiResponse({ status: 404, description: '권한을 찾을 수 없습니다.' })
   @ApiBody({ type: UpdatePermissionDto })
   async updatePermission(
-    @Param('id') id: string,
     @Body() updatePermissionDto: UpdatePermissionDto,
   ): Promise<ReadPermissionDto> {
-    const permission = await this.permissionService.updatePermission(id, updatePermissionDto);
+    const permission = await this.permissionService.updatePermission(updatePermissionDto);
+
     return new ReadPermissionDto(permission);
   }
 
@@ -53,7 +53,7 @@ export class PermissionController {
     return permissions.map(permission => new ReadPermissionDto(permission));
   }
 
-  @Get(':id')
+  @Get(':name')
   @ApiOperation({ summary: '권한 상세 조회' })
   @ApiResponse({
     status: 200,
@@ -61,19 +61,19 @@ export class PermissionController {
     type: ReadPermissionDto,
   })
   @ApiResponse({ status: 404, description: '권한을 찾을 수 없습니다.' })
-  async getPermissionById(@Param('id') id: string): Promise<ReadPermissionDto> {
-    const permission = await this.permissionService.getPermissionById(id);
+  async getPermissionByName(@Param('name') name: string): Promise<ReadPermissionDto> {
+    const permission = await this.permissionService.getPermissionByName(name);
     return new ReadPermissionDto(permission);
   }
 
-  @Delete(':id')
+  @Delete(':name')
   @ApiOperation({ summary: '권한 삭제' })
   @ApiResponse({
     status: 200,
     description: '권한이 성공적으로 삭제되었습니다.',
   })
   @ApiResponse({ status: 404, description: '권한을 찾을 수 없습니다.' })
-  async removePermission(@Param('id') id: string): Promise<void> {
-    await this.permissionService.deletePermission(id);
+  async removePermission(@Param('name') name: string): Promise<void> {
+    await this.permissionService.deletePermission(name);
   }
 }

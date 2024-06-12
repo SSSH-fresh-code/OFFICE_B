@@ -44,7 +44,7 @@ async function bootstrap() {
   });
 
   const infraModule = app.get(InfraModule);
-  infraModule.configureSwagger(app);
+  await infraModule.configureSwagger(app);
 
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new PrismaClientExceptionFilter());

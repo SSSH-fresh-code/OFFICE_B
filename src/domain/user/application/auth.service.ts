@@ -11,8 +11,6 @@ export class AuthService {
   @ApiOperation({ summary: '유저 인증' })
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.userService.getUserByEmailForLogin(email);
-
-
     if (user) {
       const hasLoginPermission = user.permissions.includes("LOGIN001");
 

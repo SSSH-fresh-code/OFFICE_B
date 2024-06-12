@@ -5,8 +5,7 @@ import { Permission } from '../domain/permission.entity';
  */
 export interface IPermissionRepository {
   findAll(): Promise<Permission[]>;
-  findById(id: string): Promise<Permission | null>;
   findByName(name: string): Promise<Permission | null>;
   save(permission: Permission): Promise<Permission>;
-  remove(id: string): Promise<void>;
+  remove(name: string): Promise<void>;
 }

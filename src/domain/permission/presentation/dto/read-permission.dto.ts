@@ -3,12 +3,6 @@ import { Permission } from '../../domain/permission.entity';
 
 export class ReadPermissionDto {
   @ApiProperty({
-    description: '권한 ID',
-    example: '1',
-  })
-  id: string;
-
-  @ApiProperty({
     description: '권한 이름',
     example: 'create_user',
   })
@@ -33,7 +27,6 @@ export class ReadPermissionDto {
   updatedAt: Date;
 
   constructor(permission: Permission) {
-    this.id = permission.id;
     this.name = permission.name;
     this.description = permission.description;
     this.createdAt = permission.createdAt;

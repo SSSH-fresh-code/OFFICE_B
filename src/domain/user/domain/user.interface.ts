@@ -22,6 +22,6 @@ export interface iUser extends AggregateRoot {
    */
   assignPermissions(permissions: {
     userId: string;
-    permissionId: string;
+    permissionName: string;
   }[]): void
 }

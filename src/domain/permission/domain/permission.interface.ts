@@ -4,11 +4,6 @@ import { AggregateRoot } from "src/domain/aggregate-root.interface";
 
 export interface IPermission extends AggregateRoot {
   /**
-   * 권한 ID를 반환합니다.
-   */
-  get id(): string;
-
-  /**
    * 권한 이름을 반환합니다.
    */
   get name(): string;

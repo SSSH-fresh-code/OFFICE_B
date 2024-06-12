@@ -68,7 +68,6 @@ export class PrismaUserRepository implements UserRepository {
         password: user.password,
         name: user.name,
         permissions: {
-          create: user.permissions.map(i => ({ permissionId: i }))
         },
       }
     });
@@ -85,12 +84,12 @@ export class PrismaUserRepository implements UserRepository {
   }
 
   async setPermissionByUser(user: User): Promise<User> {
-    const { permissions } = await this.prisma.user.findUniqueOrThrow({
+    const l = await this.prisma.user.findUniqueOrThrow({
       where: { id: user.id },
-      select: { permissions: true },
+      include: { permissions: true }
     });
 
-    user.assignPermissions(permissions);
+    user.assignPermissions(l.permissions);
 
     return user;
   }

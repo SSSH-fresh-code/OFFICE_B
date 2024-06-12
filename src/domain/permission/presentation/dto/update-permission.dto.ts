@@ -14,7 +14,6 @@ export class UpdatePermissionDto {
     example: 'Allows creating a new user',
     required: false,
   })
-  @IsOptional()
   @IsString()
-  description?: string;
+  description: string;
 }

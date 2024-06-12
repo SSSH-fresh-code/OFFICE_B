@@ -14,14 +14,14 @@ export class PermissionService {
 
   async createPermission(createPermissionDto: CreatePermissionDto): Promise<Permission> {
     const { name, description } = createPermissionDto;
-    const permission = new Permission(uuidv4(), name, description);
+    const permission = new Permission(name, description);
     return this.permissionRepository.save(permission);
   }
 
-  async updatePermission(id: string, updatePermissionDto: UpdatePermissionDto): Promise<Permission> {
-    const { name, description } = updatePermissionDto;
-    const permission = await this.permissionRepository.findById(id);
-    permission.updateDetails(name, description);
+  async updatePermission(dto: UpdatePermissionDto): Promise<Permission> {
+    const permission = await this.permissionRepository.findByName(dto.name);
+    permission.updateDetails(dto.description);
+
     return this.permissionRepository.save(permission);
   }
 
@@ -29,11 +29,11 @@ export class PermissionService {
     return this.permissionRepository.findAll();
   }
 
-  async getPermissionById(id: string): Promise<Permission> {
-    return this.permissionRepository.findById(id);
+  async getPermissionByName(name: string): Promise<Permission> {
+    return this.permissionRepository.findByName(name);
   }
 
-  async deletePermission(id: string): Promise<void> {
-    await this.permissionRepository.remove(id);
+  async deletePermission(name: string): Promise<void> {
+    await this.permissionRepository.remove(name);
   }
 }

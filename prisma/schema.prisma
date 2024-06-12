@@ -28,8 +28,7 @@ model User {
 }
 
 model Permission {
-  id             String           @id @default(uuid())
-  name           String           @unique
+  name           String           @id
   description    String?
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
@@ -37,10 +36,10 @@ model Permission {
 }
 
 model UserPermission {
-  userId       String
-  permissionId String
-  user         User       @relation(fields: [userId], references: [id])
-  permission   Permission @relation(fields: [permissionId], references: [id])
+  userId         String
+  permissionName String
+  user           User       @relation(fields: [userId], references: [id])
+  permission     Permission @relation(fields: [permissionName], references: [name])
 
-  @@id([userId, permissionId])
+  @@id([userId, permissionName])
 }

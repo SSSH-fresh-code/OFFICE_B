@@ -22,14 +22,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     await this.$disconnect();
   }
 
-  async cleanDatabase() {
-    // Prisma client 인스턴스의 모델들을 추출하여 데이터베이스를 정리합니다.
-    const modelNames = Object.keys(this).filter(
-      key => this[key] && this[key].deleteMany
-    );
-
-    for (const modelName of modelNames) {
-      await this[modelName].deleteMany();
-    }
+  async cleanDatabase(names: Prisma.ModelName[]) {
+    for (const name of names) await this[name].deleteMany();
   }
 }

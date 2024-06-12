@@ -6,20 +6,11 @@ import { IPermission } from "./permission.interface";
  */
 export class Permission implements IPermission {
   constructor(
-    private readonly _id: string,
-    private _name: string,
+    private readonly _name: string,
     private _description?: string,
     private _createdAt?: Date,
     private _updatedAt?: Date,
   ) { }
-
-  /**
-   * ID getter
-   * @returns string 권한 ID
-   */
-  public get id(): string {
-    return this._id;
-  }
 
   /**
    * 이름 getter
@@ -27,14 +18,6 @@ export class Permission implements IPermission {
    */
   public get name(): string {
     return this._name;
-  }
-
-  /**
-   * 이름 setter (private)
-   * @param name 설정할 이름
-   */
-  private set name(name: string) {
-    this._name = name;
   }
 
   /**
@@ -74,8 +57,7 @@ export class Permission implements IPermission {
    * @param name 새로운 권한 이름
    * @param description 새로운 권한 설명
    */
-  public updateDetails(name: string, description?: string): void {
-    this.name = name;
+  public updateDetails(description: string): void {
     this.description = description;
   }
 
