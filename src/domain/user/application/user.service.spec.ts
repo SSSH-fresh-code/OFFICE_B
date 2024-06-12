@@ -13,7 +13,7 @@ const mockUserRepository = () => ({
   save: jest.fn(),
   findById: jest.fn(),
   findByEmail: jest.fn(),
-  setPermissionByUser: jest.fn()
+  getPermissionByUser: jest.fn()
 });
 
 /**
@@ -49,12 +49,12 @@ describe('UserService', () => {
     it('이메일로 유저를 성공적으로 조회해야 합니다.', async () => {
       const user = new User('1', 'test@example.com', 'password123', 'TestUser', [], new Date(), new Date());
       userRepository.findByEmail.mockResolvedValue(user);
-      userRepository.setPermissionByUser.mockResolvedValue(user);
+      userRepository.getPermissionByUser.mockResolvedValue(user);
 
       const result = await userService.getUserByEmailForLogin('test@example.com');
       expect(result).toEqual(user);
       expect(userRepository.findByEmail).toHaveBeenCalledWith('test@example.com');
-      expect(userRepository.setPermissionByUser).toHaveBeenCalledWith(user);
+      expect(userRepository.getPermissionByUser).toHaveBeenCalledWith(user);
     });
 
     it('유저를 찾을 수 없으면 에러를 던져야 합니다.', async () => {

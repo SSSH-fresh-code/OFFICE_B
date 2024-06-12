@@ -7,40 +7,20 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Session {
-  sid       String    @id @default(uuid())
-  expires   DateTime?
-  data      String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  @@index([expires], name: "idx_session_expires")
-}
-
 model User {
-  id          String           @id @default(uuid())
-  email       String           @unique
+  id          String       @id @default(uuid())
+  email       String       @unique
   password    String
   name        String
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  permissions UserPermission[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  permissions Permission[] @relation("UserPermissions")
 }
 
 model Permission {
-  id             String           @id @default(uuid())
-  name           String           @unique
-  description    String?
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  UserPermission UserPermission[]
-}
-
-model UserPermission {
-  userId       String
-  permissionId String
-  user         User       @relation(fields: [userId], references: [id])
-  permission   Permission @relation(fields: [permissionId], references: [id])
-
-  @@id([userId, permissionId])
+  name        String   @id
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  users       User[]   @relation("UserPermissions")
 }

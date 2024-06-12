@@ -7,39 +7,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Session {
-  sid       String    @id @default(uuid())
-  expires   DateTime?
-  data      String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  @@index([expires], name: "idx_session_expires")
-}
-
 model User {
-  id          String           @id @default(uuid())
-  email       String           @unique
+  id          String       @id @default(uuid())
+  email       String       @unique
   password    String
   name        String
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  permissions UserPermission[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  permissions Permission[] @relation("UserPermissions")
 }
 
 model Permission {
-  name           String           @id
-  description    String?
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  UserPermission UserPermission[]
-}
-
-model UserPermission {
-  userId         String
-  permissionName String
-  user           User       @relation(fields: [userId], references: [id])
-  permission     Permission @relation(fields: [permissionName], references: [name])
-
-  @@id([userId, permissionName])
+  name        String   @id
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  users       User[]   @relation("UserPermissions")
 }

@@ -23,11 +23,11 @@ describe('PrismaUserRepository', () => {
     repository = module.get<PrismaUserRepository>(PrismaUserRepository);
     prisma = module.get<PrismaService>(PrismaService);
 
-    await prisma.$executeRaw`PRAGMA foreign_keys = OFF;`;
   });
 
   beforeEach(async () => {
-    await prisma.cleanDatabase(['UserPermission', 'User']);
+    await prisma.$executeRaw`PRAGMA foreign_keys = OFF;`;
+    await prisma.cleanDatabase(['User']);
   });
 
   afterAll(async () => {

@@ -65,4 +65,5 @@ export class PrismaPermissionRepository implements IPermissionRepository {
       throw new NotFoundException(`이름이 ${name}인 권한을 찾을 수 없습니다.`);
     }
   }
+
 }

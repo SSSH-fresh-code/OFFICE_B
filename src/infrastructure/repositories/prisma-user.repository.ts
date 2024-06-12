@@ -81,14 +81,41 @@ export class PrismaUserRepository implements UserRepository {
     );
   }
 
-  async setPermissionByUser(user: User): Promise<User> {
-    const l = await this.prisma.user.findUniqueOrThrow({
+
+  async getPermissionByUser(user: User): Promise<User> {
+    const { permissions } = await this.prisma.user.findUniqueOrThrow({
       where: { id: user.id },
-      include: { permissions: true }
+      select: { permissions: true },
     });
 
-    user.assignPermissions(l.permissions);
+    user.assignPermissions(permissions);
 
     return user;
+  }
+
+  async setPermission(user: User): Promise<User> {
+    const u = await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        permissions: {
+          set: user.permissions.map(name => ({ name }))
+        }
+      },
+      include: {
+        permissions: true
+      }
+    });
+
+    const permissions = u.permissions.map(p => p.name);
+
+    return new User(
+      u.id,
+      u.email,
+      u.password,
+      u.name,
+      permissions,
+      u.createdAt,
+      u.updatedAt
+    );
   }
 }

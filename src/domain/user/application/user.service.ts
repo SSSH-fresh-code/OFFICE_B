@@ -64,7 +64,7 @@ export class UserService {
   async getUserByEmailForLogin(email: string): Promise<User | null> {
     let user = await this.userRepository.findByEmail(email);
 
-    user = await this.userRepository.setPermissionByUser(user);
+    user = await this.userRepository.getPermissionByUser(user);
 
     return user;
   }
