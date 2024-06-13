@@ -5,7 +5,6 @@ import { USER_REPOSITORY } from '../user.const';
 import { User } from '../domain/user.entity';
 import { PagingService } from '../../../infrastructure/services/paging.service';
 import { v4 as uuidv4 } from 'uuid';
-import { Prisma } from '@prisma/client';
 
 /**
  * Mock User Repository
@@ -71,7 +70,8 @@ describe('UserService', () => {
     it('유저 ID를 성공적으로 직렬화해야 합니다.', () => {
       const user = new User('1', 'test@example.com', 'password123', 'TestUser');
       const result = userService.serializeUser(user);
-      expect(result).toBe(user.id);
+      const { id, permissions } = user;
+      expect(result).toEqual({ id, permissions });
     });
   });
 

@@ -26,6 +26,18 @@ export class UserController {
     return this.userService.createUser(email, password, name);
   }
 
+  @Put('permission')
+  @ApiOperation({ summary: '유저 권한 수정' })
+  @ApiResponse({
+    status: 200,
+    description: '유저 권한이 정상적으로 수정됨'
+  })
+
+  @ApiResponse({ status: 400, description: '존재하지 않는 유저' })
+  @ApiBody({ type: UpdateUserPermissonDto })
+  async updateUserPermission(@Body() dto: UpdateUserPermissonDto) {
+    return this.userService.updateUserPermission(dto.id, dto.permissions);
+  }
   @Put(':id')
   @ApiOperation({ summary: '기존 유저 수정' })
   @ApiResponse({
@@ -61,14 +73,4 @@ export class UserController {
     return this.userService.getUserById(id);
   }
 
-  @Put('permission')
-  @ApiOperation({ summary: '유저 권한 수정' })
-  @ApiResponse({
-    status: 200,
-    description: '유저 권한이 정상적으로 수정됨'
-  })
-  @ApiResponse({ status: 400, description: '존재하지 않는 유저' })
-  async updateUserPermission(dto: UpdateUserPermissonDto) {
-    return this.userService.updateUserPermission(dto.id, dto.permissions);
-  }
 }

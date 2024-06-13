@@ -69,8 +69,9 @@ export class UserService {
     return user;
   }
 
-  serializeUser(user: User): string {
-    return user.id;
+  serializeUser(user: User): object {
+    const { id, permissions } = user;
+    return { id, permissions };
   }
 
   async deserializeUser(userId: string): Promise<User | null> {
