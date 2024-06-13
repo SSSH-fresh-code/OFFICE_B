@@ -66,31 +66,6 @@ describe('UserService', () => {
     });
   });
 
-  describe('serializeUser', () => {
-    it('유저 ID를 성공적으로 직렬화해야 합니다.', () => {
-      const user = new User('1', 'test@example.com', 'password123', 'TestUser');
-      const result = userService.serializeUser(user);
-      const { id, permissions } = user;
-      expect(result).toEqual({ id, permissions });
-    });
-  });
-
-  describe('deserializeUser', () => {
-    it('유저 ID로 유저를 성공적으로 역직렬화해야 합니다.', async () => {
-      const user = new User('1', 'test@example.com', 'password123', 'TestUser');
-      userRepository.findById.mockResolvedValue(user);
-
-      const result = await userService.deserializeUser('1');
-      expect(result).toEqual(user);
-      expect(userRepository.findById).toHaveBeenCalledWith('1');
-    });
-
-    it('유저를 찾을 수 없으면 에러를 던져야 합니다.', async () => {
-      userRepository.findById.mockRejectedValue(new Error('유저를 찾을 수 없습니다.'));
-
-      await expect(userService.deserializeUser('1')).rejects.toThrow('유저를 찾을 수 없습니다.');
-    });
-  });
 
   describe('updateUserPermission', () => {
     it('권한 목록을 받아 유저의 권한을 수정합니다.', async () => {

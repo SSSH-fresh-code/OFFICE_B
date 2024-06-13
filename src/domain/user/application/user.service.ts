@@ -69,15 +69,6 @@ export class UserService {
     return user;
   }
 
-  serializeUser(user: User): object {
-    const { id, permissions } = user;
-    return { id, permissions };
-  }
-
-  async deserializeUser(userId: string): Promise<User | null> {
-    return this.userRepository.findById(userId);
-  }
-
   async updateUserPermission(id: string, permissions: string[] = []) {
     const user = await this.userRepository.findById(id);
 

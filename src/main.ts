@@ -1,3 +1,4 @@
+import { permission } from 'process';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { InfraModule } from './infrastructure/infra.module';
@@ -31,13 +32,16 @@ async function bootstrap() {
   app.use(passport.session());
 
   passport.serializeUser((user: User, done: (err: any, id?: any) => void) => {
-    done(null, userService.serializeUser(user));
+    const { id, permissions } = user;
+    done(null, `${id}:${permissions.join(",")}`);
   });
 
-  passport.deserializeUser(async (id: string, done: (err: any, user?: any) => void) => {
+  passport.deserializeUser(async (info: string, done: (err: any, user?: any) => void) => {
     try {
-      const user = await userService.deserializeUser(id);
-      done(null, user);
+      const [id, permissionsString] = info.split(":");
+      const permissions = permissionsString.split(",");
+
+      done(null, { id, permissions });
     } catch (err) {
       done(err);
     }
