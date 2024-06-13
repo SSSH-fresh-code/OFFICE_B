@@ -6,6 +6,7 @@ import { UserPagingDto } from './dto/user-paging.dto';
 import { User } from '../domain/user.entity';
 import { ReadUserDto } from './dto/read-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserPermissonDto } from './dto/update-userPermission.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -58,5 +59,16 @@ export class UserController {
   @ApiResponse({ status: 404, description: '존재하지 않는 유저' })
   async getUserById(@Param('id') id: string): Promise<ReadUserDto> {
     return this.userService.getUserById(id);
+  }
+
+  @Put('permission')
+  @ApiOperation({ summary: '유저 권한 수정' })
+  @ApiResponse({
+    status: 200,
+    description: '유저 권한이 정상적으로 수정됨'
+  })
+  @ApiResponse({ status: 400, description: '존재하지 않는 유저' })
+  async updateUserPermission(dto: UpdateUserPermissonDto) {
+    return this.userService.updateUserPermission(dto.id, dto.permissions);
   }
 }

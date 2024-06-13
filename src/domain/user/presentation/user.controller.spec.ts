@@ -1,3 +1,4 @@
+import { UpdateUserPermissonDto } from './dto/update-userPermission.dto';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import { UserService } from '../application/user.service';
@@ -17,6 +18,7 @@ const mockUserService = () => ({
   updateUserName: jest.fn(),
   getUsers: jest.fn(),
   getUserById: jest.fn(),
+  updateUserPermission: jest.fn()
 });
 
 describe('UserController', () => {
@@ -108,4 +110,21 @@ describe('UserController', () => {
       await expect(userController.getUserById(id)).rejects.toThrow('유저를 찾을 수 없습니다.');
     });
   });
+
+  describe('updateUserPermission', () => {
+    it('유저 id로 조회 후 권한을 수정합니다.', async () => {
+      const dto: UpdateUserPermissonDto = {
+        id: '1',
+        permissions: ["LOGIN001"]
+      }
+
+      const mockUser = new User('1', 'email@example.com', 'password', 'name', ["LOGIN001"]);
+      userService.updateUserPermission.mockResolvedValue(mockUser);
+
+      const user = await userController.updateUserPermission(dto);
+
+      expect(user).toEqual(mockUser);
+      expect(userService.updateUserPermission).toHaveBeenCalledWith(mockUser.id, mockUser.permissions);
+    })
+  })
 });
