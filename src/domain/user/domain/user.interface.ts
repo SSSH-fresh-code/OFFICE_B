@@ -21,7 +21,9 @@ export interface iUser extends AggregateRoot {
    * @param permissions 설정할 Permissions 
    */
   assignPermissions(permissions: {
-    userId: string;
-    permissionName: string;
-  }[]): void
+    name: string;
+    description: string;
+    createdAt: Date;
+    updatedAt: Date;
+  }[] | string[]): void
 }

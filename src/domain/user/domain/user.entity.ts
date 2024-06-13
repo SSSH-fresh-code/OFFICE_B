@@ -115,8 +115,22 @@ export class User implements IUser {
      * 권한 할당 메서드
      * @param permissions 할당할 권한들
      */
-  public assignPermissions(permissions) {
-    this._permissions = permissions.map(n => n.name);
+  public assignPermissions(permissions: {
+    name: string;
+    description: string;
+    createdAt: Date;
+    updatedAt: Date;
+  }[] | string[]): void {
+    let _permissions = [];
+
+    for (const p of permissions) {
+      if (typeof p === "string") _permissions = permissions.map(n => n);
+      else _permissions = permissions.map(n => n.name);
+
+      break;
+    }
+
+    this._permissions = _permissions;
   }
 
   /**

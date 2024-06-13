@@ -1,4 +1,3 @@
-import { permission } from 'process';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
@@ -29,7 +28,7 @@ describe('PrismaUserRepository', () => {
 
   beforeEach(async () => {
     await prisma.$executeRaw`PRAGMA foreign_keys = OFF;`;
-    await prisma.cleanDatabase(['User']);
+    await prisma.cleanDatabase(['Permission', 'User']);
   });
 
   afterAll(async () => {
@@ -116,7 +115,7 @@ describe('PrismaUserRepository', () => {
         },
       });
 
-      const user = new User(uuidv4(), 'test@example.com', 'password123', 'TestUser', [permissionName]);
+      const user = new User(uuidv4(), 'test@example.com', 'password123', 'TestUser');
 
       const savedUser = await repository.save(user);
 
@@ -161,5 +160,97 @@ describe('PrismaUserRepository', () => {
         await repository.getPermissionByUser(user);
       }).rejects.toThrow(Prisma.PrismaClientKnownRequestError);
     });
+  });
+
+  describe('setPermission', () => {
+    it('권한이 없는 유저의 경우 권한을 그대로 추가합니다.', async () => {
+      const testPermission1 = "TEST0001";
+      const testPermission2 = "TEST0002";
+
+      await prisma.permission.createMany({
+        data: [testPermission1, testPermission2].map((p, idx) => ({
+          name: p, description: `${idx}`
+        })),
+      });
+
+      const user = new User(uuidv4(), 'test@example.com', 'password123', 'TestUser');
+      const savedUser = await repository.save(user);
+
+      savedUser.assignPermissions([testPermission1, testPermission2])
+
+      const setPermissionUser = await repository.setPermission(savedUser);
+
+      expect(user.permissions).toEqual([]);
+      expect(savedUser.permissions).toEqual(setPermissionUser.permissions);
+    })
+
+    it('권한이 있는 유저의 경우 기존의 권한을 삭제 후 추가합니다.', async () => {
+      const testPermission1 = "TEST0001";
+      const testPermission2 = "TEST0002";
+
+      await prisma.permission.createMany({
+        data: [testPermission1, testPermission2].map((p, idx) => ({
+          name: p, description: `${idx}`
+        })),
+      });
+
+      const user = new User(uuidv4(), 'test@example.com', 'password123', 'TestUser');
+      const savedUser = await repository.save(user);
+
+      savedUser.assignPermissions([testPermission1])
+
+      const setPermissionUser = await repository.setPermission(savedUser);
+
+      savedUser.assignPermissions([testPermission2]);
+
+      const setPermissionUser2 = await repository.setPermission(savedUser);
+
+      expect(setPermissionUser.permissions).toEqual([testPermission1]);
+      expect(setPermissionUser2.permissions).toEqual([testPermission2]);
+    })
+
+    it('권한이 있는 유저에 빈 배열이 들어온 경우 초기화 합니다.', async () => {
+      const permissionName = "LOGIN001";
+
+      await prisma.permission.create({
+        data: {
+          name: permissionName,
+          description: "로그인 권한"
+        },
+      });
+
+      const user = new User(uuidv4(), 'test@example.com', 'password123', 'TestUser');
+      const savedUser = await repository.save(user);
+
+      savedUser.assignPermissions([permissionName]);
+
+      const setPermissionUser = await repository.setPermission(savedUser);
+
+      savedUser.assignPermissions([]);
+
+      const setPermissionUser2 = await repository.setPermission(savedUser);
+
+      expect(setPermissionUser.permissions).toEqual([permissionName]);
+      expect(setPermissionUser2.permissions).toEqual([]);
+    })
+
+    it('유저가 없는 경우 에러를 반환합니다.', async () => {
+      const user = new User(uuidv4(), 'test@example.com', 'password123', 'TestUser');
+
+      await expect(async () => {
+        await repository.setPermission(user);
+      }).rejects.toThrow(Prisma.PrismaClientKnownRequestError);
+    })
+
+    it('존재하지 않는 권한인 경우 에러를 반환합니다.', async () => {
+      const user = new User(uuidv4(), 'test@example.com', 'password123', 'TestUser');
+      const savedUser = await repository.save(user);
+
+      savedUser.assignPermissions(["fakePermission"]);
+
+      await expect(async () => {
+        await repository.setPermission(savedUser);
+      }).rejects.toThrow(Prisma.PrismaClientKnownRequestError);
+    })
   });
 });
