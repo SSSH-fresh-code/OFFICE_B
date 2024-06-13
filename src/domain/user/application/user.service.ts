@@ -76,4 +76,12 @@ export class UserService {
   async deserializeUser(userId: string): Promise<User | null> {
     return this.userRepository.findById(userId);
   }
+
+  async updateUserPermission(id: string, permissions: string[] = []) {
+    const user = await this.userRepository.findById(id);
+
+    user.assignPermissions(permissions);
+
+    return await this.userRepository.setPermission(user);
+  }
 }

@@ -4,6 +4,8 @@ import { UserRepository } from '../infrastructure/user.repository';
 import { USER_REPOSITORY } from '../user.const';
 import { User } from '../domain/user.entity';
 import { PagingService } from '../../../infrastructure/services/paging.service';
+import { v4 as uuidv4 } from 'uuid';
+import { Prisma } from '@prisma/client';
 
 /**
  * Mock User Repository
@@ -13,7 +15,8 @@ const mockUserRepository = () => ({
   save: jest.fn(),
   findById: jest.fn(),
   findByEmail: jest.fn(),
-  getPermissionByUser: jest.fn()
+  getPermissionByUser: jest.fn(),
+  setPermission: jest.fn()
 });
 
 /**
@@ -87,5 +90,40 @@ describe('UserService', () => {
 
       await expect(userService.deserializeUser('1')).rejects.toThrow('유저를 찾을 수 없습니다.');
     });
+  });
+
+  describe('updateUserPermission', () => {
+    it('권한 목록을 받아 유저의 권한을 수정합니다.', async () => {
+      const permissions = ["TEST0001"];
+      const user = new User(uuidv4(), 'test@example.com', 'password123', 'TestUser');
+      const hasPermissionUser = new User(user.id, 'test@example.com', 'password123', 'TestUser', permissions);
+      userRepository.findById.mockResolvedValue(user);
+      userRepository.setPermission.mockResolvedValue(hasPermissionUser);
+
+      const result = await userService.updateUserPermission(user.id, permissions);
+
+      expect(result).toEqual(hasPermissionUser);
+      expect(userRepository.findById).toHaveBeenCalledWith(user.id);
+      expect(userRepository.setPermission).toHaveBeenCalledWith(hasPermissionUser);
+    });
+
+    it('권한 목록이 없는 경우 유저의 권한을 초기화 합니다.', async () => {
+      const user = new User(uuidv4(), 'test@example.com', 'password123', 'TestUser', ["LOGIN001"]);
+      const emptyPermissionUser = new User(user.id, 'test@example.com', 'password123', 'TestUser', []);
+      userRepository.findById.mockResolvedValue(user);
+      userRepository.setPermission.mockResolvedValue(emptyPermissionUser);
+
+      const result = await userService.updateUserPermission(user.id, []);
+
+      expect(result).toEqual(emptyPermissionUser);
+      expect(userRepository.findById).toHaveBeenCalledWith(user.id);
+      expect(userRepository.setPermission).toHaveBeenCalledWith(emptyPermissionUser);
+    })
+
+    it('없는 유저를 조회하면 에러를 반환합니다.', async () => {
+      userRepository.findById.mockRejectedValue(new Error("리소스를 찾을 수 없습니다."));
+
+      await expect(userService.updateUserPermission("", [])).rejects.toThrow("리소스를 찾을 수 없습니다.");
+    })
   });
 });
