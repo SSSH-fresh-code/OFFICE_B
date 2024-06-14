@@ -3,7 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { InfraModule } from './infrastructure/infra.module';
 import { ValidationPipe } from '@nestjs/common';
-import { PrismaClientExceptionFilter } from './infrastructure/exception/prisma-exception.filter';
+import { PrismaClientExceptionFilter } from './infrastructure/filter/exception/prisma-exception.filter';
 import * as session from 'express-session';
 import * as passport from 'passport';
 import * as SQLiteStore from 'connect-sqlite3';

@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../prisma.service';
 import { PrismaUserRepository } from './prisma-user.repository';
-import { User } from '../../domain/user/domain/user.entity';
+import { User } from '../../../domain/user/domain/user.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { Prisma } from '@prisma/client';
 

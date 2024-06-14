@@ -3,7 +3,7 @@ import { UserService } from './user.service';
 import { UserRepository } from '../infrastructure/user.repository';
 import { USER_REPOSITORY } from '../user.const';
 import { User } from '../domain/user.entity';
-import { PagingService } from '../../../infrastructure/services/paging.service';
+import { PagingService } from '../../../infrastructure/common/services/paging.service';
 import { v4 as uuidv4 } from 'uuid';
 
 /**

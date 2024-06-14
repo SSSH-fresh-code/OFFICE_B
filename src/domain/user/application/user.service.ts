@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { UserRepository } from '../infrastructure/user.repository';
 import { USER_REPOSITORY } from '../user.const';
-import { PagingService } from '../../../infrastructure/services/paging.service';
+import { PagingService } from '../../../infrastructure/common/services/paging.service';
 import { User } from '../domain/user.entity';
 import { ReadUserDto } from '../presentation/dto/read-user.dto';
 import { UserPagingDto } from '../presentation/dto/user-paging.dto';

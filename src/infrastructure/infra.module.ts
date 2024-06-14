@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from './prisma/prisma.module';
+import { PrismaModule } from './db/prisma.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ClassSerializerInterceptor } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { PagingService } from './services/paging.service';
-import { PrismaService } from './prisma/prisma.service';
+import { PagingService } from './common/services/paging.service';
+import { PrismaService } from './db/prisma.service';
 
 @Module({
   imports: [

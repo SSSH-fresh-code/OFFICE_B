@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PagingService } from './paging.service';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../db/prisma.service';
 import { PagingDto } from '../dto/paging.dto';
 import { User } from '@prisma/client';
 

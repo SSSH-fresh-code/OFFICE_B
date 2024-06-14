@@ -1,8 +1,8 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import { UserService } from './user.service';
-import { SsshException } from '../../../infrastructure/exception/sssh.exception';
-import { ExceptionEnum } from '../../../infrastructure/exception/exception.enum';
+import { SsshException } from '../../../infrastructure/filter/exception/sssh.exception';
+import { ExceptionEnum } from '../../../infrastructure/filter/exception/exception.enum';
 
 @Injectable()
 export class AuthService {

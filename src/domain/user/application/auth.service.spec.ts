@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { UserService } from './user.service';
 import { User } from '../domain/user.entity';
-import { ExceptionEnum } from '../../../infrastructure/exception/exception.enum';
+import { ExceptionEnum } from '../../../infrastructure/filter/exception/exception.enum';
 
 /**
  * Mock User Service

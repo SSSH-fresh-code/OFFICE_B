@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { IPermissionRepository } from '../../domain/permission/infrastructure/permission.repository';
-import { Permission } from '../../domain/permission/domain/permission.entity';
+import { PrismaService } from '../prisma.service';
+import { IPermissionRepository } from '../../../domain/permission/infrastructure/permission.repository';
+import { Permission } from '../../../domain/permission/domain/permission.entity';
 
 @Injectable()
 export class PrismaPermissionRepository implements IPermissionRepository {
