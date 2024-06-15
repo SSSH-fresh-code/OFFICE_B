@@ -8,20 +8,19 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid()) @map("id")
-  email     String   @unique
-  password  String
-  name      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String       @id @default(uuid())
+  email       String       @unique
+  password    String
+  name        String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  permissions Permission[] @relation("UserPermissions")
 }
 
-model Session {
-  sid       String    @id @default(uuid())
-  expires   DateTime?
-  data      String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  @@index([expires], name: "idx_session_expires")
+model Permission {
+  name        String   @id
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  users       User[]   @relation("UserPermissions")
 }

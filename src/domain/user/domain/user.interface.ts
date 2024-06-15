@@ -15,4 +15,15 @@ export interface iUser extends AggregateRoot {
    * @returns boolean 비밀번호가 일치하면 true, 아니면 false를 반환합니다.
    */
   validatePassword(password: string): boolean;
+
+  /**
+   * Permissions을 설정합니다. 
+   * @param permissions 설정할 Permissions 
+   */
+  assignPermissions(permissions: {
+    name: string;
+    description: string;
+    createdAt: Date;
+    updatedAt: Date;
+  }[] | string[]): void
 }

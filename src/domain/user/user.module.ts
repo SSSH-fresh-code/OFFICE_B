@@ -3,15 +3,16 @@ import { UserService } from './application/user.service';
 import { UserController } from './presentation/user.controller';
 import { USER_REPOSITORY } from './user.const';
 import { InfraModule } from '../../infrastructure/infra.module';
-import { PrismaUserRepository } from '../../infrastructure/repositories/prisma-user.repository';
+import { PrismaUserRepository } from '../../infrastructure/db/repositories/prisma-user.repository';
 import { AuthService } from './application/auth.service';
 import { LocalStrategy } from './application/local.strategy';
 import { LocalAuthGuard } from './application/local-auth.guard';
 import { AuthController } from './presentation/auth.controller';
 import { PassportModule } from '@nestjs/passport';
+import { PermissionModule } from '../permission/permission.module';
 
 @Module({
-  imports: [InfraModule, PassportModule],
+  imports: [InfraModule, PassportModule, PermissionModule],
   providers: [
     UserService,
     AuthService,

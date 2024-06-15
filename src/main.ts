@@ -1,8 +1,9 @@
+import { permission } from 'process';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { InfraModule } from './infrastructure/infra.module';
 import { ValidationPipe } from '@nestjs/common';
-import { PrismaClientExceptionFilter } from './infrastructure/exception/prisma-exception.filter';
+import { PrismaClientExceptionFilter } from './infrastructure/filter/exception/prisma-exception.filter';
 import * as session from 'express-session';
 import * as passport from 'passport';
 import * as SQLiteStore from 'connect-sqlite3';
@@ -31,20 +32,23 @@ async function bootstrap() {
   app.use(passport.session());
 
   passport.serializeUser((user: User, done: (err: any, id?: any) => void) => {
-    done(null, userService.serializeUser(user));
+    const { id, permissions } = user;
+    done(null, `${id}:${permissions.join(",")}`);
   });
 
-  passport.deserializeUser(async (id: string, done: (err: any, user?: any) => void) => {
+  passport.deserializeUser(async (info: string, done: (err: any, user?: any) => void) => {
     try {
-      const user = await userService.deserializeUser(id);
-      done(null, user);
+      const [id, permissionsString] = info.split(":");
+      const permissions = permissionsString.split(",");
+
+      done(null, { id, permissions });
     } catch (err) {
       done(err);
     }
   });
 
   const infraModule = app.get(InfraModule);
-  infraModule.configureSwagger(app);
+  await infraModule.configureSwagger(app);
 
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new PrismaClientExceptionFilter());

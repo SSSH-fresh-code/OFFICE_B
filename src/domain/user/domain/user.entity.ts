@@ -1,18 +1,22 @@
 import * as bcrypt from 'bcrypt';
 import { iUser as IUser } from './user.interface';
+import { Permission } from '../../../domain/permission/domain/permission.entity';
 
 /**
  * UserEntity 클래스
  */
 export class User implements IUser {
+
   constructor(
     private _id: string,
     private _email: string,
     private _password: string,
     private _name: string,
+    private _permissions: string[] = [],
     private _createdAt?: Date,
     private _updatedAt?: Date,
-  ) { }
+  ) {
+  }
 
   /**
    * ID getter
@@ -106,6 +110,35 @@ export class User implements IUser {
    */
   get updatedAt(): Date {
     return this._updatedAt;
+  }
+  /**
+     * 권한 할당 메서드
+     * @param permissions 할당할 권한들
+     */
+  public assignPermissions(permissions: {
+    name: string;
+    description: string;
+    createdAt: Date;
+    updatedAt: Date;
+  }[] | string[]): void {
+    let _permissions = [];
+
+    for (const p of permissions) {
+      if (typeof p === "string") _permissions = permissions.map(n => n);
+      else _permissions = permissions.map(n => n.name);
+
+      break;
+    }
+
+    this._permissions = _permissions;
+  }
+
+  /**
+   * 권한 getter
+   * @returns Permission[] 사용자 권한들
+   */
+  public get permissions(): string[] {
+    return this._permissions;
   }
 
   /**

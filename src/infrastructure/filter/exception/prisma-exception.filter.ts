@@ -15,12 +15,16 @@ export class PrismaClientExceptionFilter implements ExceptionFilter {
     // 예외 코드에 따라 HTTP 상태 코드와 메시지를 설정합니다.
     switch (exception.code) {
       case 'P2025':
-        status = HttpStatus.NOT_FOUND;
+        status = HttpStatus.BAD_REQUEST;
         message = '리소스를 찾을 수 없습니다.';
         break;
-      // 다른 Prisma 예외 코드에 대한 처리를 여기에 추가할 수 있습니다.
+      case 'P2002':
+        status = HttpStatus.BAD_REQUEST;
+        message = `이미 존재하는 ${exception.meta.target}입니다.`
+        break;
     }
 
+    console.log(exception)
     response.status(status).json({
       statusCode: status,
       message: message,

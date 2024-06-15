@@ -1,5 +1,5 @@
 // src/infrastructure/services/paging.service.ts
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../db/prisma.service';
 import { PagingDto } from '../dto/paging.dto';
 import { Prisma } from '@prisma/client';
 import { Injectable } from '@nestjs/common';

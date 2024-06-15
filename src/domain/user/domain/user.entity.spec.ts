@@ -84,7 +84,7 @@ describe('User Entity', () => {
   describe('createdAt getter', () => {
     it('생성일을 성공적으로 가져와야 합니다.', () => {
       const createdAt = new Date();
-      user = new User('1', 'test@example.com', 'password123', 'TestUser', createdAt);
+      user = new User('1', 'test@example.com', 'password123', 'TestUser', [], createdAt);
       expect(user.createdAt).toEqual(createdAt);
     });
   });
@@ -92,7 +92,7 @@ describe('User Entity', () => {
   describe('updatedAt getter', () => {
     it('수정일을 성공적으로 가져와야 합니다.', () => {
       const updatedAt = new Date();
-      user = new User('1', 'test@example.com', 'password123', 'TestUser', new Date(), updatedAt);
+      user = new User('1', 'test@example.com', 'password123', 'TestUser', [], new Date(), updatedAt);
       expect(user.updatedAt).toEqual(updatedAt);
     });
   });
