@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { PermissionController } from './presentation/permission.controller';
-import { InfraModule } from 'src/infrastructure/infra.module';
-import { PrismaPermissionRepository } from 'src/infrastructure/db/repositories/prisma-permission.repository';
+import { InfraModule } from '../../infrastructure/infra.module';
+import { PrismaPermissionRepository } from '../../infrastructure/db/repositories/prisma-permission.repository';
 import { PERMISSION_REPOSITORY } from './permission.const';
 import { PermissionService } from './application/permission.service';
 
