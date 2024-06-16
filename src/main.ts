@@ -1,3 +1,4 @@
+import { WinstonModule } from 'nest-winston';
 import { permission } from 'process';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
@@ -7,13 +8,10 @@ import { PrismaClientExceptionFilter } from './infrastructure/filter/exception/p
 import * as session from 'express-session';
 import * as passport from 'passport';
 import * as SQLiteStore from 'connect-sqlite3';
-import { UserService } from './domain/user/application/user.service';
 import { User } from './domain/user/domain/user.entity';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
-  const userService = app.get(UserService);
 
   app.use(
     session({
