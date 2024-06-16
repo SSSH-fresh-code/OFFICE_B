@@ -7,6 +7,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { PagingService } from './common/services/paging.service';
 import { PrismaService } from './db/prisma.service';
 import { PermissionGuard } from './guard/permission.guard';
+import { LoggerModule } from './module/logger.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { PermissionGuard } from './guard/permission.guard';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    LoggerModule,
   ],
   providers: [
     {
@@ -27,7 +29,7 @@ import { PermissionGuard } from './guard/permission.guard';
     PagingService,
     PrismaService,
   ],
-  exports: [PrismaModule, ConfigModule, PagingService, PrismaService],
+  exports: [PrismaModule, ConfigModule, PagingService, PrismaService, LoggerModule],
 })
 export class InfraModule {
   async configureSwagger(app: any) {
