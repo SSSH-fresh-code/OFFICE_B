@@ -18,9 +18,36 @@ model User {
 }
 
 model Permission {
-  name        String   @id
+  name        String    @id
   description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  users       User[]   @relation("UserPermissions")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  users       User[]    @relation("UserPermissions")
+  ChatBot     ChatBot[]
+}
+
+model ChatBot {
+  id           Int         @id @default(autoincrement())
+  botId        String      @unique
+  token        String      @unique
+  name         String      @unique
+  description  String
+  permissionId String
+  permission   Permission  @relation(fields: [permissionId], references: [name])
+  type         ChatBotType
+  chatIds      Chat[]
+}
+
+model Chat {
+  id        Int     @id @default(autoincrement())
+  chatBot   ChatBot @relation(fields: [chatBotId], references: [id])
+  chatBotId Int
+  chatId    String
+  name      String
+}
+
+enum ChatBotType {
+  TELEGRAM
+  SLACK
+  DISCORD
 }

@@ -19,7 +19,7 @@
     "test:e2e": "pnpm prisma:generate:test && jest --config ./test/jest-e2e.json",
     "prisma:generate": "prisma generate && ts-node ./prisma/seed.ts",
     "prisma:generate:test": "prisma generate --schema=prisma/schema.test.prisma",
-    "test": "pnpm prisma:generate:test && jest"
+    "test": "rm ./prisma/dev.db && pnpm prisma:generate:test && jest"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
