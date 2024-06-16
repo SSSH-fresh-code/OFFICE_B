@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { UserService } from './user.service';
 import { User } from '../domain/user.entity';
 import { ExceptionEnum } from '../../../infrastructure/filter/exception/exception.enum';
+import { LoggerModule } from '../../../infrastructure/module/logger.module';
 
 /**
  * Mock User Service
@@ -18,6 +19,7 @@ describe('AuthService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [LoggerModule],
       providers: [
         AuthService,
         { provide: UserService, useFactory: mockUserService },

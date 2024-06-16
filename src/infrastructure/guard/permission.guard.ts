@@ -3,7 +3,7 @@ import { Injectable, CanActivate, ExecutionContext, ForbiddenException, HttpStat
 import { Reflector } from '@nestjs/core';
 import { SsshException } from '../filter/exception/sssh.exception';
 import { ExceptionEnum } from '../filter/exception/exception.enum';
-import { PermissionEnum } from 'src/domain/permission/domain/permission.enum';
+import { PermissionEnum } from '../../domain/permission/domain/permission.enum';
 
 @Injectable()
 export class PermissionGuard implements CanActivate {

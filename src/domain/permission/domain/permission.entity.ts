@@ -1,4 +1,3 @@
-import { AggregateRoot } from "src/domain/aggregate-root.interface";
 import { IPermission } from "./permission.interface";
 
 /**

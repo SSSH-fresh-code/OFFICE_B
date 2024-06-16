@@ -4,7 +4,7 @@ import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { ReadPermissionDto } from './dto/read-permission.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { PermissionService } from '../application/permission.service';
-import { PermissionsClass, PermissionsMethod } from 'src/infrastructure/decorator/permissions.decorator';
+import { PermissionsClass, PermissionsMethod } from '../../../infrastructure/decorator/permissions.decorator';
 import { PermissionEnum } from '../domain/permission.enum';
 
 @ApiTags('permissions')
