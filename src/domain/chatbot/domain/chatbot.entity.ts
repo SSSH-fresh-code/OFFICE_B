@@ -14,7 +14,7 @@ export class ChatBot implements iChatBot {
     private _name: string,
     private _description: string,
     private _permission: string,
-    private _type: ChatBotType,
+    private _type: MessengerType,
     chats: Chat[] = [],
   ) {
     this._chats = chats;
@@ -40,6 +40,10 @@ export class ChatBot implements iChatBot {
     return this._botId;
   }
 
+  set botId(botId: string) {
+    this._botId = botId;
+  }
+
   /**
    * 토큰 getter
    * @returns string 토큰
@@ -47,6 +51,12 @@ export class ChatBot implements iChatBot {
   get token(): string {
     return this._token;
   }
+
+
+  public set token(token: string) {
+    this._token = token;
+  }
+
 
   /**
    * 이름 getter
@@ -56,6 +66,12 @@ export class ChatBot implements iChatBot {
     return this._name;
   }
 
+
+  public set name(name: string) {
+    this._name = name;
+  }
+
+
   /**
    * 설명 getter
    * @returns string 봇 설명
@@ -63,6 +79,11 @@ export class ChatBot implements iChatBot {
   get description(): string {
     return this._description;
   }
+
+  public set description(description: string) {
+    this._description = description;
+  }
+
 
   /**
    * 권한 getter
@@ -72,11 +93,17 @@ export class ChatBot implements iChatBot {
     return this._permission;
   }
 
+
+  public set permission(permission: string) {
+    this._permission = permission;
+  }
+
+
   /**
    * 타입 getter
    * @returns ChatBotType 봇 타입
    */
-  get type(): ChatBotType {
+  get type(): MessengerType {
     return this._type;
   }
 
@@ -103,12 +130,16 @@ export class ChatBot implements iChatBot {
   removeChat(chatId: string): void {
     this._chats = this._chats.filter(chat => chat.chatId !== chatId);
   }
+
+  clearChat(): void {
+    this._chats = [];
+  }
 }
 
 /**
- * ChatBotType 열거형
+ * MessengerType 열거형
  */
-export enum ChatBotType {
+export enum MessengerType {
   TELEGRAM = 'TELEGRAM',
   SLACK = 'SLACK',
   DISCORD = 'DISCORD',

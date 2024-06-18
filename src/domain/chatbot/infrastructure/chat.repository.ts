@@ -16,18 +16,4 @@ export interface IChatRepository {
    * @param id 채팅 ID
    */
   deleteChat(id: string): Promise<void>;
-
-  /**
-   * 특정 챗봇에 연결된 모든 채팅을 조회합니다.
-   * @param chatBotId 챗봇 ID
-   * @returns 특정 챗봇에 연결된 모든 채팅
-   */
-  findChatsByChatBotId(chatBotId: string): Promise<Chat[]>;
-
-  /**
-   * ID로 채팅을 조회합니다.
-   * @param id 채팅 ID
-   * @returns 조회된 채팅
-   */
-  findChatById(id: string): Promise<Chat>;
 }
