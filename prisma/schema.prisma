@@ -27,26 +27,26 @@ model Permission {
 }
 
 model ChatBot {
-  id           Int         @id @default(autoincrement())
-  botId        String      @unique
-  token        String      @unique
-  name         String      @unique
+  id           Int           @id @default(autoincrement())
+  botId        String        @unique
+  token        String        @unique
+  name         String        @unique
   description  String
   permissionId String
-  permission   Permission  @relation(fields: [permissionId], references: [name])
-  type         ChatBotType
-  chatIds      Chat[]
+  permission   Permission    @relation(fields: [permissionId], references: [name])
+  type         MessengerType
+  chats        Chat[]        @relation("ChatBotChats")
 }
 
 model Chat {
-  id        Int     @id @default(autoincrement())
-  chatBot   ChatBot @relation(fields: [chatBotId], references: [id])
+  id        Int       @id @default(autoincrement())
   chatBotId Int
-  chatId    String
-  name      String
+  chatId    String    @unique
+  name      String    @unique
+  bots      ChatBot[] @relation("ChatBotChats")
 }
 
-enum ChatBotType {
+enum MessengerType {
   TELEGRAM
   SLACK
   DISCORD

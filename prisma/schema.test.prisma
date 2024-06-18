@@ -35,13 +35,12 @@ model ChatBot {
   permissionId String
   permission   Permission @relation(fields: [permissionId], references: [name])
   type         String
-  chatIds      Chat[]
+  chats        Chat[]     @relation("ChatBotChats")
 }
 
 model Chat {
-  id        Int     @id @default(autoincrement())
-  chatBot   ChatBot @relation(fields: [chatBotId], references: [id])
-  chatBotId Int
-  chatId    String
-  name      String
+  id     Int       @id @default(autoincrement())
+  chatId String    @unique
+  name   String    @unique
+  bots   ChatBot[] @relation("ChatBotChats")
 }
