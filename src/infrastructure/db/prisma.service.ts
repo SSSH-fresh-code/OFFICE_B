@@ -1,5 +1,5 @@
+import { Prisma, PrismaClient } from '@prisma/client';
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { PrismaClient, Prisma } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -23,6 +23,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   }
 
   async cleanDatabase(names: Prisma.ModelName[]) {
-    for (const name of names) await this[name].deleteMany();
+    await this.$executeRaw`PRAGMA foreign_keys = OFF;`;
+    for (const name of names)
+      await this[name].deleteMany();
   }
 }

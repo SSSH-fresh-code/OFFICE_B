@@ -17,7 +17,7 @@ describe('AuthService', () => {
   let authService: AuthService;
   let userService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [LoggerModule],
       providers: [

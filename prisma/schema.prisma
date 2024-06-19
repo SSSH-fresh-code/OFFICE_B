@@ -39,11 +39,10 @@ model ChatBot {
 }
 
 model Chat {
-  id        Int       @id @default(autoincrement())
-  chatBotId Int
-  chatId    String    @unique
-  name      String    @unique
-  bots      ChatBot[] @relation("ChatBotChats")
+  id     Int       @id @default(autoincrement())
+  chatId String    @unique
+  name   String    @unique
+  bots   ChatBot[] @relation("ChatBotChats")
 }
 
 enum MessengerType {

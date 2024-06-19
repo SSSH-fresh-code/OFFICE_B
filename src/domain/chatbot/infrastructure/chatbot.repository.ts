@@ -22,14 +22,14 @@ export interface IChatBotRepository {
    * 챗봇을 삭제합니다.
    * @param id 챗봇 ID
    */
-  deleteChatBot(id: string): Promise<void>;
+  deleteChatBot(id: number): Promise<void>;
 
   /**
    * ID로 챗봇을 조회합니다.
    * @param id 챗봇 ID
    * @returns 조회된 챗봇
    */
-  findChatBotById(id: string): Promise<ChatBot>;
+  findChatBotById(id: number): Promise<ChatBot>;
 
   /**
    * 모든 챗봇을 조회합니다.

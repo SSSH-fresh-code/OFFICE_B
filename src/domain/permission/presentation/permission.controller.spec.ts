@@ -23,7 +23,7 @@ describe('PermissionController', () => {
   let permissionController: PermissionController;
   let permissionService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [PermissionController],
       providers: [

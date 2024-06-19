@@ -27,7 +27,6 @@ describe('PrismaUserRepository', () => {
   });
 
   beforeEach(async () => {
-    await prisma.$executeRaw`PRAGMA foreign_keys = OFF;`;
     await prisma.cleanDatabase(['Permission', 'User']);
   });
 
