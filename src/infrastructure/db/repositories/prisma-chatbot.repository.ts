@@ -68,10 +68,14 @@ export class PrismaChatBotRepository implements IChatBotRepository {
       updatedBot.chats.map(c => new Chat(c.id, c.chatId, c.name))
     )
   }
-  deleteChatBot(id: string): Promise<void> {
-    throw new Error('Method not implemented.');
+
+  async deleteChatBot(id: number): Promise<void> {
+    await this.prisma.chatBot.delete({
+      where: { id }
+    });
   }
-  findChatBotById(id: string): Promise<ChatBot> {
+
+  findChatBotById(id: number): Promise<ChatBot> {
     throw new Error('Method not implemented.');
   }
   findAllChatBots(): Promise<ChatBot[]> {
