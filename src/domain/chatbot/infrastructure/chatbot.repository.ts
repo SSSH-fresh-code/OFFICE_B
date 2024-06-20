@@ -32,10 +32,4 @@ export interface IChatBotRepository {
    * @returns 조회된 챗봇
    */
   findChatBotById(id: number): Promise<ChatBot>;
-
-  /**
-   * 모든 챗봇을 조회합니다.
-   * @returns 모든 챗봇 목록
-   */
-  findAllChatBots(dto: PagingDto): Promise<Page<ChatBot>>;
 }
