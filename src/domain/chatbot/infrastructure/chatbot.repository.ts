@@ -1,3 +1,5 @@
+import { PagingDto } from "src/infrastructure/common/dto/paging.dto";
+import { Page } from "../../../infrastructure/common/services/paging.service";
 import { ChatBot } from "../domain/chatbot.entity";
 
 /**
@@ -35,5 +37,5 @@ export interface IChatBotRepository {
    * 모든 챗봇을 조회합니다.
    * @returns 모든 챗봇 목록
    */
-  findAllChatBots(): Promise<ChatBot[]>;
+  findAllChatBots(dto: PagingDto): Promise<Page<ChatBot>>;
 }

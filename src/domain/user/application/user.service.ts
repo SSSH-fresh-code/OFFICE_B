@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { UserRepository } from '../infrastructure/user.repository';
 import { USER_REPOSITORY } from '../user.const';
-import { PagingService } from '../../../infrastructure/common/services/paging.service';
+import { Page, PagingService } from '../../../infrastructure/common/services/paging.service';
 import { User } from '../domain/user.entity';
 import { ReadUserDto } from '../presentation/dto/read-user.dto';
 import { UserPagingDto } from '../presentation/dto/user-paging.dto';
@@ -33,7 +33,7 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  async getUsers(pagingDto: UserPagingDto): Promise<{ data: User[]; total: number }> {
+  async getUsers(pagingDto: UserPagingDto): Promise<Page<User>> {
     const where = {};
     if (pagingDto.where__email) {
       where['email'] = pagingDto.where__email;

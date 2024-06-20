@@ -312,4 +312,46 @@ describe('PrismaChatBotRepository', () => {
       expect(async () => await repository.deleteChatBot(0)).rejects.toThrow(Prisma.PrismaClientKnownRequestError);
     });
   });
+
+  describe('findChatBotById', () => {
+    it('id로 ChatBot을 조회합니다.', async () => {
+      const createdChat = await prisma.chat.create({
+        data: {
+          chatId: "chatId",
+          name: "name",
+        }
+      });
+      const chat = new Chat(createdChat.id, createdChat.chatId, createdChat.name);
+
+      const bot = await prisma.chatBot.create({
+        data: {
+          botId: "id",
+          token: "token",
+          name: "name",
+          description: "챗봇입니다.",
+          permission: {
+            connect: {
+              name: permission.name
+            }
+          },
+          type: MessengerType.TELEGRAM,
+          chats: {
+            connect: {
+              id: chat.id
+            }
+          },
+        },
+        include: { chats: true }
+      });
+
+      const result = await repository.findChatBotById(bot.id);
+
+      expect(result).toBeInstanceOf(ChatBot);
+      expect(ChatBot.of(bot)).toEqual(result);
+    });
+
+    it('존재하지 않는 id를 조회하는 경우 에러를 반환합니다.', async () => {
+      expect(async () => await repository.findChatBotById(0)).rejects.toThrow(Prisma.PrismaClientKnownRequestError);
+    });
+  });
 });

@@ -20,6 +20,44 @@ export class ChatBot implements iChatBot {
     this._chats = chats;
   }
 
+  static of(bot: {
+    chats?: {
+      id: number;
+      chatId: string;
+      name: string;
+    }[];
+  } & {
+    id: number;
+    botId: string;
+    token: string;
+    name: string;
+    description: string;
+    permissionId: string;
+    type: string;
+  }) {
+    let messengerType = MessengerType.TELEGRAM;
+
+    switch (bot.type) {
+      case MessengerType.SLACK:
+        messengerType = MessengerType.SLACK;
+        break;
+      case MessengerType.DISCORD:
+        messengerType = MessengerType.DISCORD;
+        break;
+    }
+
+    return new ChatBot(
+      bot.id,
+      bot.botId,
+      bot.token,
+      bot.name,
+      bot.description,
+      bot.permissionId,
+      messengerType,
+      bot.chats ? bot.chats.map(c => new Chat(c.id, c.chatId, c.name)) : []
+    );
+  }
+
   validate(): void {
     throw new Error("not implements");
   }

@@ -2,11 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { IChatBotRepository } from 'src/domain/chatbot/infrastructure/chatbot.repository';
 import { PrismaService } from '../prisma.service';
 import { ChatBot, MessengerType } from '../../../domain/chatbot/domain/chatbot.entity';
-import { Chat } from '../../../domain/chatbot/domain/chat.entity';
+import { Page } from '../../../infrastructure/common/services/paging.service';
+import { PagingDto } from 'src/infrastructure/common/dto/paging.dto';
 
 @Injectable()
 export class PrismaChatBotRepository implements IChatBotRepository {
   constructor(private readonly prisma: PrismaService) { }
+  private convert
 
   async createChatBot(bot: ChatBot): Promise<ChatBot> {
     const savedBot = await this.prisma.chatBot.create({
@@ -24,15 +26,7 @@ export class PrismaChatBotRepository implements IChatBotRepository {
       }
     });
 
-    return new ChatBot(
-      savedBot.id,
-      savedBot.botId,
-      savedBot.token,
-      savedBot.name,
-      savedBot.description,
-      savedBot.permissionId,
-      savedBot.type as MessengerType,
-    )
+    return ChatBot.of(savedBot);
   }
   async updateChatBot(bot: ChatBot): Promise<ChatBot> {
     const updatedBot = await this.prisma.chatBot.update({
@@ -57,16 +51,7 @@ export class PrismaChatBotRepository implements IChatBotRepository {
       }
     });
 
-    return new ChatBot(
-      updatedBot.id,
-      updatedBot.botId,
-      updatedBot.token,
-      updatedBot.name,
-      updatedBot.description,
-      updatedBot.permissionId,
-      updatedBot.type as MessengerType,
-      updatedBot.chats.map(c => new Chat(c.id, c.chatId, c.name))
-    )
+    return ChatBot.of(updatedBot);
   }
 
   async deleteChatBot(id: number): Promise<void> {
@@ -75,10 +60,12 @@ export class PrismaChatBotRepository implements IChatBotRepository {
     });
   }
 
-  findChatBotById(id: number): Promise<ChatBot> {
-    throw new Error('Method not implemented.');
-  }
-  findAllChatBots(): Promise<ChatBot[]> {
-    throw new Error('Method not implemented.');
+  async findChatBotById(id: number): Promise<ChatBot> {
+    const bot = await this.prisma.chatBot.findUniqueOrThrow({
+      where: { id },
+      include: { chats: true }
+    });
+
+    return ChatBot.of(bot)
   }
 }

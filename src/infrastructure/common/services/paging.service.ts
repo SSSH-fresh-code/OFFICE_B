@@ -12,6 +12,8 @@ interface OrderByClause {
   [key: string]: Prisma.SortOrder;
 }
 
+export type Page<T> = { data: T[]; total: number };
+
 /**
  * 공통 페이징 서비스 클래스
  * @template T Entity 타입
@@ -33,7 +35,7 @@ export class PagingService<T> {
     pagingDto: PagingDto,
     where: WhereClause = {},
     orderBy: OrderByClause = {}
-  ): Promise<{ data: T[]; total: number }> {
+  ): Promise<Page<T>> {
     const { page, orderby, direction } = pagingDto;
 
     const take = Number(pagingDto.take);

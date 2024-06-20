@@ -9,6 +9,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdateUserPermissonDto } from './dto/update-userPermission.dto';
 import { PermissionsClass, PermissionsMethod } from '../../../infrastructure/decorator/permissions.decorator';
 import { PermissionEnum } from '../../../domain/permission/domain/permission.enum';
+import { Page } from '../../../infrastructure/common/services/paging.service';
 
 @ApiTags('users')
 @Controller('users')
@@ -64,7 +65,7 @@ export class UserController {
     description: '유저 목록이 정상적으로 조회됨',
   })
   @PermissionsMethod(PermissionEnum.CAN_READ_USER)
-  async getUsers(@Query() pagingDto: UserPagingDto): Promise<{ data: User[]; total: number }> {
+  async getUsers(@Query() pagingDto: UserPagingDto): Promise<Page<User>> {
     return this.userService.getUsers(pagingDto);
   }
 
