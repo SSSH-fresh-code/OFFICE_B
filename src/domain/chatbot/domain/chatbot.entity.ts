@@ -25,6 +25,7 @@ export class ChatBot implements iChatBot {
       id: number;
       chatId: string;
       name: string;
+      type: string;
     }[];
   } & {
     id: number;
@@ -54,7 +55,7 @@ export class ChatBot implements iChatBot {
       bot.description,
       bot.permissionId,
       messengerType,
-      bot.chats ? bot.chats.map(c => new Chat(c.id, c.chatId, c.name)) : []
+      bot.chats ? bot.chats.map(c => new Chat(c.id, c.chatId, c.name, c.type)) : []
     );
   }
 

@@ -1,5 +1,3 @@
-import { PagingDto } from "src/infrastructure/common/dto/paging.dto";
-import { Page } from "../../../infrastructure/common/services/paging.service";
 import { ChatBot } from "../domain/chatbot.entity";
 
 /**

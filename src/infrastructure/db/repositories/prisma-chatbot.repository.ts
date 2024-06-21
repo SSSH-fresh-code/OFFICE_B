@@ -1,15 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { IChatBotRepository } from 'src/domain/chatbot/infrastructure/chatbot.repository';
+import { IChatBotRepository } from '../../../domain/chatbot/infrastructure/chatbot.repository';
 import { PrismaService } from '../prisma.service';
 import { ChatBot, MessengerType } from '../../../domain/chatbot/domain/chatbot.entity';
-import { Page } from '../../../infrastructure/common/services/paging.service';
-import { PagingDto } from 'src/infrastructure/common/dto/paging.dto';
 
 @Injectable()
 export class PrismaChatBotRepository implements IChatBotRepository {
   constructor(private readonly prisma: PrismaService) { }
-  private convert
-
   async createChatBot(bot: ChatBot): Promise<ChatBot> {
     const savedBot = await this.prisma.chatBot.create({
       data: {

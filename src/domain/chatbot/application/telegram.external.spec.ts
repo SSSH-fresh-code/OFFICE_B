@@ -38,7 +38,7 @@ describe('TelegramExternalService', () => {
         MessengerType.TELEGRAM
       );
 
-      const chat = new Chat(0, "chatId", "testChat");
+      const chat = new Chat(0, "chatId", "testChat", MessengerType.DISCORD);
 
       (fetch as jest.Mock).mockResolvedValue({
         ok: true

@@ -7,5 +7,5 @@ import { iChatBot } from "./chatbot.interface";
 export interface iChat {
   get chatId(): string
   get name(): string;
-  validate(bot: iChatBot): void;
+  validate(): void;
 }

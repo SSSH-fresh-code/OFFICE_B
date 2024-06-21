@@ -149,9 +149,10 @@ describe('PrismaChatBotRepository', () => {
         data: {
           chatId: "chatId",
           name: "name",
+          type: MessengerType.DISCORD
         }
       });
-      const chat = new Chat(createdChat.id, createdChat.chatId, createdChat.name);
+      const chat = new Chat(createdChat.id, createdChat.chatId, createdChat.name, MessengerType.DISCORD);
 
       const createdBot = await prisma.chatBot.create({
         data: {
@@ -206,7 +207,7 @@ describe('PrismaChatBotRepository', () => {
       });
 
       const chatBot = new ChatBot(createdBot.id, createdBot.botId, createdBot.token, createdBot.name, createdBot.description, permission.name, MessengerType.TELEGRAM);
-      const chat = new Chat(0, "fake", "name");
+      const chat = new Chat(0, "fake", "name", MessengerType.DISCORD);
 
       chatBot.addChat(chat);
 
@@ -282,9 +283,10 @@ describe('PrismaChatBotRepository', () => {
         data: {
           chatId: "chatId",
           name: "name",
+          type: MessengerType.DISCORD
         }
       });
-      const chat = new Chat(createdChat.id, createdChat.chatId, createdChat.name);
+      const chat = new Chat(createdChat.id, createdChat.chatId, createdChat.name, MessengerType.DISCORD);
 
       const createdBot = await prisma.chatBot.create({
         data: {
@@ -319,9 +321,10 @@ describe('PrismaChatBotRepository', () => {
         data: {
           chatId: "chatId",
           name: "name",
+          type: MessengerType.DISCORD
         }
       });
-      const chat = new Chat(createdChat.id, createdChat.chatId, createdChat.name);
+      const chat = new Chat(createdChat.id, createdChat.chatId, createdChat.name, MessengerType.DISCORD);
 
       const bot = await prisma.chatBot.create({
         data: {
