@@ -3,6 +3,7 @@ import { iChat } from "./chat.interface";
 import { MessengerType } from "./chatbot.entity";
 import { ExceptionEnum } from "../../../infrastructure/filter/exception/exception.enum";
 import { HttpStatus } from "@nestjs/common";
+import { Chat as PrismaChat } from "@prisma/client";
 
 /**
  * Chat 엔티티 클래스
@@ -11,7 +12,7 @@ export class Chat implements iChat {
   private _id: number;
   private _chatId: string;
   private _name: string;
-  private _type: string;
+  private _type: MessengerType;
 
   /**
    * 생성자
@@ -20,11 +21,15 @@ export class Chat implements iChat {
    * @param name - 채팅방 이름
    * @param type - 채팅방 타입
    */
-  constructor(id: number, chatId: string, name: string, type: MessengerType | string) {
+  constructor(id: number, chatId: string, name: string, type: MessengerType) {
     this._id = id;
     this._chatId = chatId;
     this._name = name;
     this._type = type;
+  }
+
+  static of({ id, chatId, name, type }: PrismaChat) {
+    return new this(id, chatId, name, MessengerType[type]);
   }
 
   /**
@@ -56,7 +61,7 @@ export class Chat implements iChat {
    * 채팅방 타입 getter
    * @returns string 채팅방 타입
    */
-  get type(): string {
+  get type(): MessengerType {
     return this._type;
   }
 

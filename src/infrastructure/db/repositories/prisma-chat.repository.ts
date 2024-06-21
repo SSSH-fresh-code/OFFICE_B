@@ -8,14 +8,32 @@ import { Chat } from '../../../domain/chatbot/domain/chat.entity';
 export class PrismaChatRepository implements IChatRepository {
   constructor(private readonly prisma: PrismaService) { }
 
-  createChat(chat: Chat): Promise<Chat> {
-    throw new Error('Method not implemented.');
+  async createChat({ chatId, name, type }: Chat): Promise<Chat> {
+    const chat = await this.prisma.chat.create({
+      data: {
+        chatId, name, type
+      }
+    });
+
+    return Chat.of(chat);
   }
-  deleteChat(id: number): Promise<void> {
-    throw new Error('Method not implemented.');
+  async deleteChat(id: number): Promise<void> {
+    await this.prisma.chat.delete({
+      where: { id }
+    });
   }
-  findChatsByType(type: MessengerType): Promise<Chat[]> {
-    throw new Error('Method not implemented.');
+
+  async findChatsByType(type: MessengerType): Promise<Chat[]> {
+    const chats = await this.prisma.chat.findMany({
+      where: {
+        type
+      },
+      orderBy: {
+        name: "asc"
+      }
+    });
+
+    return chats.map(chat => Chat.of(chat));
   }
 
 }

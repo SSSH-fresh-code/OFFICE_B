@@ -40,6 +40,7 @@ describe('PrismaChatBotRepository', () => {
 
       const createdChat = await repository.createChat(chat);
 
+      console.log(createdChat.type);
       expect(createdChat.id).not.toEqual(chat.id);
       expect(createdChat.chatId).toEqual(chat.chatId);
       expect(createdChat.name).toEqual(chat.name);
@@ -75,7 +76,7 @@ describe('PrismaChatBotRepository', () => {
 
   describe('findByChatsByType', () => {
     it('type으로 채팅들을 조회합니다.', async () => {
-      [1, 2, 3, 4, 5].forEach(async (e) => {
+      const createdChats = [1, 2, 3, 4, 5].map(async (e) => {
         await prisma.chat.create({
           data: {
             name: e.toString(),
@@ -84,6 +85,8 @@ describe('PrismaChatBotRepository', () => {
           }
         })
       });
+
+      await Promise.all(createdChats);
 
       const chats = await repository.findChatsByType(MessengerType.DISCORD);
 

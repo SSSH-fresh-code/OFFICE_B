@@ -55,7 +55,7 @@ export class ChatBot implements iChatBot {
       bot.description,
       bot.permissionId,
       messengerType,
-      bot.chats ? bot.chats.map(c => new Chat(c.id, c.chatId, c.name, c.type)) : []
+      bot.chats ? bot.chats.map(c => new Chat(c.id, c.chatId, c.name, MessengerType[c.type])) : []
     );
   }
 
