@@ -1,10 +1,15 @@
+import { SsshException } from '../../../infrastructure/filter/exception/sssh.exception';
 import { Chat } from './chat.entity';
 import { iChatBot } from './chatbot.interface';
+import { Chat as PrismaChat, ChatBot as PrismaChatBot } from "@prisma/client";
+import { ExceptionEnum } from '../../../infrastructure/filter/exception/exception.enum';
+import { HttpStatus, Logger } from '@nestjs/common';
 
 /**
  * ChatBot 엔티티 클래스
  */
 export class ChatBot implements iChatBot {
+  private readonly logger = new Logger(ChatBot.name);
   private _chats: Chat[];
 
   constructor(
@@ -20,25 +25,12 @@ export class ChatBot implements iChatBot {
     this._chats = chats;
   }
 
-  static of(bot: {
-    chats?: {
-      id: number;
-      chatId: string;
-      name: string;
-      type: string;
-    }[];
-  } & {
-    id: number;
-    botId: string;
-    token: string;
-    name: string;
-    description: string;
-    permissionId: string;
-    type: string;
-  }) {
+  static of({
+    id, botId, token, name, description, permissionId, type, chats
+  }: PrismaChatBot & { chats?: PrismaChat[] }) {
     let messengerType = MessengerType.TELEGRAM;
 
-    switch (bot.type) {
+    switch (type) {
       case MessengerType.SLACK:
         messengerType = MessengerType.SLACK;
         break;
@@ -48,20 +40,17 @@ export class ChatBot implements iChatBot {
     }
 
     return new ChatBot(
-      bot.id,
-      bot.botId,
-      bot.token,
-      bot.name,
-      bot.description,
-      bot.permissionId,
+      id,
+      botId,
+      token,
+      name,
+      description,
+      permissionId,
       messengerType,
-      bot.chats ? bot.chats.map(c => new Chat(c.id, c.chatId, c.name, MessengerType[c.type])) : []
+      chats ? chats.map(c => new Chat(c.id, c.chatId, c.name, MessengerType[c.type])) : []
     );
   }
 
-  validate(): void {
-    throw new Error("not implements");
-  }
 
   /**
    * ID getter
@@ -172,6 +161,25 @@ export class ChatBot implements iChatBot {
 
   clearChat(): void {
     this._chats = [];
+  }
+
+  validate(): void {
+    if (
+      !this._botId ||
+      !this._token ||
+      !this._name ||
+      !this._permission ||
+      !this._type
+    ) {
+      throw new SsshException(ExceptionEnum.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    for (const chat of this._chats) {
+      if (chat.type != this._type) {
+        this.logger.error("ChatBot.validate() - 하위 채팅방의 타입이 상위 챗봇과 일치하지 않습니다.");
+        throw new SsshException(ExceptionEnum.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
   }
 }
 
