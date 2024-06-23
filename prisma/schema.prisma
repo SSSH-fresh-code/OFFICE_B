@@ -18,24 +18,21 @@ model User {
 }
 
 model Permission {
-  name        String    @id
+  name        String   @id
   description String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  users       User[]    @relation("UserPermissions")
-  ChatBot     ChatBot[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  users       User[]   @relation("UserPermissions")
 }
 
 model ChatBot {
-  id           Int           @id @default(autoincrement())
-  botId        String        @unique
-  token        String        @unique
-  name         String        @unique
-  description  String
-  permissionId String
-  permission   Permission    @relation(fields: [permissionId], references: [name])
-  type         MessengerType
-  chats        Chat[]        @relation("ChatBotChats")
+  id          Int           @id @default(autoincrement())
+  botId       String        @unique
+  token       String        @unique
+  name        String        @unique
+  description String
+  type        MessengerType
+  chats       Chat[]        @relation("ChatBotChats")
 }
 
 model Chat {

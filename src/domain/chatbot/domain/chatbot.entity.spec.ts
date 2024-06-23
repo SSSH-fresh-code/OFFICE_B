@@ -11,7 +11,6 @@ describe('ChatBot Entity', () => {
   const token = "token";
   const name = "name";
   const description = "description";
-  const permissionId = "LOGIN001";
   const type = MessengerType.DISCORD;
 
   beforeEach(() => {
@@ -21,7 +20,6 @@ describe('ChatBot Entity', () => {
       token,
       name,
       description,
-      permissionId,
       type,
       []
     );
@@ -34,7 +32,6 @@ describe('ChatBot Entity', () => {
       expect(chatbot.token).toEqual(token);
       expect(chatbot.name).toEqual(name);
       expect(chatbot.description).toEqual(description);
-      expect(chatbot.permission).toEqual(permissionId);
       expect(chatbot.type).toEqual(type);
     });
   });
@@ -100,12 +97,11 @@ describe('ChatBot Entity', () => {
       const chat = new Chat(0, "chatId", "name", MessengerType.SLACK);
 
       [
-        new ChatBot(0, "", token, name, description, permissionId, type),
-        new ChatBot(0, botId, "", name, description, permissionId, type),
-        new ChatBot(0, botId, token, "", description, permissionId, type),
-        new ChatBot(0, botId, token, name, description, "", type),
-        new ChatBot(0, botId, token, name, description, permissionId, null),
-        new ChatBot(0, botId, token, name, description, permissionId, type, [chat]),
+        new ChatBot(0, "", token, name, description, type),
+        new ChatBot(0, botId, "", name, description, type),
+        new ChatBot(0, botId, token, "", description, type),
+        new ChatBot(0, botId, token, name, description, null),
+        new ChatBot(0, botId, token, name, description, type, [chat]),
       ]
         .forEach(async (e) => {
           await expect(() => { e.validate() }).toThrow(ExceptionEnum.INTERNAL_SERVER_ERROR);

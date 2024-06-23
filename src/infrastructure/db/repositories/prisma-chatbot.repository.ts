@@ -13,18 +13,13 @@ export class PrismaChatBotRepository implements IChatBotRepository {
         token: bot.token,
         name: bot.name,
         description: bot.description,
-        permission: {
-          connect: {
-            name: bot.permission
-          }
-        },
         type: bot.type
       }
     });
 
     return ChatBot.of(savedBot);
   }
-  async updateChatBot(bot: ChatBot): Promise<ChatBot> {
+  async updateChatBot(bot: ChatBot, chatIds: number[] = []): Promise<ChatBot> {
     const updatedBot = await this.prisma.chatBot.update({
       where: { id: bot.id },
       data: {
@@ -32,14 +27,11 @@ export class PrismaChatBotRepository implements IChatBotRepository {
         token: bot.token,
         name: bot.name,
         description: bot.description,
-        permission: {
-          connect: {
-            name: bot.permission
-          }
-        },
         type: bot.type,
         chats: {
-          connect: bot.chats.map(c => ({ id: c.id }))
+          connect: chatIds.map(i => ({
+            id: i
+          }))
         }
       },
       include: {
@@ -52,7 +44,8 @@ export class PrismaChatBotRepository implements IChatBotRepository {
 
   async deleteChatBot(id: number): Promise<void> {
     await this.prisma.chatBot.delete({
-      where: { id }
+      where: { id },
+
     });
   }
 
@@ -62,6 +55,6 @@ export class PrismaChatBotRepository implements IChatBotRepository {
       include: { chats: true }
     });
 
-    return ChatBot.of(bot)
+    return ChatBot.of(bot);
   }
 }

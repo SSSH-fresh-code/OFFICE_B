@@ -10,7 +10,6 @@ export interface iChatBot extends AggregateRoot {
   get token(): string;
   get name(): string;
   get description(): string;
-  get permission(): string;
   get type(): string;
   get chats(): Chat[];
 

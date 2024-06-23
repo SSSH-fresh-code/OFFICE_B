@@ -18,7 +18,6 @@ export class ChatBot implements iChatBot {
     private _token: string,
     private _name: string,
     private _description: string,
-    private _permission: string,
     private _type: MessengerType,
     chats: Chat[] = [],
   ) {
@@ -26,7 +25,7 @@ export class ChatBot implements iChatBot {
   }
 
   static of({
-    id, botId, token, name, description, permissionId, type, chats
+    id, botId, token, name, description, type, chats
   }: PrismaChatBot & { chats?: PrismaChat[] }) {
     let messengerType = MessengerType.TELEGRAM;
 
@@ -45,7 +44,6 @@ export class ChatBot implements iChatBot {
       token,
       name,
       description,
-      permissionId,
       messengerType,
       chats ? chats.map(c => new Chat(c.id, c.chatId, c.name, MessengerType[c.type])) : []
     );
@@ -112,21 +110,6 @@ export class ChatBot implements iChatBot {
     this._description = description;
   }
 
-
-  /**
-   * 권한 getter
-   * @returns Permission 권한
-   */
-  get permission(): string {
-    return this._permission;
-  }
-
-
-  public set permission(permission: string) {
-    this._permission = permission;
-  }
-
-
   /**
    * 타입 getter
    * @returns ChatBotType 봇 타입
@@ -168,7 +151,6 @@ export class ChatBot implements iChatBot {
       !this._botId ||
       !this._token ||
       !this._name ||
-      !this._permission ||
       !this._type
     ) {
       throw new SsshException(ExceptionEnum.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);

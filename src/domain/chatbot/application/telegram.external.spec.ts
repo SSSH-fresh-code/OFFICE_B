@@ -34,7 +34,6 @@ describe('TelegramExternalService', () => {
         "token",
         "name",
         "description",
-        "TEST0001",
         MessengerType.TELEGRAM
       );
 

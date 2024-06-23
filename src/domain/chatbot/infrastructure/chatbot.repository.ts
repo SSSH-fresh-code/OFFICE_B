@@ -16,7 +16,7 @@ export interface IChatBotRepository {
    * @param chatBot 챗봇 엔티티
    * @returns 수정된 챗봇
    */
-  updateChatBot(chatBot: ChatBot): Promise<ChatBot>;
+  updateChatBot(chatBot: ChatBot, chatIds?: number[]): Promise<ChatBot>;
 
   /**
    * 챗봇을 삭제합니다.
