@@ -8,3 +8,4 @@ config({ path: '.env.test' });
 
 execSync("rm ./prisma/dev.db");
 execSync("npx prisma db push --schema=./prisma/schema.test.prisma");
+execSync("prisma generate --schema=prisma/schema.test.prisma && ts-node ./prisma/seed.ts")
