@@ -41,7 +41,7 @@ export class UserController {
   async updateUserPermission(@Body() dto: UpdateUserPermissonDto) {
     return this.userService.updateUserPermission(dto.id, dto.permissions);
   }
-  @Put(':id')
+  @Put('')
   @ApiOperation({ summary: '기존 유저 수정' })
   @ApiResponse({
     status: 200,

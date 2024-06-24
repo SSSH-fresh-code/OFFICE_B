@@ -40,7 +40,6 @@ describe('PrismaChatBotRepository', () => {
 
       const createdChat = await repository.createChat(chat);
 
-      console.log(createdChat.type);
       expect(createdChat.id).not.toEqual(chat.id);
       expect(createdChat.chatId).toEqual(chat.chatId);
       expect(createdChat.name).toEqual(chat.name);

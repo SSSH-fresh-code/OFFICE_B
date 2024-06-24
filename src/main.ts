@@ -29,22 +29,6 @@ async function bootstrap() {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  passport.serializeUser((user: User, done: (err: any, id?: any) => void) => {
-    const { id, permissions } = user;
-    done(null, `${id}:${permissions.join(",")}`);
-  });
-
-  passport.deserializeUser(async (info: string, done: (err: any, user?: any) => void) => {
-    try {
-      const [id, permissionsString] = info.split(":");
-      const permissions = permissionsString.split(",");
-
-      done(null, { id, permissions });
-    } catch (err) {
-      done(err);
-    }
-  });
-
   const infraModule = app.get(InfraModule);
   await infraModule.configureSwagger(app);
 
