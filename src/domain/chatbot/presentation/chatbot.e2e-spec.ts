@@ -67,6 +67,61 @@ describe('AppController (e2e)', () => {
     await prisma.cleanDatabase(['User']);
   });
 
+  describe('GET - /users', () => {
+    it('유저가 없는 경우 유저 목록 조회', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/users?page=1&take=10&orderby=name&direction=desc')
+        .set('Cookie', cookie);
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body.data.length).toEqual(0);
+    });
+
+    it('유저 목록 조회', async () => {
+      await prisma.user.create({ data: { email, password, name } })
+
+      const response = await request(app.getHttpServer())
+        .get('/users?page=1&take=10&orderby=name&direction=desc')
+        .set('Cookie', cookie);
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body.data.length).toEqual(1);
+      expect(response.body.total).toEqual(1);
+    });
+
+    it('email 일치 검색 테스트', async () => {
+      const email2 = "2@2.com";
+      await prisma.user.create({ data: { email, password, name } })
+      await prisma.user.create({ data: { email: email2, password, name: "name2" } })
+      await prisma.user.create({ data: { email: "3@3.com", password, name: "name3" } })
+
+      const response = await request(app.getHttpServer())
+        .get(`/users?page=1&take=10&orderby=name&direction=desc&where__email=${email2}`)
+        .set('Cookie', cookie);
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body.data.length).toEqual(1);
+      expect(response.body.data[0].email).toEqual(email2);
+    });
+
+    it('name like 검색 테스트', async () => {
+      const nm1 = "hello";
+      const nm2 = "hello2";
+      await prisma.user.create({ data: { email, password, name } })
+      await prisma.user.create({ data: { email: "2@2.com", password, name: nm1 } })
+      await prisma.user.create({ data: { email: "3@3.com", password, name: nm2 } })
+
+      const response = await request(app.getHttpServer())
+        .get(`/users?page=1&take=10&orderby=name&direction=desc&like__name=${nm1}`)
+        .set('Cookie', cookie);
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body.data.length).toEqual(2);
+      expect(response.body.data[0].name.includes(nm1)).toBeTruthy();
+      expect(response.body.data[1].name.includes(nm1)).toBeTruthy();
+    });
+  });
+
   it('/users 유저 이름 업데이트 (PATCH)', async () => {
     const updateName = "LimC2";
 
@@ -114,7 +169,6 @@ describe('AppController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .get('/users?page=1&take=10&orderby=name&direction=desc')
       .set('Cookie', cookie);
-    console.log(response.body.data.length)
 
     expect(response.statusCode).toBe(200);
     expect(response.body.data.length).toEqual(response.body.total);
