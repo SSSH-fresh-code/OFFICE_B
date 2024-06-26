@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, Body } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../../../app.module';
 import { PrismaService } from '../../../infrastructure/db/prisma.service';
@@ -7,10 +7,13 @@ import { PermissionEnum } from '../../../domain/permission/domain/permission.enu
 import * as bcrypt from 'bcrypt';
 import * as session from 'express-session';
 import * as passport from 'passport';
+import { ExceptionEnum } from '../../../infrastructure/filter/exception/exception.enum';
+import { PrismaClientExceptionFilter } from '../../../infrastructure/filter/exception/prisma-exception.filter';
+import { formatMessage } from '../../../infrastructure/util/message.util';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
-  let prisma: PrismaService;
+  let prismaService: PrismaService;
   let cookie: string;
 
   const email = "test@test.com";
@@ -36,10 +39,14 @@ describe('AppController (e2e)', () => {
     app.use(passport.initialize());
     app.use(passport.session());
 
-    await app.init();
-    prisma = moduleFixture.get<PrismaService>(PrismaService);
 
-    await prisma.user.create({
+    app.useGlobalPipes(new ValidationPipe());
+    app.useGlobalFilters(new PrismaClientExceptionFilter());
+
+    await app.init();
+    prismaService = moduleFixture.get<PrismaService>(PrismaService);
+
+    await prismaService.user.create({
       data: {
         email: "super@test.com",
         password: bcrypt.hashSync("password", 10),
@@ -64,7 +71,7 @@ describe('AppController (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await prisma.cleanDatabase(['User']);
+    await prismaService.cleanDatabase(['User']);
   });
 
   describe('GET - /users', () => {
@@ -78,7 +85,7 @@ describe('AppController (e2e)', () => {
     });
 
     it('유저 목록 조회', async () => {
-      await prisma.user.create({ data: { email, password, name } })
+      await prismaService.user.create({ data: { email, password, name } })
 
       const response = await request(app.getHttpServer())
         .get('/users?page=1&take=10&orderby=name&direction=desc')
@@ -91,9 +98,9 @@ describe('AppController (e2e)', () => {
 
     it('email 일치 검색 테스트', async () => {
       const email2 = "2@2.com";
-      await prisma.user.create({ data: { email, password, name } })
-      await prisma.user.create({ data: { email: email2, password, name: "name2" } })
-      await prisma.user.create({ data: { email: "3@3.com", password, name: "name3" } })
+      await prismaService.user.create({ data: { email, password, name } })
+      await prismaService.user.create({ data: { email: email2, password, name: "name2" } })
+      await prismaService.user.create({ data: { email: "3@3.com", password, name: "name3" } })
 
       const response = await request(app.getHttpServer())
         .get(`/users?page=1&take=10&orderby=name&direction=desc&where__email=${email2}`)
@@ -107,9 +114,9 @@ describe('AppController (e2e)', () => {
     it('name like 검색 테스트', async () => {
       const nm1 = "hello";
       const nm2 = "hello2";
-      await prisma.user.create({ data: { email, password, name } })
-      await prisma.user.create({ data: { email: "2@2.com", password, name: nm1 } })
-      await prisma.user.create({ data: { email: "3@3.com", password, name: nm2 } })
+      await prismaService.user.create({ data: { email, password, name } })
+      await prismaService.user.create({ data: { email: "2@2.com", password, name: nm1 } })
+      await prismaService.user.create({ data: { email: "3@3.com", password, name: nm2 } })
 
       const response = await request(app.getHttpServer())
         .get(`/users?page=1&take=10&orderby=name&direction=desc&like__name=${nm1}`)
@@ -122,33 +129,59 @@ describe('AppController (e2e)', () => {
     });
   });
 
-  it('/users 유저 이름 업데이트 (PATCH)', async () => {
-    const updateName = "LimC2";
 
-    const { id, name } = await prisma.user.create({
-      data: {
-        email: "test@test.com",
-        password: "password",
-        name: "LimC"
-      }
+  describe('PATCH - /users', () => {
+    it('유저 이름 업데이트', async () => {
+      const updateName = "LimC2";
+
+      const { id, name } = await prismaService.user.create({
+        data: {
+          email: "test@test.com",
+          password: "password",
+          name: "LimC"
+        }
+      });
+
+      const response = await request(app.getHttpServer())
+        .put('/users')
+        .set('Cookie', cookie)
+        .send({
+          id: id,
+          email: "test2@test.com",
+          password: "password2",
+          name: "LimC2"
+        });
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body._id).toEqual(id);
+      expect(response.body._name).not.toEqual(name);
+      expect(response.body._name).toEqual(updateName);
+
+      return;
     });
 
-    const response = await request(app.getHttpServer())
-      .put('/users')
-      .set('Cookie', cookie)
-      .send({
-        id: id,
-        email: "test2@test.com",
-        password: "password2",
-        name: "LimC2"
-      });
-    expect(response.statusCode).toBe(200);
-    expect(response.body._id).toEqual(id);
-    expect(response.body._name).not.toEqual(name);
-    expect(response.body._name).toEqual(updateName);
+    it('중복된 이름 업데이트', async () => {
+      await prismaService.user.create({ data: { email, password, name } });
+      const user = await prismaService.user.create({ data: { email:"2@2.com", password, name : "name2" } });
 
-    return;
-  });
+      const response = await request(app.getHttpServer())
+        .put('/users')
+        .set('Cookie', cookie)
+        .send({
+          id: user.id,
+          email: user.email,
+          password: user.password,
+          name
+        });
+        console.log(response.body);
+
+      expect(response.statusCode).toBe(400);
+      expect(response.body.message).toBe(formatMessage(ExceptionEnum.ALREADY_EXISTS, {param: "name"}));
+
+      return;
+    });
+  })
+
 
   it('/users 유저 생성 (POST)', async () => {
     const response = await request(app.getHttpServer())
@@ -164,7 +197,7 @@ describe('AppController (e2e)', () => {
   });
 
   it('/users 유저 목록 조회 (GET)', async () => {
-    await prisma.user.create({ data: { email, password, name } })
+    await prismaService.user.create({ data: { email, password, name } })
 
     const response = await request(app.getHttpServer())
       .get('/users?page=1&take=10&orderby=name&direction=desc')

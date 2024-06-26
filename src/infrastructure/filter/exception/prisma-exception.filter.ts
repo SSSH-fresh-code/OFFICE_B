@@ -1,6 +1,8 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpStatus } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Request, Response } from 'express';
+import { formatMessage } from '../../../infrastructure/util/message.util';
+import { ExceptionEnum } from './exception.enum';
 
 @Catch(Prisma.PrismaClientKnownRequestError)
 export class PrismaClientExceptionFilter implements ExceptionFilter {
@@ -20,7 +22,7 @@ export class PrismaClientExceptionFilter implements ExceptionFilter {
         break;
       case 'P2002':
         status = HttpStatus.BAD_REQUEST;
-        message = `이미 존재하는 ${exception.meta.target}입니다.`
+        message = formatMessage(ExceptionEnum.ALREADY_EXISTS, {param: exception.meta.target})
         break;
     }
 
