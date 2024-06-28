@@ -18,15 +18,14 @@ export class PrismaClientExceptionFilter implements ExceptionFilter {
     switch (exception.code) {
       case 'P2025':
         status = HttpStatus.BAD_REQUEST;
-        message = '리소스를 찾을 수 없습니다.';
+        message = ExceptionEnum.NOT_FOUND;
         break;
       case 'P2002':
         status = HttpStatus.BAD_REQUEST;
-        message = formatMessage(ExceptionEnum.ALREADY_EXISTS, {param: exception.meta.target})
+        message = formatMessage(ExceptionEnum.ALREADY_EXISTS, { param: exception.meta.target })
         break;
     }
 
-    console.log(exception)
     response.status(status).json({
       statusCode: status,
       message: message,

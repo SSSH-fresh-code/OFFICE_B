@@ -4,12 +4,15 @@ import * as request from 'supertest';
 import { AppModule } from '../../../app.module';
 import { PrismaService } from '../../../infrastructure/db/prisma.service';
 import { PermissionEnum } from '../../../domain/permission/domain/permission.enum';
-import * as bcrypt from 'bcrypt';
 import * as session from 'express-session';
-import * as passport from 'passport';
 import { ExceptionEnum } from '../../../infrastructure/filter/exception/exception.enum';
 import { PrismaClientExceptionFilter } from '../../../infrastructure/filter/exception/prisma-exception.filter';
 import { formatMessage } from '../../../infrastructure/util/message.util';
+import * as bcrypt from 'bcrypt';
+import * as passport from 'passport';
+import { v4 as uuidv4 } from 'uuid';
+import { permission } from 'process';
+import { connect } from 'http2';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -38,7 +41,6 @@ describe('AppController (e2e)', () => {
 
     app.use(passport.initialize());
     app.use(passport.session());
-
 
     app.useGlobalPipes(new ValidationPipe());
     app.useGlobalFilters(new PrismaClientExceptionFilter());
@@ -127,6 +129,13 @@ describe('AppController (e2e)', () => {
       expect(response.body.data[0].name.includes(nm1)).toBeTruthy();
       expect(response.body.data[1].name.includes(nm1)).toBeTruthy();
     });
+
+    it('권한 없이 조회', async () => {
+      const response = await request(app.getHttpServer())
+        .get(`/users?page=1&take=10`)
+
+      expect(response.statusCode).toBe(403);
+    });
   });
 
 
@@ -162,7 +171,7 @@ describe('AppController (e2e)', () => {
 
     it('중복된 이름 업데이트', async () => {
       await prismaService.user.create({ data: { email, password, name } });
-      const user = await prismaService.user.create({ data: { email:"2@2.com", password, name : "name2" } });
+      const user = await prismaService.user.create({ data: { email: "2@2.com", password, name: "name2" } });
 
       const response = await request(app.getHttpServer())
         .put('/users')
@@ -173,39 +182,149 @@ describe('AppController (e2e)', () => {
           password: user.password,
           name
         });
-        console.log(response.body);
 
       expect(response.statusCode).toBe(400);
-      expect(response.body.message).toBe(formatMessage(ExceptionEnum.ALREADY_EXISTS, {param: "name"}));
+      expect(response.body.message).toBe(formatMessage(ExceptionEnum.ALREADY_EXISTS, { param: "name" }));
+
+      return;
+    });
+
+    it('없는 유저 업데이트', async () => {
+      const response = await request(app.getHttpServer())
+        .put('/users')
+        .set('Cookie', cookie)
+        .send({
+          id: uuidv4(),
+          email: email,
+          password: password,
+          name
+        });
+
+      expect(response.statusCode).toBe(400);
+      expect(response.body.message).toBe(ExceptionEnum.NOT_FOUND);
+
+      return;
+    });
+
+    it('권한 없이 수정', async () => {
+      const response = await request(app.getHttpServer())
+        .put('/users')
+        .send({
+          id: uuidv4(),
+          email: email,
+          password: password,
+          name
+        });
+
+      expect(response.statusCode).toBe(403);
+    });
+  })
+
+
+  describe('POST - /users', () => {
+    it('유저 생성', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/users')
+        .send({
+          email, password, name
+        });
+
+      expect(response.statusCode).toBe(201);
+
+      return;
+    });
+
+    it('중복된 이메일로 유저 생성', async () => {
+      await prismaService.user.create({ data: { email, password, name } })
+
+      const response = await request(app.getHttpServer())
+        .post('/users')
+        .send({
+          email: email,
+          password: "password",
+          name: "LimC"
+        });
+
+      expect(response.statusCode).toBe(400);
+      expect(response.body.message).toBe(formatMessage(ExceptionEnum.ALREADY_EXISTS, { param: "email" }));
+
+      return;
+    });
+
+    it('중복된 이름으로 유저 생성', async () => {
+      await prismaService.user.create({ data: { email, password, name } })
+
+      const response = await request(app.getHttpServer())
+        .post('/users')
+        .send({
+          email: "alma@naver.com",
+          password: "password",
+          name: name
+        });
+
+      expect(response.statusCode).toBe(400);
+      expect(response.body.message).toBe(formatMessage(ExceptionEnum.ALREADY_EXISTS, { param: "name" }));
 
       return;
     });
   })
 
+  describe('PUT - /users/permission', () => {
+    it('유저 권한 수정', async () => {
+      const permissions = [PermissionEnum.CAN_READ_USER, PermissionEnum.CAN_WRITE_USER];
+      const { id } = await prismaService.user.create({ data: { email, password, name } })
 
-  it('/users 유저 생성 (POST)', async () => {
-    const response = await request(app.getHttpServer())
-      .post('/users')
-      .send({
-        email: "test@test.com",
-        password: "password",
-        name: "LimC"
-      });
+      const response = await request(app.getHttpServer())
+        .put('/users/permission')
+        .set('Cookie', cookie)
+        .send({
+          id, permissions
+        });
 
-    expect(response.statusCode).toBe(201);
-    return;
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body._id).toEqual(id);
+      expect(response.body._permissions).toEqual(permissions);
+    })
+
+    it('유저 권한 초기화(빈배열)', async () => {
+      const permissions = [PermissionEnum.CAN_READ_USER, PermissionEnum.CAN_WRITE_USER];
+      const { id } = await prismaService.user.create({
+        data: {
+          email, password, name, permissions: {
+            connect: permissions.map(p => ({
+              name: p
+            }))
+          }
+        }
+      })
+
+      const response = await request(app.getHttpServer())
+        .put('/users/permission')
+        .set('Cookie', cookie)
+        .send({
+          id, permissions: []
+        });
+
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body._id).toEqual(id);
+      expect(response.body._permissions).toEqual([]);
+    })
+
+    it('권한 없이 권한 수정', async () => {
+      const response = await request(app.getHttpServer())
+        .put('/users/permission')
+        .send({
+          id: uuidv4(),
+        });
+
+      expect(response.statusCode).toBe(403);
+    });
+
+
   });
 
-  it('/users 유저 목록 조회 (GET)', async () => {
-    await prismaService.user.create({ data: { email, password, name } })
-
-    const response = await request(app.getHttpServer())
-      .get('/users?page=1&take=10&orderby=name&direction=desc')
-      .set('Cookie', cookie);
-
-    expect(response.statusCode).toBe(200);
-    expect(response.body.data.length).toEqual(response.body.total);
-  })
 
   afterAll(async () => {
     await request(app.getHttpServer()).post('/auth/logout')

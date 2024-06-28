@@ -7,7 +7,7 @@ import { User } from '../domain/user.entity';
 import { ReadUserDto } from './dto/read-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdateUserPermissonDto } from './dto/update-userPermission.dto';
-import { PermissionsClass, PermissionsMethod } from '../../../infrastructure/decorator/permissions.decorator';
+import { PermissionsMethod } from '../../../infrastructure/decorator/permissions.decorator';
 import { PermissionEnum } from '../../../domain/permission/domain/permission.enum';
 import { Page } from '../../../infrastructure/common/services/paging.service';
 

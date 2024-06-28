@@ -4,7 +4,6 @@ import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { ReadPermissionDto } from './dto/read-permission.dto';
 import { Permission } from '../domain/permission.entity';
-import { v4 as uuidv4 } from 'uuid';
 import { PermissionService } from '../application/permission.service';
 
 /**

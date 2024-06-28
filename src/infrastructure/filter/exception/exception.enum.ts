@@ -7,4 +7,5 @@ export enum ExceptionEnum {
   FORBIDDEN = '권한이 없습니다.',
   NOT_LOGGED_IN = '로그인한 상태가 아닙니다.',
   MESSAGE_SENDING_ERROR = '{param} 메세지가 전송 중 오류가 발생했습니다.',
+  NOT_FOUND = '데이터가 존재하지 않습니다.'
 }
