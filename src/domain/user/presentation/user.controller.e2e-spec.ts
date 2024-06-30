@@ -11,8 +11,6 @@ import { formatMessage } from '../../../infrastructure/util/message.util';
 import * as bcrypt from 'bcrypt';
 import * as passport from 'passport';
 import { v4 as uuidv4 } from 'uuid';
-import { permission } from 'process';
-import { connect } from 'http2';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -312,6 +310,25 @@ describe('AppController (e2e)', () => {
       expect(response.body._permissions).toEqual([]);
     })
 
+
+    it('존재하지 않는 권한 추가', async () => {
+      const { id } = await prismaService.user.create({
+        data: {
+          email, password, name
+        }
+      })
+
+      const response = await request(app.getHttpServer())
+        .put('/users/permission')
+        .set('Cookie', cookie)
+        .send({
+          id, permissions: ["WRONG001"]
+        });
+
+      expect(response.statusCode).toBe(400);
+      expect(response.body.message).toBe(ExceptionEnum.NOT_FOUND);
+    })
+
     it('권한 없이 권한 수정', async () => {
       const response = await request(app.getHttpServer())
         .put('/users/permission')
@@ -321,7 +338,47 @@ describe('AppController (e2e)', () => {
 
       expect(response.statusCode).toBe(403);
     });
+  });
 
+  describe('GET - /users/:id', () => {
+    it('유저 정보 정상 조회', async () => {
+      const user = await prismaService.user.create({
+        select: {
+          id: true,
+          email: true,
+          name: true,
+        },
+        data: {
+          email, password, name
+        }
+      });
+
+      const { statusCode, body } = await request(app.getHttpServer())
+        .get(`/users/${encodeURI(user.id)}`)
+        .set('Cookie', cookie);
+
+      expect(statusCode).toBe(200);
+      expect(body.id).toEqual(user.id);
+      expect(body.email).toEqual(user.email);
+      expect(body.name).toEqual(user.name);
+    })
+
+    it('없는 유저 조회', async () => {
+      const { statusCode, body } = await request(app.getHttpServer())
+        .get(`/users/${uuidv4()}`)
+        .set('Cookie', cookie);
+
+      expect(statusCode).toBe(400);
+      expect(body.message).toEqual(ExceptionEnum.NOT_FOUND);
+    })
+
+    it('권한 없이 조회', async () => {
+      const { statusCode, body } = await request(app.getHttpServer())
+        .get(`/users/${uuidv4()}`);
+
+      expect(statusCode).toBe(403);
+      expect(body.message).toEqual(ExceptionEnum.NOT_LOGGED_IN);
+    })
 
   });
 
@@ -331,4 +388,3 @@ describe('AppController (e2e)', () => {
     await app.close();
   });
 });
-

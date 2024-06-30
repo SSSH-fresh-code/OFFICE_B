@@ -32,6 +32,8 @@ model ChatBot {
   name        String        @unique
   description String
   type        MessengerType
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   chats       Chat[]        @relation("ChatBotChats")
 }
 
@@ -40,6 +42,8 @@ model Chat {
   chatId String        @unique
   name   String        @unique
   type   MessengerType
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   bots   ChatBot[]     @relation("ChatBotChats")
 }
 

@@ -1,5 +1,7 @@
-import { Injectable, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { Injectable, ExecutionContext, UnauthorizedException, HttpStatus } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { ExceptionEnum } from '../../../../infrastructure/filter/exception/exception.enum';
+import { SsshException } from '../../../../infrastructure/filter/exception/sssh.exception';
 
 @Injectable()
 export class LocalAuthGuard extends AuthGuard('local') {
@@ -12,7 +14,7 @@ export class LocalAuthGuard extends AuthGuard('local') {
 
   handleRequest(err, user, info) {
     if (err || !user) {
-      throw err || new UnauthorizedException();
+      throw err || new SsshException(ExceptionEnum.LOGIN_FAILED, HttpStatus.UNAUTHORIZED);
     }
     return user;
   }
