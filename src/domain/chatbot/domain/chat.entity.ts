@@ -4,6 +4,7 @@ import { MessengerType } from "./chatbot.entity";
 import { ExceptionEnum } from "../../../infrastructure/filter/exception/exception.enum";
 import { HttpStatus } from "@nestjs/common";
 import { Chat as PrismaChat } from "@prisma/client";
+import { ReadChatDto } from "../presentation/dto/read-chat.dto";
 
 /**
  * Chat 엔티티 클래스
@@ -13,6 +14,8 @@ export class Chat implements iChat {
   private _chatId: string;
   private _name: string;
   private _type: MessengerType;
+  private _createdAt?: Date;
+  private _updatedAt?: Date;
 
   /**
    * 생성자
@@ -21,15 +24,18 @@ export class Chat implements iChat {
    * @param name - 채팅방 이름
    * @param type - 채팅방 타입
    */
-  constructor(id: number, chatId: string, name: string, type: MessengerType) {
+  constructor(id: number, chatId: string, name: string, type: MessengerType, createdAt?: Date, updatedAt?: Date) {
     this._id = id;
     this._chatId = chatId;
     this._name = name;
     this._type = type;
+    this._createdAt = createdAt;
+    this._updatedAt = updatedAt;
+
   }
 
-  static of({ id, chatId, name, type }: PrismaChat) {
-    return new this(id, chatId, name, MessengerType[type]);
+  static of({ id, chatId, name, type, createdAt, updatedAt }: PrismaChat) {
+    return new this(id, chatId, name, MessengerType[type], createdAt, updatedAt);
   }
 
   /**
@@ -65,6 +71,21 @@ export class Chat implements iChat {
     return this._type;
   }
 
+  /**
+   * 채팅방 생성일자 getter
+   * @returns Date 채팅방 생성일자
+   */
+  get createdAt(): Date {
+    return this._createdAt;
+  }
+  /**
+   * 채팅방 수정일자 getter
+   * @returns Date 채팅방 수정일자
+   */
+  get updatedAt(): Date {
+    return this._updatedAt;
+  }
+
   validate(): void {
     if (this._chatId.length < 1 || this._name.length < 1) {
       throw new SsshException(ExceptionEnum.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -75,4 +96,16 @@ export class Chat implements iChat {
         if (MessengerType[key] === this._type) return;
     }
   }
+
+  toDto(): ReadChatDto {
+    return {
+      id: this._id,
+      chatId: this._chatId,
+      name: this._name,
+      type: this._type,
+      createdAt: this._createdAt,
+      updatedAt: this._updatedAt,
+    }
+  }
+
 }

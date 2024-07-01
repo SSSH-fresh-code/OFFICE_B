@@ -1,4 +1,5 @@
 import { AggregateRoot } from "../../../domain/aggregate-root.interface";
+import { ReadChatBotDto } from "../presentation/dto/read-chatbot.dto";
 import { Chat } from "./chat.entity";
 
 /**
@@ -26,4 +27,6 @@ export interface iChatBot extends AggregateRoot {
   removeChat(chatId: string): void
 
   clearChat(): void;
+
+  toDto(): ReadChatBotDto;
 }

@@ -29,7 +29,7 @@ export class PrismaChatBotRepository implements IChatBotRepository {
         description: bot.description,
         type: bot.type,
         chats: {
-          connect: chatIds.map(i => ({
+          set: chatIds.map(i => ({
             id: i
           }))
         }

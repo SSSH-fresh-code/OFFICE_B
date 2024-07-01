@@ -7,7 +7,6 @@ import { ChatBot, MessengerType } from "../domain/chatbot.entity";
 import { CreateChatBotDto } from '../presentation/dto/create-chatbot.dto';
 import { MessengerFactory } from '../infrastructure/messenger.factory';
 import { UpdateChatBotDto } from '../presentation/dto/update-chatbot.dto';
-import { Chat } from '../domain/chat.entity';
 import { ChatBotPagingDto } from "../presentation/dto/chatbot-paging.dto";
 
 /**
@@ -80,7 +79,7 @@ describe('ChatBotService', () => {
 
       const createdBot = await chatBotService.createChatBot(dto);
 
-      expect(createdBot).toEqual(bot);
+      expect(createdBot).toEqual(bot.toDto());
       expect(chatBotRepository.createChatBot).toHaveBeenCalledWith(
         new ChatBot(0, botId, token, name, description, MessengerType[type])
       );
@@ -99,23 +98,23 @@ describe('ChatBotService', () => {
 
       const updatedBot = await chatBotService.updateChatBot(dto);
 
-      expect(updatedBot).toEqual(bot);
+      expect(updatedBot).toEqual(bot.toDto());
       expect(chatBotRepository.updateChatBot).toHaveBeenCalledWith(bot, undefined);
     });
 
     it('챗봇의 정보(+채팅)를 수정합니다.', async () => {
       const chatIds: number[] = [1];
       const dto: UpdateChatBotDto = {
-        id: 1, botId, token, name, description, type
+        id: 1, botId, token, name, description, type, chatIds
       };
 
       const bot = new ChatBot(dto.id, dto.botId, dto.token, dto.name, dto.description, MessengerType[dto.type]);
 
-      chatBotRepository.updateChatBot.mockResolvedValue(bot);
+      chatBotRepository.updateChatBot.mockResolvedValue(bot, chatIds);
 
-      const updatedBot = await chatBotService.updateChatBot(dto, chatIds);
+      const updatedBot = await chatBotService.updateChatBot(dto);
 
-      expect(updatedBot).toEqual(bot);
+      expect(updatedBot).toEqual(bot.toDto());
       expect(chatBotRepository.updateChatBot).toHaveBeenCalledWith(bot, chatIds);
     });
   });

@@ -1,19 +1,25 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Inject, Param, ParseIntPipe, Post, Put, Query, Res } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { ChatBotService } from '../application/chatbot.service';
 import { PermissionsClass, PermissionsMethod } from '../../../infrastructure/decorator/permissions.decorator';
 import { PermissionEnum } from '../../../domain/permission/domain/permission.enum';
 import { CreateChatBotDto } from './dto/create-chatbot.dto';
-import { ChatBot } from '../domain/chatbot.entity';
 import { UpdateChatBotDto } from './dto/update-chatbot.dto';
 import { ChatBotPagingDto } from './dto/chatbot-paging.dto';
-import { Page } from 'src/infrastructure/common/services/paging.service';
+import { Page } from '../../../infrastructure/common/services/paging.service';
+import { ReadChatBotDto } from './dto/read-chatbot.dto';
+import { Response } from 'express';
+import { Logger } from 'winston';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 
 @ApiTags('chats')
 @Controller('chat/bot')
 @PermissionsClass(PermissionEnum.CAN_USE_CHAT)
 export class ChatBotController {
-  constructor(private readonly chatbotService: ChatBotService) { }
+  constructor(
+    private readonly chatbotService: ChatBotService,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
+  ) { }
 
   @Post()
   @ApiOperation({ summary: '신규 챗봇 생성' })
@@ -24,7 +30,7 @@ export class ChatBotController {
   @ApiResponse({ status: 400, description: '잘못된 파라미터 값' })
   @ApiBody({ type: CreateChatBotDto })
   @PermissionsMethod(PermissionEnum.CAN_WRITE_CHAT)
-  async createChatBot(@Body() dto: CreateChatBotDto): Promise<ChatBot> {
+  async createChatBot(@Body() dto: CreateChatBotDto): Promise<ReadChatBotDto> {
     return await this.chatbotService.createChatBot(dto);
   }
 
@@ -37,8 +43,26 @@ export class ChatBotController {
   @ApiResponse({ status: 400, description: '존재하지 않는 챗봇' })
   @ApiBody({ type: UpdateChatBotDto })
   @PermissionsMethod(PermissionEnum.CAN_WRITE_CHAT)
-  async UpdateChatBotDto(@Body() dto: UpdateChatBotDto) {
+  async UpdateChatBotDto(@Body() dto: UpdateChatBotDto): Promise<ReadChatBotDto> {
     return await this.chatbotService.updateChatBot(dto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: '챗봇 삭제' })
+  @ApiResponse({
+    status: 200,
+    description: '챗봇 단건 삭제',
+  })
+
+  @ApiResponse({ status: 404, description: '존재하지 않는 챗봇' })
+  @PermissionsMethod(PermissionEnum.CAN_WRITE_CHAT)
+  async deleteChatBotById(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    try {
+      await this.chatbotService.deleteChatBot(id);
+    } catch (e) {
+      this.logger.error(e);
+      throw e;
+    }
   }
 
   @Get()
@@ -48,7 +72,7 @@ export class ChatBotController {
     description: '챗봇 목록이 정상적으로 조회됨',
   })
   @PermissionsMethod(PermissionEnum.CAN_READ_CHAT)
-  async getChatBots(@Query() pagingDto: ChatBotPagingDto): Promise<Page<ChatBot>> {
+  async getChatBots(@Query() pagingDto: ChatBotPagingDto): Promise<Page<ReadChatBotDto>> {
     return await this.chatbotService.getChatBots(pagingDto);
   }
 
@@ -60,7 +84,7 @@ export class ChatBotController {
   })
   @ApiResponse({ status: 404, description: '존재하지 않는 챗봇' })
   @PermissionsMethod(PermissionEnum.CAN_READ_CHAT)
-  async getChatBotById(@Param('id', ParseIntPipe) id: number): Promise<ChatBot> {
+  async getChatBotById(@Param('id', ParseIntPipe) id: number): Promise<ReadChatBotDto> {
     return await this.chatbotService.getChatBotById(id);
   }
 

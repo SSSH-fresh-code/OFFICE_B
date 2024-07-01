@@ -146,7 +146,12 @@ describe('PrismaChatBotRepository', () => {
 
       const updatedBot = await repository.updateChatBot(updateBot, [chat.id]);
 
-      expect(updateBot).toEqual(updatedBot);
+      expect(updateBot.id).toEqual(updatedBot.id);
+      expect(updateBot.botId).toEqual(updatedBot.botId);
+      expect(updateBot.token).toEqual(updatedBot.token);
+      expect(updateBot.name).toEqual(updatedBot.name);
+      expect(updateBot.description).toEqual(updatedBot.description);
+      expect(updateBot.type).toEqual(updatedBot.type);
       expect(updatedBot.chats.length).toBe(1);
       expect(updatedBot.chats[0]).toEqual(chat);
     });

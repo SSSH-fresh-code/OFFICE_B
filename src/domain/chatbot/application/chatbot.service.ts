@@ -4,9 +4,11 @@ import { CHATBOT_REPOSITORY, CHAT_REPOSITORY, MESSENGER_FACTORY } from '../chatb
 import { IChatBotRepository } from '../infrastructure/chatbot.repository';
 import { CreateChatBotDto } from '../presentation/dto/create-chatbot.dto';
 import { ChatBot, MessengerType } from '../domain/chatbot.entity';
+import { ChatBot as PrismaChatBot } from '@prisma/client';
 import { UpdateChatBotDto } from '../presentation/dto/update-chatbot.dto';
 import { ChatBotPagingDto } from '../presentation/dto/chatbot-paging.dto';
 import { Page, PagingService } from '../../../infrastructure/common/services/paging.service';
+import { ReadChatBotDto } from '../presentation/dto/read-chatbot.dto';
 
 @Injectable()
 export class ChatBotService {
@@ -26,7 +28,9 @@ export class ChatBotService {
 
     bot.validate();
 
-    return await this.repostiroy.createChatBot(bot);
+    const createdBot = await this.repostiroy.createChatBot(bot);
+
+    return createdBot.toDto();
   }
 
   /**
@@ -34,12 +38,14 @@ export class ChatBotService {
    * @param {UpdateChatBotDto} dto 
    * @returns 수정된 챗봇을 반환합니다.
    */
-  async updateChatBot(dto: UpdateChatBotDto, chatIds?: number[]) {
+  async updateChatBot(dto: UpdateChatBotDto) {
     const bot = new ChatBot(dto.id, dto.botId, dto.token, dto.name, dto.description, MessengerType[dto.type]);
 
     bot.validate();
 
-    return await this.repostiroy.updateChatBot(bot, chatIds);
+    const updatedBot = await this.repostiroy.updateChatBot(bot, dto.chatIds);
+
+    return updatedBot.toDto();
   }
 
   /**
@@ -53,17 +59,19 @@ export class ChatBotService {
   /**
    * 아이디로 챗봇을 조회합니다.
    * @param {number} id 
-   * @return {Promise<ChatBot>} 챗봇을 반환합니다.
+   * @return {Promise<ReadChatBotDto>} 챗봇을 반환합니다.
    */
   async getChatBotById(id: number) {
-    return await this.repostiroy.findChatBotById(id);
+    const bot = await this.repostiroy.findChatBotById(id);
+
+    return bot.toDto();
   }
   /**
    * 챗봇 리스트를 조회합니다.
-   * @param {number} id 
+   * @param {ChatBotPagingDto} pagingDto 
    * @return {Promise<ChatBot>} 챗봇을 반환합니다.
    */
-  async getChatBots(pagingDto: ChatBotPagingDto): Promise<Page<ChatBot>> {
+  async getChatBots(pagingDto: ChatBotPagingDto): Promise<Page<ReadChatBotDto>> {
     const where = {};
     if (pagingDto.where__type) {
       where['type'] = pagingDto.where__type;
@@ -73,6 +81,11 @@ export class ChatBotService {
       orderBy[pagingDto.orderby] = pagingDto.direction;
     }
 
-    return this.pagingService.getPagedResults('ChatBot', pagingDto, where, orderBy);
+    const pagingBots = await this.pagingService.getPagedResults<PrismaChatBot>('ChatBot', pagingDto, where, orderBy);
+
+    return {
+      data: pagingBots.data.map(bot => ChatBot.of(bot).toDto()),
+      total: pagingBots.total
+    }
   }
 }

@@ -30,7 +30,7 @@ export class PagingService<T> {
    * @param orderBy 정렬 조건
    * @returns 데이터와 총 개수를 포함한 객체
    */
-  async getPagedResults(
+  async getPagedResults<T>(
     model: Prisma.ModelName,
     pagingDto: PagingDto,
     where: WhereClause = {},

@@ -4,6 +4,7 @@ import { iChatBot } from './chatbot.interface';
 import { Chat as PrismaChat, ChatBot as PrismaChatBot } from "@prisma/client";
 import { ExceptionEnum } from '../../../infrastructure/filter/exception/exception.enum';
 import { HttpStatus, Logger } from '@nestjs/common';
+import { ReadChatBotDto } from '../presentation/dto/read-chatbot.dto';
 
 /**
  * ChatBot 엔티티 클래스
@@ -20,12 +21,14 @@ export class ChatBot implements iChatBot {
     private _description: string,
     private _type: MessengerType,
     chats: Chat[] = [],
+    private _createdAt?: Date,
+    private _updatedAt?: Date,
   ) {
     this._chats = chats;
   }
 
   static of({
-    id, botId, token, name, description, type, chats
+    id, botId, token, name, description, type, chats, createdAt, updatedAt
   }: PrismaChatBot & { chats?: PrismaChat[] }) {
     let messengerType = MessengerType.TELEGRAM;
 
@@ -45,9 +48,12 @@ export class ChatBot implements iChatBot {
       name,
       description,
       messengerType,
-      chats ? chats.map(c => new Chat(c.id, c.chatId, c.name, MessengerType[c.type])) : []
+      chats ? chats.map(c => new Chat(c.id, c.chatId, c.name, MessengerType[c.type])) : [],
+      createdAt,
+      updatedAt
     );
   }
+
 
 
   /**
@@ -161,6 +167,20 @@ export class ChatBot implements iChatBot {
         this.logger.error("ChatBot.validate() - 하위 채팅방의 타입이 상위 챗봇과 일치하지 않습니다.");
         throw new SsshException(ExceptionEnum.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
       }
+    }
+  }
+
+  toDto(): ReadChatBotDto {
+    return {
+      id: this._id,
+      botId: this._botId,
+      token: this._token,
+      name: this._name,
+      description: this._description,
+      type: this._type,
+      chats: this._chats.map(chat => chat.toDto()),
+      createdAt: this._createdAt,
+      updatedAt: this._updatedAt,
     }
   }
 }
