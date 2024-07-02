@@ -67,7 +67,7 @@ describe('ChatBotService', () => {
 
   beforeEach(() => {
     bot = new ChatBot(0, botId, token, name, description, type, []);
-  })
+  });
 
   describe('createChatBot', () => {
     it('챗봇을 정상적으로 생성합니다.', async () => {

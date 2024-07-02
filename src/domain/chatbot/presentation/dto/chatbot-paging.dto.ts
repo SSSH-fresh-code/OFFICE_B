@@ -12,7 +12,6 @@ export class ChatBotPagingDto extends PagingDto {
   @ApiProperty({
     description: '타입으로 필터링',
     example: 'DISCORD',
-    required: true,
   })
   where__type?: string;
 }

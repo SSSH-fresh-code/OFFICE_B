@@ -8,7 +8,6 @@ import { UpdateChatBotDto } from './dto/update-chatbot.dto';
 import { ChatBotPagingDto } from './dto/chatbot-paging.dto';
 import { Page } from '../../../infrastructure/common/services/paging.service';
 import { ReadChatBotDto } from './dto/read-chatbot.dto';
-import { Response } from 'express';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 

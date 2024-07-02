@@ -87,13 +87,16 @@ export class Chat implements iChat {
   }
 
   validate(): void {
-    if (this._chatId.length < 1 || this._name.length < 1) {
-      throw new SsshException(ExceptionEnum.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
-    } else {
+    if (
+      (this._chatId && this._chatId.length > 0)
+      && (this._name && this._name.length > 0)
+    ) {
       const keys = Object.keys(MessengerType);
 
       for (const key of keys)
         if (MessengerType[key] === this._type) return;
+    } else {
+      throw new SsshException(ExceptionEnum.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
