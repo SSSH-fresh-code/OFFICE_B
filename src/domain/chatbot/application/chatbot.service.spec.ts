@@ -54,6 +54,7 @@ describe('ChatBotService', () => {
 
   let bot: ChatBot;
 
+
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [LoggerModule],
