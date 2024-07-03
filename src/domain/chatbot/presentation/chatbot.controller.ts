@@ -10,6 +10,8 @@ import { Page } from '../../../infrastructure/common/services/paging.service';
 import { ReadChatBotDto } from './dto/read-chatbot.dto';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { SendChatBotDto } from './dto/send-chatbot.dto';
+import { SendResultDto } from './dto/send-result.dto';
 
 @ApiTags('chats')
 @Controller('chat/bot')
@@ -85,6 +87,18 @@ export class ChatBotController {
   @PermissionsMethod(PermissionEnum.CAN_READ_CHAT)
   async getChatBotById(@Param('id', ParseIntPipe) id: number): Promise<ReadChatBotDto> {
     return await this.chatbotService.getChatBotById(id);
+  }
+
+  @Post('send')
+  @ApiOperation({ summary: '챗봇 메세지 전송' })
+  @ApiResponse({
+    status: 200,
+    description: '메세지가 정상적으로 전송되었습니다.',
+  })
+  @ApiBody({ type: SendChatBotDto })
+  @PermissionsMethod(PermissionEnum.CAN_WRITE_CHAT)
+  async sendMessage(@Body() dto: SendChatBotDto): Promise<SendResultDto> {
+    return await this.chatbotService.sendMessage(dto);
   }
 
 }

@@ -8,6 +8,13 @@ import { CreateChatBotDto } from '../presentation/dto/create-chatbot.dto';
 import { MessengerFactory } from '../infrastructure/messenger.factory';
 import { UpdateChatBotDto } from '../presentation/dto/update-chatbot.dto';
 import { ChatBotPagingDto } from "../presentation/dto/chatbot-paging.dto";
+import { TelegramExternalService } from "./telegram.external";
+import { Chat } from "../domain/chat.entity";
+import { SendChatBotDto } from "../presentation/dto/send-chatbot.dto";
+import { LoggerModule } from "../../../infrastructure/module/logger.module";
+import { HttpStatus } from "@nestjs/common";
+import { ExceptionEnum } from "../../../infrastructure/filter/exception/exception.enum";
+import { SsshException } from "../../../infrastructure/filter/exception/sssh.exception";
 
 /**
  * Mock User Repository
@@ -20,9 +27,6 @@ const mockChatBotRepository = () => ({
   findChatBotById: jest.fn(),
 });
 
-const mockMessengerFactory = () => ({
-  getMessengerService: jest.fn()
-});
 /**
  * Mock Paging Service
  * 페이징 서비스의 Mock 함수들을 정의합니다.
@@ -31,27 +35,36 @@ const mockPagingService = () => ({
   getPagedResults: jest.fn(),
 });
 
+const mockTelegramExternalService = () => ({
+  chat: jest.fn(),
+});
+
 describe('ChatBotService', () => {
   let chatBotService: ChatBotService;
   let chatBotRepository;
   let pagingService;
-  let messengerFactory;
+  let telegramExternalService;
+  let messengerFactory: MessengerFactory;
 
   const botId = "7370566619";
   const token = "7345685563:AAFvwnUGTM2OKm4n-qpVk7uSfQq6NZJiTB4";
   const name = "chatbot";
   const description = "챗봇";
-  const type = MessengerType.DISCORD;
-  const permission = "TEST0001";
+  const type = MessengerType.TELEGRAM;
 
   let bot: ChatBot;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [LoggerModule],
       providers: [
         {
           provide: MESSENGER_FACTORY,
-          useFactory: mockMessengerFactory,
+          useClass: MessengerFactory,
+        },
+        {
+          provide: MessengerType.TELEGRAM,
+          useFactory: mockTelegramExternalService
         },
         { provide: CHATBOT_REPOSITORY, useFactory: mockChatBotRepository },
         { provide: PagingService, useFactory: mockPagingService },
@@ -63,6 +76,8 @@ describe('ChatBotService', () => {
     chatBotRepository = module.get<PrismaChatBotRepository>(CHATBOT_REPOSITORY);
     pagingService = module.get<PagingService<ChatBot>>(PagingService);
     messengerFactory = module.get<MessengerFactory>(MESSENGER_FACTORY);
+    telegramExternalService = module.get<TelegramExternalService>(MessengerType.TELEGRAM);
+
   });
 
   beforeEach(() => {
@@ -164,6 +179,62 @@ describe('ChatBotService', () => {
         , { createdAt: 'desc' }
       );
       expect(chatbots.total).toEqual(1);
+    });
+  });
+
+  describe('sendMessage', () => {
+    it('텔레그램 메세지 전송', async () => {
+      const dto: SendChatBotDto = {
+        botId: bot.id,
+        chatId: 1,
+        message: "테스트 메세지 입니다."
+      };
+
+      bot.addChat(new Chat(1, "id", "name", MessengerType.TELEGRAM));
+
+      chatBotRepository.findChatBotById.mockResolvedValue(bot);
+
+      const result = await chatBotService.sendMessage(dto);
+
+      expect(telegramExternalService.chat).toHaveBeenCalledWith(
+        bot, bot.chats[0], dto.message
+      );
+      expect(result).toEqual({
+        isSuccess: true,
+        message: dto.message,
+        chatbot: bot.toDto(),
+        chat: bot.chats[0].toDto()
+      });
+    });
+
+    it('구현되지 않은 챗봇 타입 전송', async () => {
+      const dto: SendChatBotDto = {
+        botId: bot.id,
+        chatId: 1,
+        message: "테스트 메세지 입니다."
+      };
+
+      bot = new ChatBot(0, botId, token, name, description, MessengerType.SLACK, []);
+      bot.addChat(new Chat(1, "id", "name", MessengerType.SLACK));
+
+      chatBotRepository.findChatBotById.mockResolvedValue(bot);
+
+      await expect(() => chatBotService.sendMessage(dto)).rejects.toThrow(new SsshException(ExceptionEnum.NOT_IMPLEMENTED, HttpStatus.NOT_IMPLEMENTED));
+    });
+
+    it('챗봇 내에 채팅이 존재하지 않음', async () => {
+      const dto: SendChatBotDto = {
+        botId: bot.id,
+        chatId: 1,
+        message: "테스트 메세지 입니다."
+      };
+
+      chatBotRepository.findChatBotById.mockResolvedValue(bot);
+
+      await expect(() => chatBotService.sendMessage(dto))
+        .rejects
+        .toThrow(new SsshException(ExceptionEnum.PARAMETER_NOT_FOUND, HttpStatus.BAD_REQUEST, { param: "chat" }));
+
     });
   });
 

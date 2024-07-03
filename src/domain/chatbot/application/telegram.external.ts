@@ -32,7 +32,7 @@ export class TelegramExternalService implements iMessengerExternalService {
     });
 
     if (call.ok) {
-      await this.logger.info(`${bot.name}이 ${chat.name}으로 메세지를 전송했습니다.\n내용 : ${msg}`);
+      this.logger.info(`${bot.name}이 ${chat.name}으로 메세지를 전송했습니다.\n내용 : ${msg}`);
       return true;
     } else {
       throw new SsshException(

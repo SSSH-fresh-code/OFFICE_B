@@ -534,4 +534,103 @@ describe('ChatBotController (e2e)', () => {
       expect(body.message).toEqual(ExceptionEnum.FORBIDDEN);
     });
   });
+
+  describe('POST - /chat/bot/send', () => {
+    it('메세지 전송', async () => {
+      const dto: CreateChatBotDto = {
+        botId: "6431728868:AAEX9arBErceKy2e5HfmGTpgXXVZPtho3gs",
+        token: "6431728868:AAEX9arBErceKy2e5HfmGTpgXXVZPtho3gs",
+        name: "테스트 챗봇",
+        description: "테스트용 챗봇입니다.",
+        type: MessengerType.TELEGRAM
+      };
+
+      const createdChat = await prismaService.chat.create({
+        data: {
+          name: "테스트 챗봇",
+          chatId: "7370566612",
+          type: MessengerType.TELEGRAM,
+        }
+      });
+
+      const bot = await prismaService.chatBot.create({
+        data: {
+          ...dto,
+          chats: {
+            connect: { id: createdChat.id }
+          }
+        }
+        , include: { chats: true }
+      });
+
+      const { statusCode, body } = await request(app.getHttpServer())
+        .post(`/chat/bot/send`)
+        .set('Cookie', su)
+        .send({
+          botId: bot.id,
+          chatId: bot.chats[0].id,
+          message: "테스트 메세지 입니다.",
+        });
+
+      expect(statusCode).toBe(201);
+      expect(body.isSuccess).toBeTruthy();
+    });
+
+    it('구현되지 않은 메신저에 메세지 전송', async () => {
+      const dto: CreateChatBotDto = {
+        botId: "6431728868:AAEX9arBErceKy2e5HfmGTpgXXVZPtho3gs",
+        token: "6431728868:AAEX9arBErceKy2e5HfmGTpgXXVZPtho3gs",
+        name: "테스트 챗봇",
+        description: "테스트용 챗봇입니다.",
+        type: MessengerType.DISCORD
+      };
+
+      const createdChat = await prismaService.chat.create({
+        data: {
+          name: "테스트 챗봇",
+          chatId: "7370566612",
+          type: MessengerType.DISCORD,
+        }
+      });
+
+      const bot = await prismaService.chatBot.create({
+        data: {
+          ...dto,
+          chats: {
+            connect: { id: createdChat.id }
+          }
+        }
+        , include: { chats: true }
+      });
+
+      const { statusCode, body } = await request(app.getHttpServer())
+        .post(`/chat/bot/send`)
+        .set('Cookie', su)
+        .send({
+          botId: bot.id,
+          chatId: bot.chats[0].id,
+          message: "테스트 메세지 입니다.",
+        });
+
+      expect(statusCode).toBe(501);
+      expect(body.message).toEqual(ExceptionEnum.NOT_IMPLEMENTED);
+    });
+
+    it('권한 없이 메세지 전송', async () => {
+      const { statusCode, body } = await request(app.getHttpServer())
+        .post(`/chat/bot/send`)
+        .set('Cookie', gu);
+
+      expect(statusCode).toBe(403);
+      expect(body.message).toEqual(ExceptionEnum.FORBIDDEN);
+    });
+
+    it('로그인 하지않고 메세지 전송', async () => {
+      const { statusCode, body } = await request(app.getHttpServer())
+        .post(`/chat/bot/send`);
+
+      expect(statusCode).toBe(403);
+      expect(body.message).toEqual(ExceptionEnum.NOT_LOGGED_IN);
+    });
+  });
 })

@@ -8,11 +8,14 @@ import { PrismaChatBotRepository } from '../../infrastructure/db/repositories/pr
 import { PrismaChatRepository } from '../../infrastructure/db/repositories/prisma-chat.repository';
 import { ChatBotController } from './presentation/chatbot.controller';
 import { ChatBotService } from './application/chatbot.service';
+import { ChatService } from './application/chat.service';
+import { ChatController } from './presentation/chat.controller';
 
 @Module({
   imports: [InfraModule],
   providers: [
     ChatBotService,
+    ChatService,
     {
       provide: MESSENGER_FACTORY,
       useClass: MessengerFactory
@@ -30,6 +33,6 @@ import { ChatBotService } from './application/chatbot.service';
       useClass: PrismaChatRepository,
     },
   ],
-  controllers: [ChatBotController],
+  controllers: [ChatBotController, ChatController],
 })
 export class ChatBotModule { }

@@ -75,4 +75,5 @@ export class ChatService {
       total: pagingChats.total
     }
   }
+
 }
