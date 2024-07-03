@@ -612,7 +612,7 @@ describe('ChatBotController (e2e)', () => {
           message: "테스트 메세지 입니다.",
         });
 
-      expect(statusCode).toBe(401);
+      expect(statusCode).toBe(501);
       expect(body.message).toEqual(ExceptionEnum.NOT_IMPLEMENTED);
     });
 
