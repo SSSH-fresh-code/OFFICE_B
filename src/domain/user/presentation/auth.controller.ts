@@ -1,9 +1,8 @@
-import { Controller, Inject, Logger, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
-import { AuthService } from '../application/auth.service';
+import { AuthService } from '../application/auth/auth.service';
 import { Request, Response } from 'express';
-import { LocalAuthGuard } from '../application/local-auth.guard';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { LocalAuthGuard } from '../application/auth/local-auth.guard';
 
 @ApiTags('auth')
 @Controller('auth')

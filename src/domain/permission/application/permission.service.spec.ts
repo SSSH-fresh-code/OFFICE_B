@@ -21,7 +21,7 @@ describe('PermissionService', () => {
   let permissionService: PermissionService;
   let permissionRepository: jest.Mocked<IPermissionRepository>;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PermissionService,

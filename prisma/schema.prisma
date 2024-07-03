@@ -11,7 +11,7 @@ model User {
   id          String       @id @default(uuid())
   email       String       @unique
   password    String
-  name        String
+  name        String @unique
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   permissions Permission[] @relation("UserPermissions")
@@ -23,4 +23,32 @@ model Permission {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   users       User[]   @relation("UserPermissions")
+}
+
+model ChatBot {
+  id          Int           @id @default(autoincrement())
+  botId       String        @unique
+  token       String        @unique
+  name        String        @unique
+  description String
+  type        MessengerType
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  chats       Chat[]        @relation("ChatBotChats")
+}
+
+model Chat {
+  id     Int           @id @default(autoincrement())
+  chatId String        @unique
+  name   String        @unique
+  type   MessengerType
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  bots   ChatBot[]     @relation("ChatBotChats")
+}
+
+enum MessengerType {
+  TELEGRAM
+  SLACK
+  DISCORD
 }

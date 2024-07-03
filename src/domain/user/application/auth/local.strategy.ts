@@ -1,9 +1,9 @@
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { User } from '../domain/user.entity';
+import { User } from '../../domain/user.entity';
 
 @ApiTags('auth')
 @Injectable()

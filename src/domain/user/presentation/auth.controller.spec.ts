@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
-import { AuthService } from '../application/auth.service';
+import { AuthService } from '../application/auth/auth.service';
 import { UserService } from '../application/user.service';
-import { LocalAuthGuard } from '../application/local-auth.guard';
+import { LocalAuthGuard } from '../application/auth/local-auth.guard';
 import { Request, Response } from 'express';
 import { User } from '../domain/user.entity';
 
@@ -28,7 +28,7 @@ describe('AuthController', () => {
   let authService;
   let userService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
       providers: [

@@ -7,12 +7,12 @@ import { User } from '../domain/user.entity';
 import { ReadUserDto } from './dto/read-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdateUserPermissonDto } from './dto/update-userPermission.dto';
-import { PermissionsClass, PermissionsMethod } from '../../../infrastructure/decorator/permissions.decorator';
+import { PermissionsMethod } from '../../../infrastructure/decorator/permissions.decorator';
 import { PermissionEnum } from '../../../domain/permission/domain/permission.enum';
+import { Page } from '../../../infrastructure/common/services/paging.service';
 
 @ApiTags('users')
 @Controller('users')
-@PermissionsClass(PermissionEnum.CAN_USE_USER)
 export class UserController {
   constructor(private readonly userService: UserService) { }
 
@@ -24,7 +24,6 @@ export class UserController {
   })
   @ApiResponse({ status: 400, description: '잘못된 파라미터 값' })
   @ApiBody({ type: CreateUserDto })
-  @PermissionsMethod(PermissionEnum.CAN_WRITE_USER)
   async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
     const { email, password, name } = createUserDto;
     return this.userService.createUser(email, password, name);
@@ -38,11 +37,11 @@ export class UserController {
   })
   @ApiResponse({ status: 400, description: '존재하지 않는 유저' })
   @ApiBody({ type: UpdateUserPermissonDto })
-  @PermissionsMethod(PermissionEnum.CAN_WRITE_USER)
+  @PermissionsMethod(PermissionEnum.CAN_USE_USER, PermissionEnum.CAN_WRITE_USER)
   async updateUserPermission(@Body() dto: UpdateUserPermissonDto) {
     return this.userService.updateUserPermission(dto.id, dto.permissions);
   }
-  @Put(':id')
+  @Put('')
   @ApiOperation({ summary: '기존 유저 수정' })
   @ApiResponse({
     status: 200,
@@ -50,7 +49,7 @@ export class UserController {
   })
   @ApiResponse({ status: 404, description: '존재하지 않는 유저' })
   @ApiBody({ type: UpdateUserDto })
-  @PermissionsMethod(PermissionEnum.CAN_WRITE_USER)
+  @PermissionsMethod(PermissionEnum.CAN_USE_USER, PermissionEnum.CAN_WRITE_USER)
   async updateUserName(
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<User | null> {
@@ -63,8 +62,8 @@ export class UserController {
     status: 200,
     description: '유저 목록이 정상적으로 조회됨',
   })
-  @PermissionsMethod(PermissionEnum.CAN_READ_USER)
-  async getUsers(@Query() pagingDto: UserPagingDto): Promise<{ data: User[]; total: number }> {
+  @PermissionsMethod(PermissionEnum.CAN_USE_USER, PermissionEnum.CAN_READ_USER)
+  async getUsers(@Query() pagingDto: UserPagingDto): Promise<Page<User>> {
     return this.userService.getUsers(pagingDto);
   }
 
@@ -75,7 +74,7 @@ export class UserController {
     description: '유저 정보가 정상적으로 조회됨',
   })
   @ApiResponse({ status: 404, description: '존재하지 않는 유저' })
-  @PermissionsMethod(PermissionEnum.CAN_READ_USER)
+  @PermissionsMethod(PermissionEnum.CAN_USE_USER, PermissionEnum.CAN_READ_USER)
   async getUserById(@Param('id') id: string): Promise<ReadUserDto> {
     return this.userService.getUserById(id);
   }

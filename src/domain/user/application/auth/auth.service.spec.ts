@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { UserService } from './user.service';
-import { User } from '../domain/user.entity';
-import { ExceptionEnum } from '../../../infrastructure/filter/exception/exception.enum';
-import { LoggerModule } from '../../../infrastructure/module/logger.module';
+import { UserService } from '../user.service';
+import { User } from '../../domain/user.entity';
+import { ExceptionEnum } from '../../../../infrastructure/filter/exception/exception.enum';
+import { LoggerModule } from '../../../../infrastructure/module/logger.module';
 
 /**
  * Mock User Service
@@ -17,7 +17,7 @@ describe('AuthService', () => {
   let authService: AuthService;
   let userService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [LoggerModule],
       providers: [

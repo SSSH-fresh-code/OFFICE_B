@@ -9,7 +9,7 @@ describe('PermissionGuard', () => {
   let guard: PermissionGuard;
   let reflector: Reflector;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PermissionGuard,

@@ -17,7 +17,7 @@ describe('PagingService', () => {
   let pagingService: PagingService<User>;
   let prismaService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PagingService,

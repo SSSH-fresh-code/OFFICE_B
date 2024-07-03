@@ -3,8 +3,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma.service';
 import { PrismaPermissionRepository } from './prisma-permission.repository';
 import { Permission } from '../../../domain/permission/domain/permission.entity';
-import { v4 as uuidv4 } from 'uuid';
-import { NotFoundError } from 'rxjs';
 import { NotFoundException } from '@nestjs/common';
 
 describe('PrismaPermissionRepository', () => {
