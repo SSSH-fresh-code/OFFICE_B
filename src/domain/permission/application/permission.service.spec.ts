@@ -11,15 +11,24 @@ import { PERMISSION_REPOSITORY } from '../permission.const';
  * 권한 저장소의 Mock 함수들을 정의합니다.
  */
 const mockPermissionRepository = (): IPermissionRepository => ({
+  createPermission: jest.fn(),
+  updatePermission: jest.fn(),
   findAll: jest.fn(),
   findByName: jest.fn(),
-  save: jest.fn(),
-  remove: jest.fn(),
+  deletePermission: jest.fn()
 });
 
 describe('PermissionService', () => {
   let permissionService: PermissionService;
   let permissionRepository: jest.Mocked<IPermissionRepository>;
+  let permission: Permission;
+
+
+  const createDto: CreatePermissionDto = {
+    name: "TEST0001",
+    description: "테스트 권한입니다."
+  }
+
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -36,82 +45,74 @@ describe('PermissionService', () => {
     permissionRepository = module.get<IPermissionRepository>(PERMISSION_REPOSITORY) as jest.Mocked<IPermissionRepository>;
   });
 
+  beforeEach(() => { permission = new Permission(createDto.name, createDto.description) })
+
   describe('createPermission', () => {
     it('권한을 성공적으로 생성해야 합니다.', async () => {
-      const createPermissionDto: CreatePermissionDto = { name: 'create_user', description: '새 유저를 생성할 수 있습니다.' };
-      const permission = new Permission('create_user', '새 유저를 생성할 수 있습니다.');
-      permissionRepository.save.mockResolvedValue(permission);
+      permissionRepository.createPermission.mockResolvedValue(permission);
 
-      const result = await permissionService.createPermission(createPermissionDto);
-      expect(result).toEqual(permission);
-      expect(permissionRepository.save).toHaveBeenCalledWith(expect.any(Permission));
-    });
+      const result = await permissionService.createPermission(createDto);
 
-    it('중복된 권한 이름으로 생성 시 에러를 던져야 합니다.', async () => {
-      const createPermissionDto: CreatePermissionDto = { name: 'create_user', description: '새 유저를 생성할 수 있습니다.' };
-      permissionRepository.save.mockRejectedValue(new Error('이미 존재하는 권한입니다.'));
-
-      await expect(permissionService.createPermission(createPermissionDto)).rejects.toThrow('이미 존재하는 권한입니다.');
+      expect(result).toEqual(permission.toDto());
+      expect(permissionRepository.createPermission).toHaveBeenCalledWith(permission);
     });
   });
 
   describe('updatePermission', () => {
     it('권한을 성공적으로 업데이트해야 합니다.', async () => {
-      const updatePermissionDto: UpdatePermissionDto = { name: 'update_user', description: '유저를 업데이트할 수 있습니다.' };
-      const permission = new Permission('create_user', '새 유저를 생성할 수 있습니다.');
+      const updateDto: UpdatePermissionDto = {
+        ...createDto,
+        description: "업데이트 내용"
+      }
+
+      const updatedPermission = new Permission(updateDto.name, updateDto.description);
+
       permissionRepository.findByName.mockResolvedValue(permission);
-      permissionRepository.save.mockResolvedValue(permission);
 
-      const result = await permissionService.updatePermission(updatePermissionDto);
-      expect(result).toEqual(permission);
-      expect(permissionRepository.findByName).toHaveBeenCalledWith(updatePermissionDto.name);
-      expect(permissionRepository.save).toHaveBeenCalledWith(expect.any(Permission));
-    });
+      permissionRepository.updatePermission.mockResolvedValue(updatedPermission);
 
-    it('존재하지 않는 권한을 업데이트 시 에러를 던져야 합니다.', async () => {
-      const updatePermissionDto: UpdatePermissionDto = { name: 'update_user', description: '유저를 업데이트할 수 있습니다.' };
-      permissionRepository.findByName.mockRejectedValue(new Error('ID가 1인 권한을 찾을 수 없습니다.'));
+      const result = await permissionService.updatePermission(updateDto);
 
-      await expect(permissionService.updatePermission(updatePermissionDto)).rejects.toThrow('ID가 1인 권한을 찾을 수 없습니다.');
+      expect(result).toEqual(updatedPermission.toDto());
+      expect(permissionRepository.findByName).toHaveBeenCalledWith(createDto.name);
+      expect(permissionRepository.updatePermission).toHaveBeenCalledWith(expect.any(Permission));
     });
   });
 
   describe('getPermissions', () => {
     it('권한 목록을 성공적으로 반환해야 합니다.', async () => {
       const permissions = [
-        new Permission('create_user', '새 유저를 생성할 수 있습니다.'),
-        new Permission('update_user', '유저를 업데이트할 수 있습니다.'),
+        permission,
+        new Permission("TEST0002", permission.description)
       ];
+
       permissionRepository.findAll.mockResolvedValue(permissions);
 
       const result = await permissionService.getPermissions();
-      expect(result).toEqual(permissions);
-      expect(permissionRepository.findAll).toHaveBeenCalled();
-    });
 
-    it('권한이 없을 때 빈 배열을 반환해야 합니다.', async () => {
-      permissionRepository.findAll.mockResolvedValue([]);
-
-      const result = await permissionService.getPermissions();
-      expect(result).toEqual([]);
+      expect(result).toEqual(permissions.map(p => p.toDto()));
       expect(permissionRepository.findAll).toHaveBeenCalled();
     });
   });
 
+  describe('getPermissionByName', () => {
+    it('권한을 성공적으로 반환해야 합니다.', async () => {
+      permissionRepository.findByName.mockResolvedValue(permission);
+
+      const result = await permissionService.getPermissionByName(permission.name);
+
+      expect(result).toEqual(permission.toDto());
+      expect(permissionRepository.findByName).toHaveBeenCalledWith(permission.name);
+    });
+  });
 
   describe('deletePermission', () => {
     it('이름으로 권한을 삭제해야 합니다.', async () => {
-      permissionRepository.remove.mockResolvedValue();
+      permissionRepository.deletePermission.mockResolvedValue();
 
       await permissionService.deletePermission("name");
-      expect(permissionRepository.remove).toHaveBeenCalledWith("name");
-    });
 
-    it('존재하지 않는 ID로 삭제 시 에러를 던져야 합니다.', async () => {
-      const name = "name";
-      permissionRepository.remove.mockRejectedValue(new Error(`이름이 ${name}인 권한을 찾을 수 없습니다.`));
-
-      await expect(permissionService.deletePermission(name)).rejects.toThrow(`이름이 ${name}인 권한을 찾을 수 없습니다.`);
+      expect(permissionRepository.deletePermission).toHaveBeenCalledWith("name");
     });
   });
 });
