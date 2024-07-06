@@ -3,11 +3,17 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma.service';
 import { PrismaPermissionRepository } from './prisma-permission.repository';
 import { Permission } from '../../../domain/permission/domain/permission.entity';
-import { NotFoundException } from '@nestjs/common';
+import { CreatePermissionDto } from 'src/domain/permission/presentation/dto/create-permission.dto';
+import { Prisma } from '@prisma/client';
 
 describe('PrismaPermissionRepository', () => {
   let repository: PrismaPermissionRepository;
   let prisma: PrismaService;
+
+  const createDto: CreatePermissionDto = {
+    name: "TEST0001",
+    description: "테스트 권한입니다."
+  }
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -35,20 +41,17 @@ describe('PrismaPermissionRepository', () => {
 
   describe('findAll', () => {
     it('모든 권한을 성공적으로 조회해야 합니다.', async () => {
-      const permission1 = new Permission('create_user', '새 유저를 생성할 수 있습니다.');
-      const permission2 = new Permission('update_user', '유저를 업데이트할 수 있습니다.');
+      const createDto2 = { ...createDto, name: "TEST0002" };
 
-      await repository.save(permission1);
-      await repository.save(permission2);
+      await prisma.permission.create({ data: createDto });
+      await prisma.permission.create({ data: createDto2 });
 
       const result = await repository.findAll();
+
       expect(result.length).toBe(2);
-      expect(result).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ name: 'create_user' }),
-          expect.objectContaining({ name: 'update_user' }),
-        ]),
-      );
+      result.forEach(e => {
+        expect([createDto.name, createDto2.name].includes(e.name)).toBeTruthy
+      });
     });
 
     it('권한이 없을 때 빈 배열을 반환해야 합니다.', async () => {
@@ -59,52 +62,65 @@ describe('PrismaPermissionRepository', () => {
 
   describe('findByName', () => {
     it('이름으로 권한을 성공적으로 조회해야 합니다.', async () => {
-      const permission = new Permission('create_user', '새 유저를 생성할 수 있습니다.');
-      await repository.save(permission);
+      await prisma.permission.create({ data: createDto });
 
-      const result = await repository.findByName(permission.name);
-      expect(result).toEqual(expect.objectContaining({ name: permission.name }));
+      const result = await repository.findByName(createDto.name);
+
+      expect(result.name).toEqual(createDto.name);
+      expect(result.description).toEqual(createDto.description);
     });
 
     it('존재하지 않는 이름으로 조회 시 에러를 던져야 합니다.', async () => {
-      const name = 'nonexistent_name';
-      await expect(repository.findByName(name)).rejects.toThrow(`이름이 ${name}인 권한을 찾을 수 없습니다.`);
+      await expect(repository.findByName("WRONG001")).rejects.toThrow(Prisma.PrismaClientKnownRequestError);
     });
   });
 
-  describe('save', () => {
+  describe('createdPermission', () => {
     it('권한을 성공적으로 저장해야 합니다.', async () => {
-      const permission = new Permission('create_user', '새 유저를 생성할 수 있습니다.');
-      const result = await repository.save(permission);
-      expect(result).toEqual(expect.objectContaining({ name: permission.name }));
+      const permission = new Permission(createDto.name, createDto.description);
+
+      const result = await repository.createPermission(permission);
+
+      expect(result.name).toEqual(permission.name);
+      expect(result.description).toEqual(permission.description);
     });
 
-    it('기존 권한을 업데이트해야 합니다.', async () => {
-      const permission = new Permission('create_user', '새 유저를 생성할 수 있습니다.');
-      await repository.save(permission);
+    it('이미 존재하는 이름인 경우 저장되지 않습니다.', async () => {
+      await prisma.permission.create({ data: createDto });
 
-      permission.updateDetails('유저를 업데이트할 수 있습니다.');
-      const updatedPermission = await repository.save(permission);
+      const permission = new Permission(createDto.name, createDto.description);
 
-      expect(updatedPermission.name).toBe('create_user');
-      expect(updatedPermission.description).toBe('유저를 업데이트할 수 있습니다.');
+      await expect(repository.createPermission(permission)).rejects.toThrow(Prisma.PrismaClientKnownRequestError);
     });
   });
 
-  describe('remove', () => {
-    it('ID로 권한을 성공적으로 삭제해야 합니다.', async () => {
-      const permission = new Permission('create_user', '새 유저를 생성할 수 있습니다.');
-      await repository.save(permission);
+  describe('updatePermission', () => {
+    it('권한을 성공적으로 수정해야 합니다.', async () => {
+      const updateDetail = "업데이트 합니다.";
+      const permission = await prisma.permission.create({ data: createDto });
 
-      await repository.remove(permission.name);
+      const updatedPermission = Permission.of(permission);
+      updatedPermission.updateDetails(updateDetail);
+
+      const result = await repository.updatePermission(updatedPermission);
+
+      expect(result.name).toEqual(updatedPermission.name);
+      expect(result.description).toEqual(updatedPermission.description);
+    });
+
+  });
+
+  describe('deletePermission', () => {
+    it('NAME으로 권한을 성공적으로 삭제해야 합니다.', async () => {
+      const permission = await prisma.permission.create({ data: createDto });
+
+      await repository.deletePermission(permission.name);
     });
 
     it('존재하지 않는 ID로 삭제 시 에러를 던져야 합니다.', async () => {
       const name = "00000001";
-      await expect(async () => {
-        await repository.remove(name);
-      }).rejects.toThrow(new NotFoundException(`이름이 ${name}인 권한을 찾을 수 없습니다.`));
-    });
 
+      await expect(repository.deletePermission(name)).rejects.toThrow(Prisma.PrismaClientKnownRequestError);
+    });
   });
 });

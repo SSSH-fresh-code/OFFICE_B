@@ -19,6 +19,7 @@ export class PrismaChatBotRepository implements IChatBotRepository {
 
     return ChatBot.of(savedBot);
   }
+
   async updateChatBot(bot: ChatBot, chatIds: number[] = []): Promise<ChatBot> {
     const updatedBot = await this.prisma.chatBot.update({
       where: { id: bot.id },

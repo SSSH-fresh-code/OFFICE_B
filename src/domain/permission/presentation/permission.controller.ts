@@ -7,8 +7,8 @@ import { PermissionService } from '../application/permission.service';
 import { PermissionsClass, PermissionsMethod } from '../../../infrastructure/decorator/permissions.decorator';
 import { PermissionEnum } from '../domain/permission.enum';
 
-@ApiTags('permissions')
-@Controller('permissions')
+@ApiTags('permission')
+@Controller('permission')
 @PermissionsClass(PermissionEnum.CAN_USE_PERMISSION)
 export class PermissionController {
   constructor(private readonly permissionService: PermissionService) { }
@@ -24,11 +24,10 @@ export class PermissionController {
   @ApiBody({ type: CreatePermissionDto })
   @PermissionsMethod(PermissionEnum.CAN_WRITE_PERMISSION)
   async createPermission(@Body() createPermissionDto: CreatePermissionDto): Promise<ReadPermissionDto> {
-    const permission = await this.permissionService.createPermission(createPermissionDto);
-    return new ReadPermissionDto(permission);
+    return await this.permissionService.createPermission(createPermissionDto);
   }
 
-  @Put(':id')
+  @Put()
   @ApiOperation({ summary: '권한 수정' })
   @ApiResponse({
     status: 200,
@@ -41,9 +40,7 @@ export class PermissionController {
   async updatePermission(
     @Body() updatePermissionDto: UpdatePermissionDto,
   ): Promise<ReadPermissionDto> {
-    const permission = await this.permissionService.updatePermission(updatePermissionDto);
-
-    return new ReadPermissionDto(permission);
+    return await this.permissionService.updatePermission(updatePermissionDto);
   }
 
   @Get()
@@ -55,8 +52,7 @@ export class PermissionController {
   })
   @PermissionsMethod(PermissionEnum.CAN_READ_PERMISSION)
   async getPermissions(): Promise<ReadPermissionDto[]> {
-    const permissions = await this.permissionService.getPermissions();
-    return permissions.map(permission => new ReadPermissionDto(permission));
+    return await this.permissionService.getPermissions();
   }
 
   @Get(':name')
@@ -69,8 +65,7 @@ export class PermissionController {
   @ApiResponse({ status: 404, description: '권한을 찾을 수 없습니다.' })
   @PermissionsMethod(PermissionEnum.CAN_READ_PERMISSION)
   async getPermissionByName(@Param('name') name: string): Promise<ReadPermissionDto> {
-    const permission = await this.permissionService.getPermissionByName(name);
-    return new ReadPermissionDto(permission);
+    return await this.permissionService.getPermissionByName(name);
   }
 
   @Delete(':name')

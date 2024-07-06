@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { IPermissionRepository } from '../../../domain/permission/infrastructure/permission.repository';
 import { Permission } from '../../../domain/permission/domain/permission.entity';
@@ -9,61 +9,46 @@ export class PrismaPermissionRepository implements IPermissionRepository {
 
   async findAll(): Promise<Permission[]> {
     const permissions = await this.prisma.permission.findMany({});
-    return permissions.map(permission => new Permission(
-      permission.name,
-      permission.description,
-      permission.createdAt,
-      permission.updatedAt,
-    ));
+
+    return permissions.map(permission => Permission.of(permission));
   }
 
-  async findByName(name: string): Promise<Permission | null> {
-    try {
-      const permission = await this.prisma.permission.findUniqueOrThrow({
-        where: { name }
-      });
-      return new Permission(
-        permission.name,
-        permission.description,
-        permission.createdAt,
-        permission.updatedAt,
-      );
-    } catch (error) {
-      throw new NotFoundException(`이름이 ${name}인 권한을 찾을 수 없습니다.`);
-    }
+  async findByName(name: string): Promise<Permission> {
+    const permission = await this.prisma.permission.findUniqueOrThrow({
+      where: { name }
+    });
+
+    return Permission.of(permission);
   }
 
-  async save(permission: Permission): Promise<Permission> {
-    const upsertPermission = await this.prisma.permission.upsert({
-      where: { name: permission.name },
-      update: {
-        description: permission.description,
-        updatedAt: new Date(),
-      },
-      create: {
+  async createPermission(permission: Permission): Promise<Permission> {
+    const createPermission = await this.prisma.permission.create({
+      data: {
         name: permission.name,
         description: permission.description,
-        createdAt: new Date(),
-        updatedAt: new Date(),
       },
     });
 
-    return new Permission(
-      upsertPermission.name,
-      upsertPermission.description,
-      upsertPermission.createdAt,
-      upsertPermission.updatedAt,
-    );
+    return Permission.of(createPermission);
   }
 
-  async remove(name: string): Promise<void> {
-    try {
-      await this.prisma.permission.delete({
-        where: { name },
-      });
-    } catch (error) {
-      throw new NotFoundException(`이름이 ${name}인 권한을 찾을 수 없습니다.`);
-    }
+  async updatePermission(permission: Permission): Promise<Permission> {
+    const updatePermission = await this.prisma.permission.update({
+      where: {
+        name: permission.name
+      },
+      data: {
+        description: permission.description,
+      },
+    });
+
+    return Permission.of(updatePermission);
+  }
+
+  async deletePermission(name: string): Promise<void> {
+    await this.prisma.permission.delete({
+      where: { name }
+    })
   }
 
 }
