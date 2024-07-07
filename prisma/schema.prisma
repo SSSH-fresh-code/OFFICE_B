@@ -47,6 +47,14 @@ model Chat {
   bots   ChatBot[]     @relation("ChatBotChats")
 }
 
+
+model Topic {
+  id     Int           @id @default(autoincrement())
+  name   String        @unique
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
 enum MessengerType {
   TELEGRAM
   SLACK
