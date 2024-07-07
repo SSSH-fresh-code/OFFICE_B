@@ -91,6 +91,9 @@
     "setupFiles": [
       "../test/setup-env.ts"
     ],
+    "moduleNameMapper": {
+        "src(.*)$": "<rootDir>/$1"
+    },
     "maxWorkers": 1
   },
   "packageManager": "pnpm@9.0.6"
