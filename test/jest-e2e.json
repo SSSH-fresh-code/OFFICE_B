@@ -18,7 +18,7 @@
     "<rootDir>/test/setup-env.ts"
   ],
   "moduleNameMapper": {
-      'src(.*)$': '<rootDir>/$1'
+      "src(.*)$": "<rootDir>/$1"
   },
   "maxWorkers": 1
 }
