@@ -4,6 +4,7 @@ import { TOPIC_REPOSITORY } from "../../blog.const";
 import { TopicRepository } from "../../infrastructure/topic/topic.repository";
 import { Page, PagingService } from "src/infrastructure/common/services/paging.service";
 import { Topic } from "../../domain/topic/topic.entity";
+import { Topic as PrismaTopic } from "@prisma/client";
 import { PagingTopicDto } from "../../presentation/topic/dto/paging-topic.dto";
 import { CreateTopicDto } from "../../presentation/topic/dto/create-topic.dto";
 import { UpdateTopicDto } from "../../presentation/topic/dto/update-topic.dto";
@@ -17,22 +18,46 @@ export class TopicService implements iTopicService {
   ) { }
 
   async getTopicByName(name: string): Promise<ReadTopicDto> {
-    throw new Error("method not implements");
+    const topic = await this.topicRepository.findByName(name);
+
+    return topic.toDto();
   };
 
   async getTopics(dto: PagingTopicDto): Promise<Page<ReadTopicDto>> {
-    throw new Error("method not implements");
+    const where = {};
+    const orderby = {};
+
+    if (dto.like__name) where['like__name'] = dto.like__name;
+    if (dto.orderby && dto.direction) orderby[dto.orderby] = dto.direction;
+
+    const topics = await this.pagingService.getPagedResults('Topic', dto, where, orderby);
+
+    return {
+      data: topics.data.map(t => {
+        return Topic.of(t as PrismaTopic).toDto();
+      }), total: topics.total
+    };
   };
 
   async createTopic(dto: CreateTopicDto): Promise<ReadTopicDto> {
-    throw new Error("method not implements");
+    const topic = new Topic(0, dto.name);
+
+    const createdTopic = await this.topicRepository.save(topic);
+
+    return createdTopic.toDto();
   };
 
   async updateTopic(dto: UpdateTopicDto): Promise<ReadTopicDto> {
-    throw new Error("method not implements");
+    const topic = await this.topicRepository.findById(dto.id);
+
+    topic.name = dto.name;
+
+    const updatedTopic = await this.topicRepository.update(topic);
+
+    return updatedTopic.toDto();
   };
 
   async deleteTopic(name: string) {
-    throw new Error("method not implements");
+    await this.topicRepository.delete(name);
   };
 }

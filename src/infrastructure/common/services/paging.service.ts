@@ -5,7 +5,7 @@ import { Prisma } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 
 interface WhereClause {
-  [key: string]: any;
+  [key: string]: string;
 }
 
 interface OrderByClause {
@@ -42,6 +42,8 @@ export class PagingService<T> {
     const skip = (page - 1) * take;
     const order = orderby ? { [orderby]: direction } : { id: 'desc' };
 
+    where = this.parseWhereClause(where);
+
     const [data, total] = await this.prisma.$transaction([
       this.prisma[model].findMany({
         where,
@@ -53,5 +55,32 @@ export class PagingService<T> {
     ]);
 
     return { data, total };
+  }
+
+  private parseWhereClause(where: WhereClause): WhereClause {
+    const result = {};
+
+    for (const key of Object.keys(where)) {
+      const splitKey = key.split('__');
+
+      if (splitKey.length !== 2) {
+        continue;
+      }
+
+      switch (splitKey[0]) {
+        case 'where':
+          result[splitKey[1]] = where[key];
+          break;
+        case 'like':
+          result[splitKey[1]] = {
+            contains: where[key]
+          }
+          break;
+        default:
+          break;
+      }
+    }
+
+    return result;
   }
 }

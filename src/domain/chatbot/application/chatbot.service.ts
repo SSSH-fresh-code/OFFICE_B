@@ -81,7 +81,7 @@ export class ChatBotService {
   async getChatBots(pagingDto: ChatBotPagingDto): Promise<Page<ReadChatBotDto>> {
     const where = {};
     if (pagingDto.where__type) {
-      where['type'] = pagingDto.where__type;
+      where['where__type'] = pagingDto.where__type;
     }
     const orderBy = {};
     if (pagingDto.orderby) {

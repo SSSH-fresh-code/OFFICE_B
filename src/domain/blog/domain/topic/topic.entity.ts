@@ -15,7 +15,7 @@ export class Topic implements iTopic {
     private _createdAt?: Date,
     private _updatedAt?: Date
   ) {
-    this._name = _name;
+    this.name = _name;
   }
 
   static of(topic: PrismaTopic) {
