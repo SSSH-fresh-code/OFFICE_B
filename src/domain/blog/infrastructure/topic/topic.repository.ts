@@ -37,7 +37,7 @@ export interface TopicRepository {
 
   /**
    * Topic를 삭제합니다.  
-   * @param {string} name - 삭제할 Topic 이름
+   * @param {number} id - 삭제할 Topic 이름
    */
-  delete(name: string): Promise<void>;
+  delete(id: number): Promise<void>;
 }

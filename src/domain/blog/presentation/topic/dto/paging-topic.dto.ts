@@ -8,7 +8,7 @@ export class PagingTopicDto extends PagingDto {
   @ApiProperty({
     description: '이름 필터링(부분 일치)',
     example: '',
-    require: false
+    required: false
   })
   like__name?: string;
 

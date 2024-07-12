@@ -137,17 +137,17 @@ describe('PrismaTopicRepository', () => {
 
   describe('delete', () => {
     it('Topic을 삭제합니다.', async () => {
-      const { name } = await prisma.topic.create({
+      const { id } = await prisma.topic.create({
         data: {
           name: dummyTopic.name
         }
       });
 
-      expect(() => repository.delete(name)).resolves;
+      expect(() => repository.delete(id)).resolves;
     });
 
     it('존재하지 않는 Topic을 삭제합니다.', async () => {
-      await expect(() => repository.delete(dummyTopic.name)).rejects.toThrow(Prisma.PrismaClientKnownRequestError)
+      await expect(() => repository.delete(dummyTopic.id)).rejects.toThrow(Prisma.PrismaClientKnownRequestError)
     });
   });
 })

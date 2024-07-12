@@ -43,9 +43,9 @@ export class PrismaTopicRepository implements TopicRepository {
     return Topic.of(entity);
   }
 
-  async delete(name: string): Promise<void> {
+  async delete(id: number): Promise<void> {
     await this.prisma.topic.delete({
-      where: { name }
+      where: { id }
     });
   }
 }

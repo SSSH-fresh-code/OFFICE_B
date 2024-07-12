@@ -57,7 +57,7 @@ export class TopicService implements iTopicService {
     return updatedTopic.toDto();
   };
 
-  async deleteTopic(name: string) {
-    await this.topicRepository.delete(name);
+  async deleteTopic(id: number) {
+    await this.topicRepository.delete(id);
   };
 }

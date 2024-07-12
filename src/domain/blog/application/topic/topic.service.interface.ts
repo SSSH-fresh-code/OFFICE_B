@@ -9,5 +9,5 @@ export interface iTopicService {
   getTopics(dto: PagingTopicDto): Promise<Page<ReadTopicDto>>;
   createTopic(dto: CreateTopicDto): Promise<ReadTopicDto>;
   updateTopic(dto: UpdateTopicDto): Promise<ReadTopicDto>;
-  deleteTopic(name: string): Promise<void>;
+  deleteTopic(id: number): Promise<void>;
 }

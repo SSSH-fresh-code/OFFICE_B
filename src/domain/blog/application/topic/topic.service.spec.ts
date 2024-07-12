@@ -145,7 +145,7 @@ describe('TopicService', () => {
     it('토픽을 삭제합니다.', async () => {
       repository.delete.mockResolvedValue();
 
-      await topicService.deleteTopic("umm...");
+      await topicService.deleteTopic(0);
     });
   });
 });
