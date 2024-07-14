@@ -50,6 +50,16 @@ model Chat {
 model Topic {
   id     Int           @id @default(autoincrement())
   name   String        @unique
+  series Series[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Series {
+  id     Int           @id @default(autoincrement())
+  name   String @unique
+  topic   Topic @relation(fields: [topicId], references: [id])
+  topicId Int
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 }
