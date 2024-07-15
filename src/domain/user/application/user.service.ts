@@ -50,7 +50,7 @@ export class UserService {
       orderBy[pagingDto.orderby] = pagingDto.direction;
     }
 
-    return this.pagingService.getPagedResults('User', pagingDto, where, orderBy);
+    return this.pagingService.getPagedResults('User', pagingDto, where);
   }
 
   async getUserById(id: string): Promise<ReadUserDto> {

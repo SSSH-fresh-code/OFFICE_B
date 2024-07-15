@@ -14,7 +14,7 @@ import { ReadTopicDto } from "../../presentation/topic/dto/read-topic.dto";
 export class TopicService implements iTopicService {
   constructor(
     @Inject(TOPIC_REPOSITORY) private readonly topicRepository: TopicRepository,
-    private readonly pagingService: PagingService<Topic>
+    private readonly pagingService: PagingService<PrismaTopic>
   ) { }
 
   async getTopicByName(name: string): Promise<ReadTopicDto> {
@@ -30,7 +30,7 @@ export class TopicService implements iTopicService {
     if (dto.like__name) where['like__name'] = dto.like__name;
     if (dto.orderby && dto.direction) orderby[dto.orderby] = dto.direction;
 
-    const topics = await this.pagingService.getPagedResults('Topic', dto, where, orderby);
+    const topics = await this.pagingService.getPagedResults('Topic', dto, where);
 
     return {
       data: topics.data.map(t => {

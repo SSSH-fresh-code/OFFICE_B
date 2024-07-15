@@ -134,7 +134,6 @@ describe('ChatBotService', () => {
         'Chat'
         , dto
         , { type: MessengerType.DISCORD }
-        , { createdAt: 'desc' }
       );
 
       expect(chats.total).toEqual(1);

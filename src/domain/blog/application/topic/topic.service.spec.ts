@@ -84,7 +84,6 @@ describe('TopicService', () => {
         'Topic'
         , dto
         , {}
-        , { createdAt: 'desc' }
       )
       expect(result.total).toEqual(1);
     });
@@ -108,7 +107,6 @@ describe('TopicService', () => {
         'Topic'
         , dto
         , { like__name: 'test' }
-        , { createdAt: 'desc' }
       )
       expect(result.total).toEqual(1);
     });

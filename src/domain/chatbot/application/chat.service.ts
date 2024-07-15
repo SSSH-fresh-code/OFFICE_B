@@ -1,9 +1,7 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { CHAT_REPOSITORY, MESSENGER_FACTORY } from '../chatbot.const';
-import { ChatBot, MessengerType } from '../domain/chatbot.entity';
+import { CHAT_REPOSITORY } from '../chatbot.const';
+import { MessengerType } from '../domain/chatbot.entity';
 import { Page, PagingService } from '../../../infrastructure/common/services/paging.service';
-import { Logger } from 'winston';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { CreateChatDto } from '../presentation/dto/create-chat.dto';
 import { IChatRepository } from '../infrastructure/chat.repository';
 import { ReadChatDto } from '../presentation/dto/read-chat.dto';
@@ -17,8 +15,7 @@ import { Chat as PrismaChat } from '@prisma/client';
 export class ChatService {
   constructor(
     @Inject(CHAT_REPOSITORY) private readonly repostiroy: IChatRepository,
-    private readonly pagingService: PagingService<ChatBot>,
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
+    private readonly pagingService: PagingService<PrismaChat>,
   ) { }
 
   /**
@@ -68,7 +65,7 @@ export class ChatService {
       orderBy[dto.orderby] = dto.direction;
 
 
-    const pagingChats = await this.pagingService.getPagedResults<PrismaChat>('Chat', dto, where, orderBy);
+    const pagingChats = await this.pagingService.getPagedResults('Chat', dto, where);
 
     return {
       data: pagingChats.data.map(chat => Chat.of(chat).toDto()),
