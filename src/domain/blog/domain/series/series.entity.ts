@@ -9,15 +9,17 @@ import { iTopic } from "../topic/topic.interface";
 export class Series implements iSeries {
   private readonly logger = new Logger(Series.name);
   private _name: string;
+  private _topic: iTopic;
 
   constructor(
     private _id: number,
     _name: string,
-    private _topic: iTopic,
+    _topic: iTopic,
     private _createdAt?: Date,
     private _updatedAt?: Date
   ) {
     this.name = _name;
+    this.topic = _topic;
   }
 
   static of(series: PrismaSeries, topic: iTopic) {
@@ -42,6 +44,10 @@ export class Series implements iSeries {
     }
 
     this._name = name.replaceAll(" ", "_");
+  }
+
+  set topic(topic: iTopic) {
+    this._topic = topic;
   }
   get topic(): iTopic { return this._topic; }
   get createdAt(): Date { return this._createdAt; }

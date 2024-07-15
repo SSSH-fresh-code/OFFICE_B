@@ -9,5 +9,6 @@ export enum ExceptionEnum {
   MESSAGE_SENDING_ERROR = '{param} 메세지가 전송 중 오류가 발생했습니다.',
   NOT_FOUND = '데이터가 존재하지 않습니다.',
   LOGIN_FAILED = '일치하는 계정 정보가 없습니다.',
-  NOT_IMPLEMENTED = '아직 구현되지 않았습니다.'
+  NOT_IMPLEMENTED = '아직 구현되지 않았습니다.',
+  NOT_MODIFIED = '수정사항이 없습니다.'
 }

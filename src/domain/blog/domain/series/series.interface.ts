@@ -26,6 +26,12 @@ export interface iSeries {
   get topic(): iTopic;
 
   /**
+   * 시리즈 topic을 설정합니다.
+   * @param {iTopic} topic
+   */
+  set topic(topic: iTopic);
+
+  /**
    * 생성일을 반환합니다.
    */
   get createdAt(): Date;
