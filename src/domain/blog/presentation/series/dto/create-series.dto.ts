@@ -1,12 +1,18 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, Length } from "class-validator";
+import { IsNumber, IsString } from "class-validator";
 
-export class CreateTopicDto {
+export class CreateSeriesDto {
   @ApiProperty({
-    description: '토픽 이름',
+    description: '시리즈 이름',
     example: "sample",
   })
   @IsString()
-  @Length(0, 50)
   name: string;
+
+  @ApiProperty({
+    description: '토픽 id',
+    example: 1,
+  })
+  @IsNumber()
+  topicId: number;
 }

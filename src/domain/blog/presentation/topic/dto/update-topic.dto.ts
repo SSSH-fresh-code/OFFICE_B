@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, Length } from "class-validator";
+import { IsString } from "class-validator";
 
 export class UpdateTopicDto {
   @ApiProperty({
@@ -13,6 +13,5 @@ export class UpdateTopicDto {
     example: "sample",
   })
   @IsString()
-  @Length(0, 50)
   name: string;
 }
