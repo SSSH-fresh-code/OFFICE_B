@@ -3,12 +3,13 @@ import { PrismaService } from '../../db/prisma.service';
 import { PagingDto } from '../dto/paging.dto';
 import { Prisma } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
+import { iPagingService } from './paging.interface';
 
-interface WhereClause {
+export interface WhereClause {
   [key: string]: string;
 }
 
-interface OrderByClause {
+export interface OrderByClause {
   [key: string]: Prisma.SortOrder;
 }
 
@@ -19,7 +20,7 @@ export type Page<T> = { data: T[]; total: number };
  * @template T Entity 타입
  */
 @Injectable()
-export class PagingService<T> {
+export class PagingService<T> implements iPagingService {
   constructor(private readonly prisma: PrismaService) { }
 
   /**
@@ -30,19 +31,25 @@ export class PagingService<T> {
    * @param orderBy 정렬 조건
    * @returns 데이터와 총 개수를 포함한 객체
    */
-  async getPagedResults<T>(
+  async getPagedResults(
     model: Prisma.ModelName,
     pagingDto: PagingDto,
     where: WhereClause = {},
-    orderBy: OrderByClause = {}
   ): Promise<Page<T>> {
     const { page, orderby, direction } = pagingDto;
 
     const take = Number(pagingDto.take);
     const skip = (page - 1) * take;
     const order = orderby ? { [orderby]: direction } : { id: 'desc' };
+    const includes = {};
 
     where = this.parseWhereClause(where);
+
+    // TODO: 추후 공통적으로 필히 수정
+    if (model === "Series") {
+      includes["topic"] = true;
+    }
+
 
     const [data, total] = await this.prisma.$transaction([
       this.prisma[model].findMany({
@@ -50,6 +57,7 @@ export class PagingService<T> {
         skip,
         take,
         orderBy: order,
+        includes
       }),
       this.prisma[model].count({ where }),
     ]);
