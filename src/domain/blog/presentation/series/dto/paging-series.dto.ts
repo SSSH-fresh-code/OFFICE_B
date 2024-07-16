@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import { PagingDto } from 'src/infrastructure/common/dto/paging.dto';
 
 export class PagingSeriesDto extends PagingDto {
@@ -12,13 +12,12 @@ export class PagingSeriesDto extends PagingDto {
   })
   like__name?: string;
 
-  @IsOptional()
-  @IsNumber()
   @ApiProperty({
     description: '상위 주제 id(완전 일치)',
     example: 1,
     required: false
   })
+  @IsOptional()
   where__topicId?: number;
 
 }

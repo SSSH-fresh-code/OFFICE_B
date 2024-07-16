@@ -41,13 +41,13 @@ export class PagingService<T> implements iPagingService {
     const take = Number(pagingDto.take);
     const skip = (page - 1) * take;
     const order = orderby ? { [orderby]: direction } : { id: 'desc' };
-    const includes = {};
+    const include = {};
 
     where = this.parseWhereClause(where);
 
     // TODO: 추후 공통적으로 필히 수정
     if (model === "Series") {
-      includes["topic"] = true;
+      include["topic"] = true;
     }
 
 
@@ -57,7 +57,7 @@ export class PagingService<T> implements iPagingService {
         skip,
         take,
         orderBy: order,
-        includes
+        include
       }),
       this.prisma[model].count({ where }),
     ]);
