@@ -15,6 +15,7 @@ model User {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   permissions Permission[] @relation("UserPermissions")
+  posts Post[]
 }
 
 model Permission {
@@ -52,6 +53,7 @@ model Topic {
   id     Int           @id @default(autoincrement())
   name   String        @unique
   series Series[]
+  posts Post[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 }
@@ -61,6 +63,21 @@ model Series {
   name   String  @unique
   topic   Topic @relation(fields: [topicId], references: [id])
   topicId Int
+  posts Post[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Post {
+  title String @id
+  content String @db.Text
+  thumbnail String? 
+  author User @relation(fields: [authorId], references: [id])
+  authorId String
+  topic Topic @relation(fields: [topicId], references: [id])
+  topicId Int
+  series Series @relation(fields: [seriesId], references: [id])
+  seriesId Int
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 }
