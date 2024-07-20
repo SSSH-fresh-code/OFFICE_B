@@ -22,7 +22,7 @@ export class Series implements iSeries {
     this.topic = _topic;
   }
 
-  static of(series: PrismaSeries, topic: iTopic) {
+  static of(series: PrismaSeries, topic?: iTopic) {
     return new this(
       series.id,
       series.name,
