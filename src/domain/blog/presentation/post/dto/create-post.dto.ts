@@ -25,11 +25,11 @@ export class CreatePostDto {
   thumbnail?: string;
 
   @ApiProperty({
-    description: '유저 id',
+    description: '유저 name',
     example: "",
   })
   @IsString()
-  authorId: string;
+  authorName: string;
 
   @ApiProperty({
     description: '토픽 id',

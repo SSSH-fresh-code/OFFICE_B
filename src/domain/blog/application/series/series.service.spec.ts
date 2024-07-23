@@ -76,8 +76,8 @@ describe('SeriesService', () => {
     });
   });
 
-  describe('getSeriess', () => {
-    it('topic list를 조회합니다.', async () => {
+  describe('getSeries', () => {
+    it('series list를 조회합니다.', async () => {
       const dto: PagingSeriesDto = {
         page: 1,
         take: 10,

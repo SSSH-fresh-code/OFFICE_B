@@ -43,11 +43,14 @@ export class PagingService<T> implements iPagingService {
     const order = orderby ? { [orderby]: direction } : { id: 'desc' };
     const include = {};
 
-    where = this.parseWhereClause(where);
+    where = this.parseWhereClause(pagingDto, where);
 
-    // TODO: 추후 공통적으로 필히 수정
     if (model === "Series") {
       include["topic"] = true;
+    } else if (model === "Post") {
+      include["author"] = true;
+      include["topic"] = true;
+      include["series"] = true;
     }
 
 
@@ -65,27 +68,51 @@ export class PagingService<T> implements iPagingService {
     return { data, total };
   }
 
-  private parseWhereClause(where: WhereClause): WhereClause {
+  private parseWhereClause(pagingDto: PagingDto, where?: WhereClause): WhereClause {
     const result = {};
+    if (where) {
+      for (const key of Object.keys(where)) {
+        const splitKey = key.split('__');
 
-    for (const key of Object.keys(where)) {
-      const splitKey = key.split('__');
+        if (splitKey.length !== 2) {
+          continue;
+        }
 
-      if (splitKey.length !== 2) {
-        continue;
+        switch (splitKey[0]) {
+          case 'where':
+            result[splitKey[1]] = where[key];
+            break;
+          case 'like':
+            result[splitKey[1]] = {
+              contains: where[key]
+            }
+            break;
+          default:
+            break;
+        }
       }
+    } else {
+      for (const key of Object.keys(pagingDto)) {
+        if (key.indexOf('__') < 0) continue;
 
-      switch (splitKey[0]) {
-        case 'where':
-          result[splitKey[1]] = where[key];
-          break;
-        case 'like':
-          result[splitKey[1]] = {
-            contains: where[key]
-          }
-          break;
-        default:
-          break;
+        const splitKey = key.split('__');
+
+        if (splitKey.length !== 2) {
+          continue;
+        }
+
+        switch (splitKey[0]) {
+          case 'where':
+            result[splitKey[1]] = pagingDto[key];
+            break;
+          case 'like':
+            result[splitKey[1]] = {
+              contains: pagingDto[key]
+            }
+            break;
+          default:
+            break;
+        }
       }
     }
 

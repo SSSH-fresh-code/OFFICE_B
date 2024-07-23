@@ -72,8 +72,8 @@ model Post {
   title String @unique
   content String
   thumbnail String? 
-  author User @relation(fields: [authorId], references: [id])
-  authorId String
+  author User @relation(fields: [authorName], references: [name])
+  authorName String
   topic Topic @relation(fields: [topicId], references: [id])
   topicId Int
   series Series? @relation(fields: [seriesId], references: [id])

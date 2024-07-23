@@ -1,5 +1,5 @@
 import { HttpStatus, Logger } from "@nestjs/common";
-import { Post as PrismaPost } from "@prisma/client";
+import { Post as PrismaPost, Series as PrismaSeries, Topic as PrismaTopic, User as PrismaUser } from "@prisma/client";
 import { SsshException } from "src/infrastructure/filter/exception/sssh.exception";
 import { ExceptionEnum } from "src/infrastructure/filter/exception/exception.enum";
 import { iPost } from "./post.interface";
@@ -7,6 +7,11 @@ import { iSeries } from "../series/series.interface";
 import { iTopic } from "../topic/topic.interface";
 import { iUser } from "src/domain/user/domain/user.interface";
 import { ReadPostDto } from "../../presentation/post/dto/read-post.dto";
+import { User } from "src/domain/user/domain/user.entity";
+import { Topic } from "../topic/topic.entity";
+import { Series } from "../series/series.entity";
+
+export type ofPost = PrismaPost & { author: PrismaUser, topic: PrismaTopic, series?: PrismaSeries };
 
 export class Post implements iPost {
   private readonly logger = new Logger(Post.name);
@@ -36,14 +41,14 @@ export class Post implements iPost {
     this.series = _series;
   }
 
-  static of(post: PrismaPost, user: iUser, topic: iTopic, series?: iSeries) {
+  static of(post: ofPost) {
     return new this(
       post.id,
       post.title,
       post.content,
-      user,
-      topic,
-      series,
+      User.of(post.author),
+      Topic.of(post.topic),
+      post.series ? Series.of(post.series) : null,
       post.thumbnail,
       post.createdAt,
       post.updatedAt
@@ -100,7 +105,7 @@ export class Post implements iPost {
       thumbnail: this._thumbnail,
       author: this._author.toDto(),
       topic: this._topic.toDto(),
-      series: this._series ? this._series.toDto() : undefined,
+      series: this._series ? this._series.toDto() : null,
       createdAt: this._createdAt,
       updatedAt: this._updatedAt
     }

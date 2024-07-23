@@ -57,7 +57,7 @@ export class Series implements iSeries {
     return {
       id: this._id,
       name: this._name,
-      topic: this._topic.toDto(),
+      topic: this._topic ? this._topic.toDto() : null,
       createdAt: this._createdAt,
       updatedAt: this._updatedAt
     }

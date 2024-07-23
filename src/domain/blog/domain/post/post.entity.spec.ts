@@ -5,7 +5,7 @@ import { Topic } from "../topic/topic.entity";
 import { iPost } from "./post.interface";
 import { Series } from "../series/series.entity";
 import { User } from "src/domain/user/domain/user.entity";
-import { Post } from "./post.entity";
+import { Post, ofPost } from "./post.entity";
 import { CreatePostDto } from "../../presentation/post/dto/create-post.dto";
 
 describe('Post Entity', () => {
@@ -23,7 +23,7 @@ describe('Post Entity', () => {
     title: "제목 입니다",
     content: "내용입니다.",
     thumbnail: "001.avif",
-    authorId: user.id,
+    authorName: user.name,
     topicId: topic.id,
     seriesId: series.id
   }
@@ -301,22 +301,46 @@ describe('Post Entity', () => {
 
   describe('of', () => {
     it('정적 생성자 사용', () => {
-      const p: PrismaPost = {
+      const p: ofPost = {
         id: 1,
         title: "제목_입니다",
         content: "내용입니다.",
-        authorId: "mmm-mmmmm-mmm",
         thumbnail: "001.avif",
-        topicId: 1,
-        seriesId: 1,
+        author: {
+          id: user.id,
+          email: user.email,
+          password: user.password,
+          name: user.name,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        authorName: user.name,
+        topicId: topic.id,
+        seriesId: series.id,
+        topic: {
+          id: topic.id,
+          name: topic.name,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        series: {
+          id: series.id,
+          name: series.name,
+          topicId: series.topic.id,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
         createdAt: new Date(),
         updatedAt: new Date()
       };
 
-      post = new Post(p.id, p.title, p.content, user, topic, series, p.thumbnail, p.createdAt, p.updatedAt);
-      const ofPost = Post.of(p, user, topic, series);
+      const ofPost = Post.of(p);
 
-      expect(post).toEqual(ofPost);
+      expect(p.id).toEqual(ofPost.id);
+      expect(p.author.id).toEqual(ofPost.author.id);
+      expect(p.author.name).toEqual(ofPost.author.name);
+      expect(p.topic.id).toEqual(ofPost.topic.id);
+      expect(p.series.id).toEqual(ofPost.series.id);
     })
   });
 
@@ -373,7 +397,7 @@ describe('Post Entity', () => {
       expect(post.thumbnail).toEqual(postDto.thumbnail);
       expect(post.author.toDto()).toEqual(postDto.author);
       expect(post.topic.toDto()).toEqual(postDto.topic);
-      expect(postDto.series).toBeUndefined();
+      expect(postDto.series).toBeNull();
       expect(post.createdAt).toEqual(postDto.createdAt);
       expect(post.updatedAt).toEqual(postDto.updatedAt);
     });
@@ -392,7 +416,7 @@ describe('Post Entity', () => {
       expect(postDto.thumbnail).toBeUndefined();
       expect(post.author.toDto()).toEqual(postDto.author);
       expect(post.topic.toDto()).toEqual(postDto.topic);
-      expect(postDto.series).toBeUndefined();
+      expect(postDto.series).toBeNull();
       expect(post.createdAt).toEqual(postDto.createdAt);
       expect(post.updatedAt).toEqual(postDto.updatedAt);
     });

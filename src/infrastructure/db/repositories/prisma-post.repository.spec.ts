@@ -58,7 +58,7 @@ describe('PrismaPostRepository', () => {
 
     const prismaSeries = await prisma.series.create({
       data: {
-        name: "topic",
+        name: "series",
         topicId: prismaTopic.id
       }
     });
@@ -195,7 +195,7 @@ describe('PrismaPostRepository', () => {
 
       const anotherPrismaSeries = await prisma.series.create({
         data: {
-          name: "series",
+          name: "series2",
           topicId: anotherPrismaTopic.id
         }
       });
@@ -213,6 +213,16 @@ describe('PrismaPostRepository', () => {
       hasDiffEntity(updatedPost, savedPost);
       expect(updatedPost.topic.id).not.toEqual(post.topic.id);
       expect(updatedPost.series.id).not.toEqual(post.series.id);
+    });
+
+    it('Post 시리즈를 없앱니다.', async () => {
+      const savedPost = await repository.save(post);
+
+      savedPost.series = null;
+
+      const updatedPost = await repository.update(savedPost);
+
+      expect(updatedPost.series).toBeNull();
     });
 
     it('Post 작성자를 수정합니다.', async () => {
