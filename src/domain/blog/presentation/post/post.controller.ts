@@ -6,82 +6,91 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { PermissionsClass, PermissionsMethod } from 'src/infrastructure/decorator/permissions.decorator';
 import { PermissionEnum } from 'src/domain/permission/domain/permission.enum';
 import { Page } from 'src/infrastructure/common/services/paging.service';
-import { iSeriesService } from '../../application/series/series.service.interface';
-import { SERIES_SERVICE } from '../../blog.const';
-import { ReadSeriesDto } from './dto/read-series.dto';
-import { PagingSeriesDto } from './dto/paging-series.dto';
-import { CreateSeriesDto } from './dto/create-series.dto';
-import { UpdateSeriesDto } from './dto/update-series.dto';
+import { POST_SERVICE } from '../../blog.const';
+import { iPostService } from '../../application/post/post.service.interface';
+import { ReadPostDto } from './dto/read-post.dto';
+import { PagingPostDto } from './dto/paging-post.dto';
+import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 
 @ApiTags('blog')
-@Controller('series')
-@PermissionsClass(PermissionEnum.CAN_USE_BLOG)
-export class SeriesController {
+@Controller('post')
+export class PostController {
   constructor(
-    @Inject(SERIES_SERVICE) private readonly seriesService: iSeriesService,
+    @Inject(POST_SERVICE) private readonly postService: iPostService,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
   ) { }
 
-  @Get(':name')
-  @ApiOperation({ summary: '시리즈 단건 조회' })
+
+  @Get(':id')
+  @ApiOperation({ summary: '게시글 단건 id 조회' })
   @ApiResponse({
     status: 200,
-    description: '시리즈가 정상적으로 조회됨',
+    description: '게시글이 정상적으로 조회됨',
   })
-  @PermissionsMethod(PermissionEnum.CAN_READ_BLOG)
-  async getSeriesByName(@Param('name') name: string): Promise<ReadSeriesDto> {
-    return await this.seriesService.getSeriesByName(name);
+  @PermissionsMethod(PermissionEnum.CAN_USE_BLOG, PermissionEnum.CAN_READ_BLOG)
+  async getPostById(@Param('id', ParseIntPipe) id: number): Promise<ReadPostDto> {
+    return await this.postService.getPostById(id);
+  }
+
+  @Get(':title')
+  @ApiOperation({ summary: '게시글 단건 조회' })
+  @ApiResponse({
+    status: 200,
+    description: '게시글이 정상적으로 조회됨',
+  })
+  async getPostByTitle(@Param('title') title: string): Promise<ReadPostDto> {
+    return await this.postService.getPostByTitle(title);
   }
 
   @Get()
-  @ApiOperation({ summary: '시리즈 다건 조회' })
+  @ApiOperation({ summary: '게시글 다건 조회' })
   @ApiResponse({
     status: 200,
-    description: '시리즈들이 정상적으로 조회됨',
+    description: '게시글들이 정상적으로 조회됨',
   })
-  @PermissionsMethod(PermissionEnum.CAN_READ_BLOG)
-  async getSeriess(@Query() dto: PagingSeriesDto): Promise<Page<ReadSeriesDto>> {
+  async getPosts(@Query() dto: PagingPostDto): Promise<Page<ReadPostDto>> {
     dto.where__topicId = Number(dto.where__topicId);
-    return await this.seriesService.getSeries(dto);
+    dto.where__seriesId = Number(dto.where__seriesId);
+    return await this.postService.getPosts(dto);
   }
 
   @Post()
-  @ApiOperation({ summary: '신규 시리즈 생성' })
+  @ApiOperation({ summary: '신규 게시글 생성' })
   @ApiResponse({
     status: 201,
-    description: '시리즈가 정상적으로 생성 됨',
+    description: '게시글이 정상적으로 생성 됨',
   })
   @ApiResponse({ status: 400, description: '잘못된 파라미터 값' })
-  @ApiBody({ type: CreateSeriesDto })
-  @PermissionsMethod(PermissionEnum.CAN_WRITE_BLOG)
-  async createSeries(@Body() dto: CreateSeriesDto): Promise<ReadSeriesDto> {
-    return await this.seriesService.createSeries(dto);
+  @ApiBody({ type: CreatePostDto })
+  @PermissionsMethod(PermissionEnum.CAN_USE_BLOG, PermissionEnum.CAN_WRITE_BLOG)
+  async createSeries(@Body() dto: CreatePostDto): Promise<ReadPostDto> {
+    return await this.postService.createPost(dto);
   }
 
   @Put()
-  @ApiOperation({ summary: '시리즈 수정' })
+  @ApiOperation({ summary: '게시글 수정' })
   @ApiResponse({
     status: 201,
-    description: '시리즈가 정상적으로 수정 됨',
+    description: '게시글이 정상적으로 수정 됨',
   })
   @ApiResponse({ status: 400, description: '잘못된 파라미터 값' })
-  @ApiBody({ type: UpdateSeriesDto })
-  @PermissionsMethod(PermissionEnum.CAN_WRITE_BLOG)
-  async updateSeries(@Body() dto: UpdateSeriesDto): Promise<ReadSeriesDto> {
-    return await this.seriesService.updateSeries(dto);
+  @ApiBody({ type: UpdatePostDto })
+  @PermissionsMethod(PermissionEnum.CAN_USE_BLOG, PermissionEnum.CAN_WRITE_BLOG)
+  async updatePost(@Body() dto: UpdatePostDto): Promise<ReadPostDto> {
+    return await this.postService.updatePost(dto);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: '시리즈 삭제' })
+  @ApiOperation({ summary: '게시글 삭제' })
   @ApiResponse({
     status: 200,
-    description: '시리즈 단건 삭제',
+    description: '게시글 단건 삭제',
   })
-  @ApiResponse({ status: 404, description: '존재하지 않는 시리즈' })
-  @PermissionsMethod(PermissionEnum.CAN_WRITE_BLOG)
-  async deleteSeries(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  @PermissionsMethod(PermissionEnum.CAN_USE_BLOG, PermissionEnum.CAN_WRITE_BLOG)
+  async deletePost(@Param('id', ParseIntPipe) id: number): Promise<void> {
     try {
-      await this.seriesService.deleteSeries(id);
+      await this.postService.deletePost(id);
     } catch (e) {
       this.logger.error(e);
       throw e;

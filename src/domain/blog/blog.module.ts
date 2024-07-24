@@ -11,6 +11,7 @@ import { PostService } from './application/post/post.service';
 import { PrismaPostRepository } from 'src/infrastructure/db/repositories/prisma-post.repository';
 import { USER_REPOSITORY } from '../user/user.const';
 import { PrismaUserRepository } from 'src/infrastructure/db/repositories/prisma-user.repository';
+import { PostController } from './presentation/post/post.controller';
 
 @Module({
   imports: [InfraModule],
@@ -41,6 +42,6 @@ import { PrismaUserRepository } from 'src/infrastructure/db/repositories/prisma-
       useClass: PostService
     }
   ],
-  controllers: [TopicController, SeriesController]
+  controllers: [TopicController, SeriesController, PostController]
 })
 export class BlogModule { }
