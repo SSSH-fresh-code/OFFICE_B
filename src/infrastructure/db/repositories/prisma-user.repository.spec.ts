@@ -68,6 +68,23 @@ describe('PrismaUserRepository', () => {
     });
   });
 
+  describe('findByName', () => {
+    it('유저를 성공적으로 찾을 수 있어야 합니다.', async () => {
+      const user = new User(uuidv4(), 'test@example.com', 'password123', 'TestUser');
+      await repository.save(user);
+
+      const foundUser = await repository.findByName(user.name);
+      expect(foundUser).toEqual(expect.objectContaining({
+        email: 'test@example.com',
+        name: 'TestUser',
+      }));
+    });
+
+    it('유저를 찾을 수 없으면 예외를 던져야 합니다.', async () => {
+      await expect(repository.findById(uuidv4())).rejects.toThrow(Prisma.PrismaClientKnownRequestError);
+    });
+  });
+
   describe('findByEmail', () => {
     it('유저를 성공적으로 찾을 수 있어야 합니다.', async () => {
       const user = new User(uuidv4(), 'test@example.com', 'password123', 'TestUser');

@@ -53,6 +53,23 @@ export class PrismaUserRepository implements UserRepository {
     );
   }
 
+  async findByName(name: string): Promise<User | null> {
+    const user = await this.prisma.user.findUniqueOrThrow({
+      where: { name },
+      include: { permissions: true }
+    });
+
+    return new User(
+      user.id,
+      user.email,
+      user.password,
+      user.name,
+      [],
+      user.createdAt,
+      user.updatedAt,
+    );
+  }
+
   async save(user: User): Promise<User> {
     const upsertUser = await this.prisma.user.upsert({
       include: { permissions: true },

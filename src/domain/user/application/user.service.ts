@@ -35,18 +35,22 @@ export class UserService {
 
   async getUsers(pagingDto: UserPagingDto): Promise<Page<User>> {
     const where = {};
+
     if (pagingDto.where__email) {
-      where['email'] = pagingDto.where__email;
+      where['where__email'] = pagingDto.where__email;
     }
+
     if (pagingDto.like__name) {
-      where['name'] = { contains: pagingDto.like__name };
+      where['like__name'] = pagingDto.like__name;
     }
+
     const orderBy = {};
+
     if (pagingDto.orderby) {
       orderBy[pagingDto.orderby] = pagingDto.direction;
     }
 
-    return this.pagingService.getPagedResults('User', pagingDto, where, orderBy);
+    return this.pagingService.getPagedResults('User', pagingDto, where);
   }
 
   async getUserById(id: string): Promise<ReadUserDto> {

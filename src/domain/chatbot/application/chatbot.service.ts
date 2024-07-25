@@ -21,7 +21,7 @@ export class ChatBotService {
   constructor(
     @Inject(MESSENGER_FACTORY) private readonly messengerFactory: MessengerFactory,
     @Inject(CHATBOT_REPOSITORY) private readonly chatBotRepository: IChatBotRepository,
-    private readonly pagingService: PagingService<ChatBot>,
+    private readonly pagingService: PagingService<PrismaChatBot>,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
   ) { }
 
@@ -81,14 +81,14 @@ export class ChatBotService {
   async getChatBots(pagingDto: ChatBotPagingDto): Promise<Page<ReadChatBotDto>> {
     const where = {};
     if (pagingDto.where__type) {
-      where['type'] = pagingDto.where__type;
+      where['where__type'] = pagingDto.where__type;
     }
     const orderBy = {};
     if (pagingDto.orderby) {
       orderBy[pagingDto.orderby] = pagingDto.direction;
     }
 
-    const pagingBots = await this.pagingService.getPagedResults<PrismaChatBot>('ChatBot', pagingDto, where, orderBy);
+    const pagingBots = await this.pagingService.getPagedResults('ChatBot', pagingDto, where);
 
     return {
       data: pagingBots.data.map(bot => ChatBot.of(bot).toDto()),

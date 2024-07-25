@@ -1,11 +1,12 @@
 import * as bcrypt from 'bcrypt';
-import { iUser as IUser } from './user.interface';
-import { Permission } from '../../../domain/permission/domain/permission.entity';
+import { iUser } from './user.interface';
+import { ReadUserDto } from '../presentation/dto/read-user.dto';
+import { User as PrismaUser } from "@prisma/client";
 
 /**
  * UserEntity 클래스
  */
-export class User implements IUser {
+export class User implements iUser {
 
   constructor(
     private _id: string,
@@ -16,6 +17,19 @@ export class User implements IUser {
     private _createdAt?: Date,
     private _updatedAt?: Date,
   ) {
+  }
+
+
+  static of({ id, email, password, name, createdAt, updatedAt }: PrismaUser) {
+    return new this(
+      id,
+      email,
+      password,
+      name,
+      [],
+      createdAt,
+      updatedAt
+    );
   }
 
   /**
@@ -147,5 +161,15 @@ export class User implements IUser {
    */
   validate(): void {
     throw new Error('아직 구현체 없음');
+  }
+
+  toDto(): ReadUserDto {
+    return {
+      id: this._id,
+      email: this.email,
+      name: this._name,
+      createdAt: this._createdAt,
+      updatedAt: this._updatedAt
+    }
   }
 }

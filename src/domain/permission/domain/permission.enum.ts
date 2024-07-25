@@ -10,6 +10,9 @@ export enum PermissionEnum {
   CAN_USE_CHAT = "CHAT0001",
   CAN_READ_CHAT = "CHAT0002",
   CAN_WRITE_CHAT = "CHAT0003",
+  CAN_USE_BLOG = "BLOG0001",
+  CAN_READ_BLOG = "BLOG0002",
+  CAN_WRITE_BLOG = "BLOG0003",
 }
 
 export enum PermissionDescriptionEnum {
@@ -24,4 +27,7 @@ export enum PermissionDescriptionEnum {
   CAN_USE_CHAT = "채팅/챗봇 관련 API 사용 권한(R + W)",
   CAN_READ_CHAT = "채팅/챗봇 관련 API 사용 권한(R)",
   CAN_WRITE_CHAT = "채팅/챗봇 관련 API 사용 권한(W)",
+  CAN_USE_BLOG = "블로그 관련 API 사용 권한",
+  CAN_READ_BLOG = "블로그 관련 API 사용 권한(R)",
+  CAN_WRITE_BLOG = "블로그 관련 API 사용 권한(W)",
 }

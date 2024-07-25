@@ -20,6 +20,15 @@ export interface UserRepository {
    */
   findByEmail(email: string): Promise<User | null>;
   /**
+   * ID로 사용자를 조회합니다. 
+   * 대상 사용자가 존재하지 않으면 오류를 반환합니다.
+   * 
+   * @param {string} id - 조회할 사용자의 ID
+   * @returns {Promise<User>} - 조회된 사용자 정보를 반환합니다.
+   * @throws {Prisma.PrismaClientKnownRequestError} - 대상 사용자가 존재하지 않으면 오류를 반환합니다.
+   */
+  findByName(id: string): Promise<User | null>;
+  /**
    * 사용자를 저장합니다. 사용자가 존재하면 업데이트하고, 존재하지 않으면 새로 생성합니다.
    * 
    * @param {User} user - 저장할 사용자 정보

@@ -3,12 +3,13 @@ import { PrismaService } from '../../db/prisma.service';
 import { PagingDto } from '../dto/paging.dto';
 import { Prisma } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
+import { iPagingService } from './paging.interface';
 
-interface WhereClause {
-  [key: string]: any;
+export interface WhereClause {
+  [key: string]: string;
 }
 
-interface OrderByClause {
+export interface OrderByClause {
   [key: string]: Prisma.SortOrder;
 }
 
@@ -19,7 +20,7 @@ export type Page<T> = { data: T[]; total: number };
  * @template T Entity 타입
  */
 @Injectable()
-export class PagingService<T> {
+export class PagingService<T> implements iPagingService {
   constructor(private readonly prisma: PrismaService) { }
 
   /**
@@ -30,17 +31,28 @@ export class PagingService<T> {
    * @param orderBy 정렬 조건
    * @returns 데이터와 총 개수를 포함한 객체
    */
-  async getPagedResults<T>(
+  async getPagedResults(
     model: Prisma.ModelName,
     pagingDto: PagingDto,
-    where: WhereClause = {},
-    orderBy: OrderByClause = {}
+    where?: WhereClause,
   ): Promise<Page<T>> {
     const { page, orderby, direction } = pagingDto;
 
     const take = Number(pagingDto.take);
     const skip = (page - 1) * take;
     const order = orderby ? { [orderby]: direction } : { id: 'desc' };
+    const include = {};
+
+    where = this.parseWhereClause(pagingDto, where);
+
+    if (model === "Series") {
+      include["topic"] = true;
+    } else if (model === "Post") {
+      include["author"] = true;
+      include["topic"] = true;
+      include["series"] = true;
+    }
+
 
     const [data, total] = await this.prisma.$transaction([
       this.prisma[model].findMany({
@@ -48,10 +60,62 @@ export class PagingService<T> {
         skip,
         take,
         orderBy: order,
+        include
       }),
       this.prisma[model].count({ where }),
     ]);
 
     return { data, total };
+  }
+
+  private parseWhereClause(pagingDto: PagingDto, where?: WhereClause): WhereClause {
+    const result = {};
+    if (where) {
+      for (const key of Object.keys(where)) {
+        const splitKey = key.split('__');
+
+        if (splitKey.length !== 2) {
+          continue;
+        }
+
+        switch (splitKey[0]) {
+          case 'where':
+            result[splitKey[1]] = where[key];
+            break;
+          case 'like':
+            result[splitKey[1]] = {
+              contains: where[key]
+            }
+            break;
+          default:
+            break;
+        }
+      }
+    } else {
+      for (const key of Object.keys(pagingDto)) {
+        if (key.indexOf('__') < 0) continue;
+
+        const splitKey = key.split('__');
+
+        if (splitKey.length !== 2) {
+          continue;
+        }
+
+        switch (splitKey[0]) {
+          case 'where':
+            result[splitKey[1]] = pagingDto[key];
+            break;
+          case 'like':
+            result[splitKey[1]] = {
+              contains: pagingDto[key]
+            }
+            break;
+          default:
+            break;
+        }
+      }
+    }
+
+    return result;
   }
 }

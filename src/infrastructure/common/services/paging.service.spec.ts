@@ -59,6 +59,7 @@ describe('PagingService', () => {
       prismaService.$transaction.mockResolvedValue([users, total]);
 
       const result = await pagingService.getPagedResults('User', pagingDto, where);
+
       expect(result).toEqual({ data: users, total });
       expect(prismaService.$transaction).toHaveBeenCalledWith([
         prismaService['User'].findMany({

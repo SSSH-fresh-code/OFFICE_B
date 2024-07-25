@@ -176,8 +176,7 @@ describe('ChatBotService', () => {
       expect(pagingService.getPagedResults).toHaveBeenCalledWith(
         'ChatBot'
         , pagingDto
-        , { type: MessengerType.DISCORD }
-        , { createdAt: 'desc' }
+        , { where__type: MessengerType.DISCORD }
       );
       expect(chatbots.total).toEqual(1);
     });
