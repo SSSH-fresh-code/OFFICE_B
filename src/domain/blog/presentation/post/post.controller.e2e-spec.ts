@@ -8,17 +8,21 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from 'src/app.module';
 import { PrismaClientExceptionFilter } from 'src/infrastructure/filter/exception/prisma-exception.filter';
 import { PermissionEnum } from 'src/domain/permission/domain/permission.enum';
+import { Topic } from '../../domain/topic/topic.entity';
+import { CreatePostDto } from './dto/create-post.dto';
+import { User } from 'src/domain/user/domain/user.entity';
 import { formatMessage } from 'src/infrastructure/util/message.util';
 import { ExceptionEnum } from 'src/infrastructure/filter/exception/exception.enum';
-import { CreateSeriesDto } from './dto/create-series.dto';
-import { Topic } from '../../domain/topic/topic.entity';
-import { UpdateSeriesDto } from './dto/update-series.dto';
+import { Series } from '../../domain/series/series.entity';
+import { UpdatePostDto } from './dto/update-post.dto';
 
 describe('SeriesController (e2e)', () => {
   let app: INestApplication;
   let prismaService: PrismaService;
+  let author: User;
   let topic: Topic;
-  let createDto: CreateSeriesDto;
+  let series: Series;
+  let createDto: CreatePostDto;
   let su: string;
   let gu: string;
 
@@ -58,7 +62,7 @@ describe('SeriesController (e2e)', () => {
     await app.init();
     prismaService = moduleFixture.get<PrismaService>(PrismaService);
 
-    await prismaService.user.create({
+    const createUser = await prismaService.user.create({
       data: {
         ...superUser,
         permissions: {
@@ -89,6 +93,7 @@ describe('SeriesController (e2e)', () => {
       .send({ email: superUser.email, password: "password" });
 
     su = response.headers['set-cookie'];
+    author = User.of(createUser);
 
     response = await request(app.getHttpServer())
       .post('/auth/login')
@@ -98,7 +103,7 @@ describe('SeriesController (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await prismaService.cleanDatabase(['Topic', 'Series']);
+    await prismaService.cleanDatabase(['Topic', 'Series', 'Post']);
 
     const createTopic = await prismaService.topic.create({
       data: {
@@ -106,55 +111,97 @@ describe('SeriesController (e2e)', () => {
       }
     });
 
+    const createSeries = await prismaService.series.create({
+      data: {
+        name: "topic"
+        , topicId: createTopic.id
+      }
+    });
+
     topic = Topic.of(createTopic);
+    series = Series.of(createSeries);
 
     createDto = {
-      name: "series im",
-      topicId: topic.id
+      title: "post test",
+      content: "test content",
+      authorName: author.name,
+      topicId: topic.id,
+      seriesId: series.id,
+      thumbnail: "0001.avif"
     }
   });
 
-  describe('POST - /series', () => {
+  describe('POST - /post', () => {
 
-    it('시리즈 생성', async () => {
+    it('게시글 생성', async () => {
       const { statusCode, body } = await request(app.getHttpServer())
-        .post('/series')
+        .post('/post')
         .set('Cookie', su)
         .send(createDto);
 
       expect(statusCode).toEqual(201);
       expect(body.id).toBeDefined();
-      expect(body.name).toEqual(createDto.name.replaceAll(" ", "_"));
+      expect(body.title).toEqual(createDto.title.replaceAll(" ", "_"));
+      expect(body.content).toEqual(createDto.content);
+      expect(body.thumbnail).toEqual(createDto.thumbnail);
+      expect(body.author.id).toEqual(author.id);
+      expect(body.author.name).toEqual(author.name);
       expect(body.topic.id).toEqual(topic.id);
       expect(body.topic.name).toEqual(topic.name);
+      expect(body.series.id).toEqual(series.id);
+      expect(body.series.name).toEqual(series.name);
       expect(body.createdAt).toBeDefined();
       expect(body.updatedAt).toBeDefined();
 
       return;
     });
 
-    it('시리즈 중복 생성', async () => {
-      await prismaService.series.create({
-        data: {
-          name: createDto.name.replaceAll(" ", "_"),
-          topicId: topic.id
-        }
-      });
-
+    it('시리즈, 썸네일 없는 게시글 생성', async () => {
       const { statusCode, body } = await request(app.getHttpServer())
-        .post('/series')
+        .post('/post')
         .set('Cookie', su)
-        .send(createDto);
+        .send({
+          title: createDto.title,
+          content: createDto.content,
+          authorName: author.name,
+          topicId: topic.id
+        });
 
-      expect(statusCode).toEqual(400);
-      expect(body.message).toEqual(formatMessage(ExceptionEnum.ALREADY_EXISTS, { param: "name" }))
+      expect(statusCode).toEqual(201);
+      expect(body.id).toBeDefined();
+      expect(body.title).toEqual(createDto.title.replaceAll(" ", "_"));
+      expect(body.content).toEqual(createDto.content);
+      expect(body.thumbnail).toBeNull();
+      expect(body.author.id).toEqual(author.id);
+      expect(body.author.name).toEqual(author.name);
+      expect(body.topic.id).toEqual(topic.id);
+      expect(body.topic.name).toEqual(topic.name);
+      expect(body.series).toBeNull();
+      expect(body.createdAt).toBeDefined();
+      expect(body.updatedAt).toBeDefined();
 
       return;
     });
 
-    it('권한 없이 시리즈 생성', async () => {
+    it('게시글 중복 생성', async () => {
+      await prismaService.post.create({
+        data: { ...createDto, title: createDto.title.replaceAll(" ", "_") }
+      });
+
       const { statusCode, body } = await request(app.getHttpServer())
-        .post('/series')
+        .post('/post')
+        .set('Cookie', su)
+        .send(createDto);
+
+      expect(statusCode).toEqual(400);
+      expect(body.message).toEqual(formatMessage(ExceptionEnum.ALREADY_EXISTS, { param: "title" }))
+
+      return;
+    });
+
+    it('권한 없이 게시글 생성', async () => {
+      const { statusCode, body } = await request(app.getHttpServer())
+        .post('/post')
         .set('Cookie', gu)
         .send(createDto);
 
@@ -164,9 +211,9 @@ describe('SeriesController (e2e)', () => {
       return;
     });
 
-    it('로그인 없이 시리즈 생성', async () => {
+    it('로그인 없이 게시글 생성', async () => {
       const { statusCode, body } = await request(app.getHttpServer())
-        .post('/series')
+        .post('/post')
         .send(createDto);
 
       expect(statusCode).toEqual(403);
@@ -176,63 +223,58 @@ describe('SeriesController (e2e)', () => {
     });
   });
 
-  describe('PUT - /series', () => {
-    it('시리즈 이름 수정', async () => {
-      const updateName = "hello guys";
-      const convertName = updateName.replaceAll(" ", "_");
+  describe('PUT - /post', () => {
+    it('게시글 제목, 내용, 썸네일 수정', async () => {
+      const updateTitle = "update Title";
+      const convertTitle = updateTitle.replaceAll(" ", "_");
+      const updateContent = "수정한 내용";
+      const updateThumbnail = "0003.avif";
 
-
-      const { id } = await prismaService.series.create({
-        data: {
-          name: createDto.name.replaceAll(" ", "_"),
-          topicId: topic.id
-        }
+      const { id } = await prismaService.post.create({
+        data: { ...createDto, title: createDto.title.replaceAll(" ", "_") }
       });
 
-      const dto: UpdateSeriesDto = {
-        id, name: updateName
+      const dto: UpdatePostDto = {
+        id, title: updateTitle, content: updateContent, thumbnail: updateThumbnail
       }
 
       const { statusCode, body } = await request(app.getHttpServer())
-        .put('/series')
+        .put('/post')
         .set('Cookie', su)
         .send(dto);
 
       expect(statusCode).toEqual(200);
       expect(body.id).toEqual(dto.id);
-      expect(body.name).toEqual(convertName);
-      expect(body.topic.id).toEqual(topic.id);
-      expect(body.topic.name).toEqual(topic.name);
+      expect(body.title).toEqual(convertTitle);
+      expect(body.content).toEqual(updateContent);
+      expect(body.thumbnail).toEqual(updateThumbnail);
 
       return;
     });
 
-    it('시리즈 주제 수정', async () => {
+    it('게시글 주제 수정', async () => {
       const anotherTopic = await prismaService.topic.create({
         data: {
           name: "new_Topic!"
         }
       })
 
-      const { id, name } = await prismaService.series.create({
-        data: {
-          name: createDto.name.replaceAll(" ", "_"),
-          topicId: topic.id
-        }
+      const { id, topic } = await prismaService.post.create({
+        data: createDto,
+        include: { topic: true }
       });
 
-      const dto: UpdateSeriesDto = {
+      const dto: UpdatePostDto = {
         id, topicId: anotherTopic.id
       }
 
       const { statusCode, body } = await request(app.getHttpServer())
-        .put('/series')
+        .put('/post')
         .set('Cookie', su)
         .send(dto);
 
       expect(statusCode).toEqual(200);
       expect(body.id).toEqual(dto.id);
-      expect(body.name).toEqual(name);
       expect(body.topic.id).not.toEqual(topic.id);
       expect(body.topic.name).not.toEqual(topic.name);
       expect(body.topic.id).toEqual(anotherTopic.id);
@@ -241,72 +283,124 @@ describe('SeriesController (e2e)', () => {
       return;
     });
 
-    it('시리즈 주제, 이름 동시 수정', async () => {
-      const updateName = "hello guys";
-      const convertName = updateName.replaceAll(" ", "_");
-      const anotherTopic = await prismaService.topic.create({
+    it('게시글 시리즈 수정', async () => {
+      const anotherSeries = await prismaService.series.create({
         data: {
-          name: "new_Topic!"
+          name: "new_series!",
+          topicId: topic.id
         }
       })
 
-      const { id } = await prismaService.series.create({
-        data: {
-          name: createDto.name.replaceAll(" ", "_"),
-          topicId: topic.id
-        }
+      const { id, series } = await prismaService.post.create({
+        data: createDto,
+        include: { series: true }
       });
 
-      const dto: UpdateSeriesDto = {
-        id, name: updateName, topicId: anotherTopic.id
+      const dto: UpdatePostDto = {
+        id, seriesId: anotherSeries.id
       }
 
       const { statusCode, body } = await request(app.getHttpServer())
-        .put('/series')
+        .put('/post')
         .set('Cookie', su)
         .send(dto);
 
       expect(statusCode).toEqual(200);
       expect(body.id).toEqual(dto.id);
-      expect(body.name).toEqual(convertName);
-      expect(body.topic.id).not.toEqual(topic.id);
-      expect(body.topic.name).not.toEqual(topic.name);
-      expect(body.topic.id).toEqual(anotherTopic.id);
-      expect(body.topic.name).toEqual(anotherTopic.name);
+      expect(body.series.id).not.toEqual(series.id);
+      expect(body.series.name).not.toEqual(series.name);
+      expect(body.series.id).toEqual(anotherSeries.id);
+      expect(body.series.name).toEqual(anotherSeries.name);
 
       return;
     });
 
-    it('이미 있는 데이터로 시리즈 수정', async () => {
-      const updateName = "hello guys";
-      const convertName = updateName.replaceAll(" ", "_");
-
-      await prismaService.series.create({
-        data: { name: convertName, topicId: topic.id }
+    it('게시글 시리즈 삭제(=수정)', async () => {
+      const { id, series } = await prismaService.post.create({
+        data: createDto,
+        include: { series: true }
       });
 
-      const { id } = await prismaService.series.create({
-        data: { name: "what", topicId: topic.id }
-      });
-
-      const dto: UpdateSeriesDto = {
-        id, name: updateName
+      const dto: UpdatePostDto = {
+        id, seriesId: null
       }
 
       const { statusCode, body } = await request(app.getHttpServer())
-        .put('/series')
+        .put('/post')
+        .set('Cookie', su)
+        .send(dto);
+
+      expect(statusCode).toEqual(200);
+      expect(body.id).toEqual(dto.id);
+      expect(body.series).toBeNull();
+
+      return;
+    });
+
+    it('게시글 저자 수정', async () => {
+      const anotherUser = await prismaService.user.create({
+        data: {
+          email: author.email + "2",
+          password: author.password,
+          name: author.name + "2"
+        }
+      })
+
+      const post = await prismaService.post.create({
+        data: createDto,
+        include: { author: true }
+      });
+
+      const dto: UpdatePostDto = {
+        id: post.id, authorName: anotherUser.name
+      }
+
+      const { statusCode, body } = await request(app.getHttpServer())
+        .put('/post')
+        .set('Cookie', su)
+        .send(dto);
+
+      expect(statusCode).toEqual(200);
+      expect(body.id).toEqual(dto.id);
+      expect(body.author.id).not.toEqual(author.id);
+      expect(body.author.name).not.toEqual(author.name);
+      expect(body.author.id).toEqual(anotherUser.id);
+      expect(body.author.name).toEqual(anotherUser.name);
+
+      return;
+    });
+
+    it('이미 있는 제목으로 게시글 수정', async () => {
+      const title = "title";
+
+      await prismaService.post.create({
+        data: {
+          ...createDto, title: title
+        }
+      });
+
+      const { id } = await prismaService.post.create({
+        data: { ...createDto, title: "anotherTitle" }
+      });
+
+      const dto: UpdatePostDto = {
+        id, title: title
+      }
+
+      const { statusCode, body } = await request(app.getHttpServer())
+        .put('/post')
         .set('Cookie', su)
         .send(dto);
 
       expect(statusCode).toEqual(400);
-      expect(body.message).toEqual(formatMessage(ExceptionEnum.ALREADY_EXISTS, { param: "name" }))
+      expect(body.message).toEqual(formatMessage(ExceptionEnum.ALREADY_EXISTS, { param: "title" }))
 
       return;
     });
 
-    it('권한 없이 시리즈 수정', async () => {
+    it('권한 없이 게시글 수정', async () => {
       const { statusCode, body } = await request(app.getHttpServer())
-        .put('/series')
+        .put('/post')
         .set('Cookie', gu)
         .send(createDto);
 
@@ -316,9 +410,9 @@ describe('SeriesController (e2e)', () => {
       return;
     });
 
-    it('로그인 없이 시리즈 생성', async () => {
+    it('로그인 없이 게시글 생성', async () => {
       const { statusCode, body } = await request(app.getHttpServer())
-        .put('/series')
+        .put('/post')
         .send(createDto);
 
       expect(statusCode).toEqual(403);
@@ -328,32 +422,32 @@ describe('SeriesController (e2e)', () => {
     });
   });
 
-  describe('DELETE - /series/:id', () => {
-    it('시리즈 삭제', async () => {
-      const { id } = await prismaService.series.create({
+  describe('DELETE - /post/:id', () => {
+    it('게시글 삭제', async () => {
+      const { id } = await prismaService.post.create({
         data: createDto
       });
 
       const { statusCode, body } = await request(app.getHttpServer())
-        .delete(`/series/${id}`)
+        .delete(`/post/${id}`)
         .set('Cookie', su);
 
       expect(statusCode).toEqual(200);
       expect(body).toEqual({});
     });
 
-    it('존재 하지 않는 시리즈 삭제', async () => {
+    it('존재 하지 않는 게시글 삭제', async () => {
       const { statusCode, body } = await request(app.getHttpServer())
-        .delete(`/series/0`)
+        .delete(`/post/0`)
         .set('Cookie', su);
 
       expect(statusCode).toEqual(400);
       expect(body.message).toEqual(ExceptionEnum.NOT_FOUND);
     });
 
-    it('권한 없이 시리즈 삭제', async () => {
+    it('권한 없이 게시글 삭제', async () => {
       const { statusCode, body } = await request(app.getHttpServer())
-        .delete(`/series/0`)
+        .delete(`/post/0`)
         .set('Cookie', gu);
 
       expect(statusCode).toEqual(403);
@@ -361,118 +455,241 @@ describe('SeriesController (e2e)', () => {
     });
   });
 
-  describe('GET - /series', () => {
-    it('시리즈 목록 조회하기', async () => {
-      const dto2: CreateSeriesDto = {
-        name: "테스트 시리즈2",
-        topicId: topic.id
+  describe('GET - /post', () => {
+    it('게시글 목록 조회하기', async () => {
+      const dto2: CreatePostDto = {
+        title: "test2",
+        content: "test content",
+        authorName: author.name,
+        topicId: topic.id,
+        seriesId: series.id,
+        thumbnail: "0003.avif"
       };
 
-      await prismaService.series.createMany({
+      await prismaService.post.createMany({
         data: [createDto, dto2]
       });
 
       const { statusCode, body } = await request(app.getHttpServer())
-        .get(`/series?page=1&take=10&orderby=name&direction=desc`)
+        .get(`/post?page=1&take=10&orderby=id&direction=desc`)
         .set('Cookie', su);
 
       expect(statusCode).toEqual(200);
       expect(body.data.length).toEqual(2);
     });
 
-    it('빈 목록 조회', async () => {
+    it('제목 필터링으로 목록 조회하기', async () => {
+      const dto2: CreatePostDto = {
+        title: "test2",
+        content: "test content",
+        authorName: author.name,
+        topicId: topic.id,
+        seriesId: series.id,
+        thumbnail: "0003.avif"
+      };
+
+      await prismaService.post.createMany({
+        data: [createDto, dto2]
+      });
+
       const { statusCode, body } = await request(app.getHttpServer())
-        .get(`/series?page=1&take=10&orderby=name&direction=desc`)
+        .get(`/post?like__title=${dto2.title}&page=1&take=10&orderby=id&direction=desc`)
         .set('Cookie', su);
 
       expect(statusCode).toEqual(200);
-      expect(body.data.length).toEqual(0);
+      expect(body.data.length).toEqual(1);
     });
 
-    it('주제 검색으로 목록 조회', async () => {
+    it('내용 필터링으로 목록 조회하기', async () => {
+      const dto2: CreatePostDto = {
+        title: "test2",
+        content: "hello nice",
+        authorName: author.name,
+        topicId: topic.id,
+        seriesId: series.id,
+        thumbnail: "0003.avif"
+      };
+
+      await prismaService.post.createMany({
+        data: [createDto, dto2]
+      });
+
+      const { statusCode, body } = await request(app.getHttpServer())
+        .get(`/post?like__content=nice&page=1&take=10&orderby=id&direction=desc`)
+        .set('Cookie', su);
+
+      expect(statusCode).toEqual(200);
+      expect(body.data.length).toEqual(1);
+    });
+
+    it('주제로 필러팅하여 목록 조회하기', async () => {
       const anotherTopic = await prismaService.topic.create({
         data: {
           name: "new Topic!"
         }
       });
 
-      const dto2: CreateSeriesDto = {
-        name: "what",
-        topicId: anotherTopic.id
+      const dto2: CreatePostDto = {
+        title: "test2",
+        content: "hello nice",
+        authorName: author.name,
+        topicId: anotherTopic.id,
+        seriesId: series.id,
+        thumbnail: "0003.avif"
       };
 
-      await prismaService.series.createMany({
+      await prismaService.post.createMany({
         data: [createDto, dto2]
       });
 
       const { statusCode, body } = await request(app.getHttpServer())
-        .get(`/series?page=1&take=10&orderby=name&direction=desc&where__topicId=${anotherTopic.id}`)
+        .get(`/post?where__topicId=${anotherTopic.id}&page=1&take=10&orderby=id&direction=desc`)
         .set('Cookie', su);
 
       expect(statusCode).toEqual(200);
       expect(body.data.length).toEqual(1);
-      expect(body.data[0].name).toEqual(dto2.name);
     });
 
-    it('부분 검색으로 목록 조회', async () => {
-      const dto2: CreateSeriesDto = {
-        name: "테스트채팅2",
-        topicId: topic.id
+    it('시리즈로 필터링하여 목록 조회하기', async () => {
+      const anotherSeries = await prismaService.series.create({
+        data: {
+          name: "new Series!",
+          topicId: topic.id
+        }
+      });
+
+      const dto2: CreatePostDto = {
+        title: "test2",
+        content: "hello nice",
+        authorName: author.name,
+        topicId: topic.id,
+        seriesId: anotherSeries.id,
+        thumbnail: "0003.avif"
       };
 
-      await prismaService.series.createMany({
+      await prismaService.post.createMany({
         data: [createDto, dto2]
       });
 
       const { statusCode, body } = await request(app.getHttpServer())
-        .get(`/series?page=1&take=10&orderby=name&direction=desc&like__name=2`)
+        .get(`/post?where__seriesId=${anotherSeries.id}&page=1&take=10&orderby=id&direction=desc`)
         .set('Cookie', su);
 
       expect(statusCode).toEqual(200);
       expect(body.data.length).toEqual(1);
+    });
+
+    it('유저로 필터링하여 목록 조회하기', async () => {
+      const anotherUser = await prismaService.user.create({
+        data: {
+          email: author.email + "3",
+          password: author.password,
+          name: author.name + "3"
+        }
+      })
+
+      const dto2: CreatePostDto = {
+        title: "test2",
+        content: "hello nice",
+        authorName: anotherUser.name,
+        topicId: topic.id,
+        seriesId: series.id,
+        thumbnail: "0003.avif"
+      };
+
+      await prismaService.post.createMany({
+        data: [createDto, dto2]
+      });
+
+      const { statusCode, body } = await request(app.getHttpServer())
+        .get(`/post?where__authorName=${anotherUser.name}&page=1&take=10&orderby=id&direction=desc`)
+        .set('Cookie', su);
+
+      expect(statusCode).toEqual(200);
+      expect(body.data.length).toEqual(1);
+    });
+
+    it('빈 목록 조회', async () => {
+      const { statusCode, body } = await request(app.getHttpServer())
+        .get(`/post?page=1&take=10&orderby=id&direction=desc`)
+        .set('Cookie', su);
+
+      expect(statusCode).toEqual(200);
+      expect(body.data.length).toEqual(0);
     });
 
     it('권한 없이 목록 조회', async () => {
+      await prismaService.post.create({ data: createDto });
+
       const { statusCode, body } = await request(app.getHttpServer())
-        .get(`/series?page=1&take=10&orderby=name&direction=desc`)
+        .get(`/post?page=1&take=10&orderby=id&direction=desc`)
         .set('Cookie', gu);
 
-      expect(statusCode).toEqual(403);
-      expect(body.message).toEqual(ExceptionEnum.FORBIDDEN);
+      expect(statusCode).toEqual(200);
+      expect(body.data.length).toEqual(1);
+    });
+
+    it('로그인 없이 목록 조회', async () => {
+      await prismaService.post.create({ data: createDto });
+
+      const { statusCode, body } = await request(app.getHttpServer())
+        .get(`/post?page=1&take=10&orderby=id&direction=desc`)
+
+      expect(statusCode).toEqual(200);
+      expect(body.data.length).toEqual(1);
     });
   });
 
-  describe('GET - /series/:name', () => {
-    it('시리즈 단건 조회하기', async () => {
-      const { id, name } = await prismaService.series.create({
-        data: { name: createDto.name.replaceAll(" ", "_"), topicId: topic.id }
+  describe('GET - /post/:title', () => {
+    it('게시글 단건 조회하기', async () => {
+      const { id, title } = await prismaService.post.create({
+        data: { ...createDto, title: createDto.title.replaceAll(" ", "_") }
       });
 
       const { statusCode, body } = await request(app.getHttpServer())
-        .get(`/series/${encodeURI(name)}`)
+        .get(`/post/${encodeURI(title)}`)
         .set('Cookie', su);
 
       expect(statusCode).toEqual(200);
       expect(body.id).toEqual(id);
-      expect(body.name).toEqual(name);
+      expect(body.title).toEqual(title);
     });
 
-    it('존재 하지 않는 시리즈 조회', async () => {
+    it('띄어쓰기로 게시글 단건 조회하기', async () => {
+      const { id, title } = await prismaService.post.create({
+        data: { ...createDto, title: createDto.title.replaceAll(" ", "_") }
+      });
+
       const { statusCode, body } = await request(app.getHttpServer())
-        .get(`/series/none`)
+        .get(`/post/${encodeURI(createDto.title)}`)
+        .set('Cookie', su);
+
+      expect(statusCode).toEqual(200);
+      expect(body.id).toEqual(id);
+      expect(body.title).toEqual(title);
+    });
+
+    it('존재 하지 않는 게시글 조회', async () => {
+      const { statusCode, body } = await request(app.getHttpServer())
+        .get(`/post/none`)
         .set('Cookie', su);
 
       expect(statusCode).toEqual(400);
       expect(body.message).toEqual(ExceptionEnum.NOT_FOUND);
     });
 
-    it('권한 없이 시리즈 조회', async () => {
-      const { statusCode, body } = await request(app.getHttpServer())
-        .get(`/series/none`)
-        .set('Cookie', gu);
+    it('권한 없이 게시글 조회', async () => {
+      const { id, title } = await prismaService.post.create({
+        data: { ...createDto, title: createDto.title.replaceAll(" ", "_") }
+      });
 
-      expect(statusCode).toEqual(403);
-      expect(body.message).toEqual(ExceptionEnum.FORBIDDEN);
+      const { statusCode, body } = await request(app.getHttpServer())
+        .get(`/post/${encodeURI(title)}`)
+        .set('Cookie', su);
+
+      expect(statusCode).toEqual(200);
+      expect(body.id).toEqual(id);
+      expect(body.title).toEqual(title);
     });
   });
 })
