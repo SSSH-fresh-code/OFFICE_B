@@ -34,7 +34,7 @@ export class PagingService<T> implements iPagingService {
   async getPagedResults(
     model: Prisma.ModelName,
     pagingDto: PagingDto,
-    where: WhereClause = {},
+    where?: WhereClause,
   ): Promise<Page<T>> {
     const { page, orderby, direction } = pagingDto;
 

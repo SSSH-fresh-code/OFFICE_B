@@ -21,18 +21,6 @@ export class PostController {
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
   ) { }
 
-
-  @Get(':id')
-  @ApiOperation({ summary: '게시글 단건 id 조회' })
-  @ApiResponse({
-    status: 200,
-    description: '게시글이 정상적으로 조회됨',
-  })
-  @PermissionsMethod(PermissionEnum.CAN_USE_BLOG, PermissionEnum.CAN_READ_BLOG)
-  async getPostById(@Param('id', ParseIntPipe) id: number): Promise<ReadPostDto> {
-    return await this.postService.getPostById(id);
-  }
-
   @Get(':title')
   @ApiOperation({ summary: '게시글 단건 조회' })
   @ApiResponse({
@@ -50,8 +38,8 @@ export class PostController {
     description: '게시글들이 정상적으로 조회됨',
   })
   async getPosts(@Query() dto: PagingPostDto): Promise<Page<ReadPostDto>> {
-    dto.where__topicId = Number(dto.where__topicId);
-    dto.where__seriesId = Number(dto.where__seriesId);
+    if (dto.where__seriesId) dto.where__seriesId = Number(dto.where__seriesId)
+    if (dto.where__topicId) dto.where__topicId = Number(dto.where__topicId)
     return await this.postService.getPosts(dto);
   }
 
