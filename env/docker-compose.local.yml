@@ -1,0 +1,44 @@
+version: '3'
+
+networks:
+  net:
+    driver: bridge
+
+services:
+  db:
+    networks:
+      - net
+    image: postgres:15.6-alpine3.19
+    restart: always
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: daeseong0226
+      POSTGRES_PASSWORD: 230308
+      POSTGRES_DB: newoffice
+    cpus: "0.5"
+    mem_limit: "0.5g"
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - net
+  app:
+    image: daeseong0226/server:0.1.0
+    depends_on:
+      - db
+    networks:
+      - net
+    volumes:
+      - ../.env:/usr/src/app/.env # 로컬의 .env 파일을 컨테이너의 .env 파일로 마운트
+    environment:
+      NODE_ENV: production
+    command: sh -c "pm2-runtime start ecosystem.config.js"
+    cpus: "1"
+    mem_limit: "1g"
+    restart: always

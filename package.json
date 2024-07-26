@@ -17,7 +17,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "pnpm prisma:generate:test && jest --config ./test/jest-e2e.json",
-    "prisma:generate": "prisma generate && ts-node ./prisma/seed.ts",
+    "prisma:generate": "prisma db push --schema=prisma/schema.prisma && prisma generate && node ./prisma/seed.js",
     "prisma:generate:test": "prisma generate --schema=prisma/schema.test.prisma",
     "test": "pnpm prisma:generate:test && jest"
   },
