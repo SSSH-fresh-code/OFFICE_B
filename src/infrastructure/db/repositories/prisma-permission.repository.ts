@@ -1,21 +1,21 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
-import { IPermissionRepository } from '../../../domain/permission/infrastructure/permission.repository';
-import { Permission } from '../../../domain/permission/domain/permission.entity';
+import {Injectable} from '@nestjs/common';
+import {PrismaService} from '../prisma.service';
+import {IPermissionRepository} from '../../../domain/permission/infrastructure/permission.repository';
+import {Permission} from '../../../domain/permission/domain/permission.entity';
 
 @Injectable()
 export class PrismaPermissionRepository implements IPermissionRepository {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async findAll(): Promise<Permission[]> {
     const permissions = await this.prisma.permission.findMany({});
 
-    return permissions.map(permission => Permission.of(permission));
+    return permissions.map((permission) => Permission.of(permission));
   }
 
   async findByName(name: string): Promise<Permission> {
     const permission = await this.prisma.permission.findUniqueOrThrow({
-      where: { name }
+      where: {name},
     });
 
     return Permission.of(permission);
@@ -35,7 +35,7 @@ export class PrismaPermissionRepository implements IPermissionRepository {
   async updatePermission(permission: Permission): Promise<Permission> {
     const updatePermission = await this.prisma.permission.update({
       where: {
-        name: permission.name
+        name: permission.name,
       },
       data: {
         description: permission.description,
@@ -47,8 +47,7 @@ export class PrismaPermissionRepository implements IPermissionRepository {
 
   async deletePermission(name: string): Promise<void> {
     await this.prisma.permission.delete({
-      where: { name }
-    })
+      where: {name},
+    });
   }
-
 }

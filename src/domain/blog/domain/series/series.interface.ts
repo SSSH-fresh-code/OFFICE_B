@@ -1,8 +1,7 @@
-import { ReadSeriesDto } from "../../presentation/series/dto/read-series.dto";
-import { iTopic } from "../topic/topic.interface";
+import {ReadSeriesDto} from '../../presentation/series/dto/read-series.dto';
+import {iTopic} from '../topic/topic.interface';
 
 export interface iSeries {
-
   /**
    * 시리즈 id를 반환합니다.
    */
@@ -18,7 +17,6 @@ export interface iSeries {
    * @param {string} name
    */
   set name(name: string);
-
 
   /**
    * 시리즈 주제를 반환합니다.
@@ -40,7 +38,6 @@ export interface iSeries {
    * 수정일을 반환합니다.
    */
   get updatedAt(): Date;
-
 
   /**
    * dto로 변환합니다.

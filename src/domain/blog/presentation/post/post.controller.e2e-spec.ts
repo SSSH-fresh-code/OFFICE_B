@@ -2,19 +2,19 @@ import * as request from 'supertest';
 import * as session from 'express-session';
 import * as bcrypt from 'bcrypt';
 import * as passport from 'passport';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { PrismaService } from 'src/infrastructure/db/prisma.service';
-import { Test, TestingModule } from '@nestjs/testing';
-import { AppModule } from 'src/app.module';
-import { PrismaClientExceptionFilter } from 'src/infrastructure/filter/exception/prisma-exception.filter';
-import { PermissionEnum } from 'src/domain/permission/domain/permission.enum';
-import { Topic } from '../../domain/topic/topic.entity';
-import { CreatePostDto } from './dto/create-post.dto';
-import { User } from 'src/domain/user/domain/user.entity';
-import { formatMessage } from 'src/infrastructure/util/message.util';
-import { ExceptionEnum } from 'src/infrastructure/filter/exception/exception.enum';
-import { Series } from '../../domain/series/series.entity';
-import { UpdatePostDto } from './dto/update-post.dto';
+import {INestApplication, ValidationPipe} from '@nestjs/common';
+import {PrismaService} from 'src/infrastructure/db/prisma.service';
+import {Test, TestingModule} from '@nestjs/testing';
+import {AppModule} from 'src/app.module';
+import {PrismaClientExceptionFilter} from 'src/infrastructure/filter/exception/prisma-exception.filter';
+import {PermissionEnum} from 'src/domain/permission/domain/permission.enum';
+import {Topic} from '../../domain/topic/topic.entity';
+import {CreatePostDto} from './dto/create-post.dto';
+import {User} from 'src/domain/user/domain/user.entity';
+import {formatMessage} from 'src/infrastructure/util/message.util';
+import {ExceptionEnum} from 'src/infrastructure/filter/exception/exception.enum';
+import {Series} from '../../domain/series/series.entity';
+import {UpdatePostDto} from './dto/update-post.dto';
 
 describe('SeriesController (e2e)', () => {
   let app: INestApplication;
@@ -27,15 +27,15 @@ describe('SeriesController (e2e)', () => {
   let gu: string;
 
   const superUser = {
-    email: "super@super.com",
-    password: bcrypt.hashSync("password", 10),
-    name: "super"
-  }
+    email: 'super@super.com',
+    password: bcrypt.hashSync('password', 10),
+    name: 'super',
+  };
   const guestUser = {
-    email: "guest@guest.com",
-    password: bcrypt.hashSync("password", 10),
-    name: "guest"
-  }
+    email: 'guest@guest.com',
+    password: bcrypt.hashSync('password', 10),
+    name: 'guest',
+  };
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -66,38 +66,44 @@ describe('SeriesController (e2e)', () => {
       data: {
         ...superUser,
         permissions: {
-          connect: [{
-            name: PermissionEnum.CAN_LOGIN
-          }, {
-            name: PermissionEnum.CAN_READ_BLOG
-          }, {
-            name: PermissionEnum.CAN_WRITE_BLOG
-          }]
-        }
-      }
+          connect: [
+            {
+              name: PermissionEnum.CAN_LOGIN,
+            },
+            {
+              name: PermissionEnum.CAN_READ_BLOG,
+            },
+            {
+              name: PermissionEnum.CAN_WRITE_BLOG,
+            },
+          ],
+        },
+      },
     });
 
     await prismaService.user.create({
       data: {
         ...guestUser,
         permissions: {
-          connect: [{
-            name: PermissionEnum.CAN_LOGIN
-          }]
-        }
-      }
+          connect: [
+            {
+              name: PermissionEnum.CAN_LOGIN,
+            },
+          ],
+        },
+      },
     });
 
     let response = await request(app.getHttpServer())
       .post('/auth/login')
-      .send({ email: superUser.email, password: "password" });
+      .send({email: superUser.email, password: 'password'});
 
     su = response.headers['set-cookie'];
     author = User.of(createUser);
 
     response = await request(app.getHttpServer())
       .post('/auth/login')
-      .send({ email: guestUser.email, password: "password" });
+      .send({email: guestUser.email, password: 'password'});
 
     gu = response.headers['set-cookie'];
   });
@@ -107,41 +113,40 @@ describe('SeriesController (e2e)', () => {
 
     const createTopic = await prismaService.topic.create({
       data: {
-        name: "topic"
-      }
+        name: 'topic',
+      },
     });
 
     const createSeries = await prismaService.series.create({
       data: {
-        name: "topic"
-        , topicId: createTopic.id
-      }
+        name: 'topic',
+        topicId: createTopic.id,
+      },
     });
 
     topic = Topic.of(createTopic);
     series = Series.of(createSeries);
 
     createDto = {
-      title: "post test",
-      content: "test content",
+      title: 'post test',
+      content: 'test content',
       authorName: author.name,
       topicId: topic.id,
       seriesId: series.id,
-      thumbnail: "0001.avif"
-    }
+      thumbnail: '0001.avif',
+    };
   });
 
   describe('POST - /post', () => {
-
     it('게시글 생성', async () => {
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .post('/post')
         .set('Cookie', su)
         .send(createDto);
 
       expect(statusCode).toEqual(201);
       expect(body.id).toBeDefined();
-      expect(body.title).toEqual(createDto.title.replaceAll(" ", "_"));
+      expect(body.title).toEqual(createDto.title.replaceAll(' ', '_'));
       expect(body.content).toEqual(createDto.content);
       expect(body.thumbnail).toEqual(createDto.thumbnail);
       expect(body.author.id).toEqual(author.id);
@@ -157,19 +162,19 @@ describe('SeriesController (e2e)', () => {
     });
 
     it('시리즈, 썸네일 없는 게시글 생성', async () => {
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .post('/post')
         .set('Cookie', su)
         .send({
           title: createDto.title,
           content: createDto.content,
           authorName: author.name,
-          topicId: topic.id
+          topicId: topic.id,
         });
 
       expect(statusCode).toEqual(201);
       expect(body.id).toBeDefined();
-      expect(body.title).toEqual(createDto.title.replaceAll(" ", "_"));
+      expect(body.title).toEqual(createDto.title.replaceAll(' ', '_'));
       expect(body.content).toEqual(createDto.content);
       expect(body.thumbnail).toBeNull();
       expect(body.author.id).toEqual(author.id);
@@ -185,22 +190,24 @@ describe('SeriesController (e2e)', () => {
 
     it('게시글 중복 생성', async () => {
       await prismaService.post.create({
-        data: { ...createDto, title: createDto.title.replaceAll(" ", "_") }
+        data: {...createDto, title: createDto.title.replaceAll(' ', '_')},
       });
 
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .post('/post')
         .set('Cookie', su)
         .send(createDto);
 
       expect(statusCode).toEqual(400);
-      expect(body.message).toEqual(formatMessage(ExceptionEnum.ALREADY_EXISTS, { param: "title" }))
+      expect(body.message).toEqual(
+        formatMessage(ExceptionEnum.ALREADY_EXISTS, {param: 'title'}),
+      );
 
       return;
     });
 
     it('권한 없이 게시글 생성', async () => {
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .post('/post')
         .set('Cookie', gu)
         .send(createDto);
@@ -212,7 +219,7 @@ describe('SeriesController (e2e)', () => {
     });
 
     it('로그인 없이 게시글 생성', async () => {
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .post('/post')
         .send(createDto);
 
@@ -225,20 +232,23 @@ describe('SeriesController (e2e)', () => {
 
   describe('PUT - /post', () => {
     it('게시글 제목, 내용, 썸네일 수정', async () => {
-      const updateTitle = "update Title";
-      const convertTitle = updateTitle.replaceAll(" ", "_");
-      const updateContent = "수정한 내용";
-      const updateThumbnail = "0003.avif";
+      const updateTitle = 'update Title';
+      const convertTitle = updateTitle.replaceAll(' ', '_');
+      const updateContent = '수정한 내용';
+      const updateThumbnail = '0003.avif';
 
-      const { id } = await prismaService.post.create({
-        data: { ...createDto, title: createDto.title.replaceAll(" ", "_") }
+      const {id} = await prismaService.post.create({
+        data: {...createDto, title: createDto.title.replaceAll(' ', '_')},
       });
 
       const dto: UpdatePostDto = {
-        id, title: updateTitle, content: updateContent, thumbnail: updateThumbnail
-      }
+        id,
+        title: updateTitle,
+        content: updateContent,
+        thumbnail: updateThumbnail,
+      };
 
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .put('/post')
         .set('Cookie', su)
         .send(dto);
@@ -255,20 +265,21 @@ describe('SeriesController (e2e)', () => {
     it('게시글 주제 수정', async () => {
       const anotherTopic = await prismaService.topic.create({
         data: {
-          name: "new_Topic!"
-        }
-      })
+          name: 'new_Topic!',
+        },
+      });
 
-      const { id, topic } = await prismaService.post.create({
+      const {id, topic} = await prismaService.post.create({
         data: createDto,
-        include: { topic: true }
+        include: {topic: true},
       });
 
       const dto: UpdatePostDto = {
-        id, topicId: anotherTopic.id
-      }
+        id,
+        topicId: anotherTopic.id,
+      };
 
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .put('/post')
         .set('Cookie', su)
         .send(dto);
@@ -286,21 +297,22 @@ describe('SeriesController (e2e)', () => {
     it('게시글 시리즈 수정', async () => {
       const anotherSeries = await prismaService.series.create({
         data: {
-          name: "new_series!",
-          topicId: topic.id
-        }
-      })
+          name: 'new_series!',
+          topicId: topic.id,
+        },
+      });
 
-      const { id, series } = await prismaService.post.create({
+      const {id, series} = await prismaService.post.create({
         data: createDto,
-        include: { series: true }
+        include: {series: true},
       });
 
       const dto: UpdatePostDto = {
-        id, seriesId: anotherSeries.id
-      }
+        id,
+        seriesId: anotherSeries.id,
+      };
 
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .put('/post')
         .set('Cookie', su)
         .send(dto);
@@ -316,16 +328,17 @@ describe('SeriesController (e2e)', () => {
     });
 
     it('게시글 시리즈 삭제(=수정)', async () => {
-      const { id, series } = await prismaService.post.create({
+      const {id, series} = await prismaService.post.create({
         data: createDto,
-        include: { series: true }
+        include: {series: true},
       });
 
       const dto: UpdatePostDto = {
-        id, seriesId: null
-      }
+        id,
+        seriesId: null,
+      };
 
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .put('/post')
         .set('Cookie', su)
         .send(dto);
@@ -340,22 +353,23 @@ describe('SeriesController (e2e)', () => {
     it('게시글 저자 수정', async () => {
       const anotherUser = await prismaService.user.create({
         data: {
-          email: author.email + "2",
+          email: author.email + '2',
           password: author.password,
-          name: author.name + "2"
-        }
-      })
+          name: author.name + '2',
+        },
+      });
 
       const post = await prismaService.post.create({
         data: createDto,
-        include: { author: true }
+        include: {author: true},
       });
 
       const dto: UpdatePostDto = {
-        id: post.id, authorName: anotherUser.name
-      }
+        id: post.id,
+        authorName: anotherUser.name,
+      };
 
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .put('/post')
         .set('Cookie', su)
         .send(dto);
@@ -371,35 +385,39 @@ describe('SeriesController (e2e)', () => {
     });
 
     it('이미 있는 제목으로 게시글 수정', async () => {
-      const title = "title";
+      const title = 'title';
 
       await prismaService.post.create({
         data: {
-          ...createDto, title: title
-        }
+          ...createDto,
+          title: title,
+        },
       });
 
-      const { id } = await prismaService.post.create({
-        data: { ...createDto, title: "anotherTitle" }
+      const {id} = await prismaService.post.create({
+        data: {...createDto, title: 'anotherTitle'},
       });
 
       const dto: UpdatePostDto = {
-        id, title: title
-      }
+        id,
+        title: title,
+      };
 
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .put('/post')
         .set('Cookie', su)
         .send(dto);
 
       expect(statusCode).toEqual(400);
-      expect(body.message).toEqual(formatMessage(ExceptionEnum.ALREADY_EXISTS, { param: "title" }))
+      expect(body.message).toEqual(
+        formatMessage(ExceptionEnum.ALREADY_EXISTS, {param: 'title'}),
+      );
 
       return;
     });
 
     it('권한 없이 게시글 수정', async () => {
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .put('/post')
         .set('Cookie', gu)
         .send(createDto);
@@ -411,7 +429,7 @@ describe('SeriesController (e2e)', () => {
     });
 
     it('로그인 없이 게시글 생성', async () => {
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .put('/post')
         .send(createDto);
 
@@ -424,11 +442,11 @@ describe('SeriesController (e2e)', () => {
 
   describe('DELETE - /post/:id', () => {
     it('게시글 삭제', async () => {
-      const { id } = await prismaService.post.create({
-        data: createDto
+      const {id} = await prismaService.post.create({
+        data: createDto,
       });
 
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .delete(`/post/${id}`)
         .set('Cookie', su);
 
@@ -437,7 +455,7 @@ describe('SeriesController (e2e)', () => {
     });
 
     it('존재 하지 않는 게시글 삭제', async () => {
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .delete(`/post/0`)
         .set('Cookie', su);
 
@@ -446,7 +464,7 @@ describe('SeriesController (e2e)', () => {
     });
 
     it('권한 없이 게시글 삭제', async () => {
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .delete(`/post/0`)
         .set('Cookie', gu);
 
@@ -458,19 +476,19 @@ describe('SeriesController (e2e)', () => {
   describe('GET - /post', () => {
     it('게시글 목록 조회하기', async () => {
       const dto2: CreatePostDto = {
-        title: "test2",
-        content: "test content",
+        title: 'test2',
+        content: 'test content',
         authorName: author.name,
         topicId: topic.id,
         seriesId: series.id,
-        thumbnail: "0003.avif"
+        thumbnail: '0003.avif',
       };
 
       await prismaService.post.createMany({
-        data: [createDto, dto2]
+        data: [createDto, dto2],
       });
 
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .get(`/post?page=1&take=10&orderby=id&direction=desc`)
         .set('Cookie', su);
 
@@ -480,20 +498,22 @@ describe('SeriesController (e2e)', () => {
 
     it('제목 필터링으로 목록 조회하기', async () => {
       const dto2: CreatePostDto = {
-        title: "test2",
-        content: "test content",
+        title: 'test2',
+        content: 'test content',
         authorName: author.name,
         topicId: topic.id,
         seriesId: series.id,
-        thumbnail: "0003.avif"
+        thumbnail: '0003.avif',
       };
 
       await prismaService.post.createMany({
-        data: [createDto, dto2]
+        data: [createDto, dto2],
       });
 
-      const { statusCode, body } = await request(app.getHttpServer())
-        .get(`/post?like__title=${dto2.title}&page=1&take=10&orderby=id&direction=desc`)
+      const {statusCode, body} = await request(app.getHttpServer())
+        .get(
+          `/post?like__title=${dto2.title}&page=1&take=10&orderby=id&direction=desc`,
+        )
         .set('Cookie', su);
 
       expect(statusCode).toEqual(200);
@@ -502,20 +522,22 @@ describe('SeriesController (e2e)', () => {
 
     it('내용 필터링으로 목록 조회하기', async () => {
       const dto2: CreatePostDto = {
-        title: "test2",
-        content: "hello nice",
+        title: 'test2',
+        content: 'hello nice',
         authorName: author.name,
         topicId: topic.id,
         seriesId: series.id,
-        thumbnail: "0003.avif"
+        thumbnail: '0003.avif',
       };
 
       await prismaService.post.createMany({
-        data: [createDto, dto2]
+        data: [createDto, dto2],
       });
 
-      const { statusCode, body } = await request(app.getHttpServer())
-        .get(`/post?like__content=nice&page=1&take=10&orderby=id&direction=desc`)
+      const {statusCode, body} = await request(app.getHttpServer())
+        .get(
+          `/post?like__content=nice&page=1&take=10&orderby=id&direction=desc`,
+        )
         .set('Cookie', su);
 
       expect(statusCode).toEqual(200);
@@ -525,25 +547,27 @@ describe('SeriesController (e2e)', () => {
     it('주제로 필러팅하여 목록 조회하기', async () => {
       const anotherTopic = await prismaService.topic.create({
         data: {
-          name: "new Topic!"
-        }
+          name: 'new Topic!',
+        },
       });
 
       const dto2: CreatePostDto = {
-        title: "test2",
-        content: "hello nice",
+        title: 'test2',
+        content: 'hello nice',
         authorName: author.name,
         topicId: anotherTopic.id,
         seriesId: series.id,
-        thumbnail: "0003.avif"
+        thumbnail: '0003.avif',
       };
 
       await prismaService.post.createMany({
-        data: [createDto, dto2]
+        data: [createDto, dto2],
       });
 
-      const { statusCode, body } = await request(app.getHttpServer())
-        .get(`/post?where__topicId=${anotherTopic.id}&page=1&take=10&orderby=id&direction=desc`)
+      const {statusCode, body} = await request(app.getHttpServer())
+        .get(
+          `/post?where__topicId=${anotherTopic.id}&page=1&take=10&orderby=id&direction=desc`,
+        )
         .set('Cookie', su);
 
       expect(statusCode).toEqual(200);
@@ -553,26 +577,28 @@ describe('SeriesController (e2e)', () => {
     it('시리즈로 필터링하여 목록 조회하기', async () => {
       const anotherSeries = await prismaService.series.create({
         data: {
-          name: "new Series!",
-          topicId: topic.id
-        }
+          name: 'new Series!',
+          topicId: topic.id,
+        },
       });
 
       const dto2: CreatePostDto = {
-        title: "test2",
-        content: "hello nice",
+        title: 'test2',
+        content: 'hello nice',
         authorName: author.name,
         topicId: topic.id,
         seriesId: anotherSeries.id,
-        thumbnail: "0003.avif"
+        thumbnail: '0003.avif',
       };
 
       await prismaService.post.createMany({
-        data: [createDto, dto2]
+        data: [createDto, dto2],
       });
 
-      const { statusCode, body } = await request(app.getHttpServer())
-        .get(`/post?where__seriesId=${anotherSeries.id}&page=1&take=10&orderby=id&direction=desc`)
+      const {statusCode, body} = await request(app.getHttpServer())
+        .get(
+          `/post?where__seriesId=${anotherSeries.id}&page=1&take=10&orderby=id&direction=desc`,
+        )
         .set('Cookie', su);
 
       expect(statusCode).toEqual(200);
@@ -582,27 +608,29 @@ describe('SeriesController (e2e)', () => {
     it('유저로 필터링하여 목록 조회하기', async () => {
       const anotherUser = await prismaService.user.create({
         data: {
-          email: author.email + "3",
+          email: author.email + '3',
           password: author.password,
-          name: author.name + "3"
-        }
-      })
+          name: author.name + '3',
+        },
+      });
 
       const dto2: CreatePostDto = {
-        title: "test2",
-        content: "hello nice",
+        title: 'test2',
+        content: 'hello nice',
         authorName: anotherUser.name,
         topicId: topic.id,
         seriesId: series.id,
-        thumbnail: "0003.avif"
+        thumbnail: '0003.avif',
       };
 
       await prismaService.post.createMany({
-        data: [createDto, dto2]
+        data: [createDto, dto2],
       });
 
-      const { statusCode, body } = await request(app.getHttpServer())
-        .get(`/post?where__authorName=${anotherUser.name}&page=1&take=10&orderby=id&direction=desc`)
+      const {statusCode, body} = await request(app.getHttpServer())
+        .get(
+          `/post?where__authorName=${anotherUser.name}&page=1&take=10&orderby=id&direction=desc`,
+        )
         .set('Cookie', su);
 
       expect(statusCode).toEqual(200);
@@ -610,7 +638,7 @@ describe('SeriesController (e2e)', () => {
     });
 
     it('빈 목록 조회', async () => {
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .get(`/post?page=1&take=10&orderby=id&direction=desc`)
         .set('Cookie', su);
 
@@ -619,9 +647,9 @@ describe('SeriesController (e2e)', () => {
     });
 
     it('권한 없이 목록 조회', async () => {
-      await prismaService.post.create({ data: createDto });
+      await prismaService.post.create({data: createDto});
 
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .get(`/post?page=1&take=10&orderby=id&direction=desc`)
         .set('Cookie', gu);
 
@@ -630,10 +658,11 @@ describe('SeriesController (e2e)', () => {
     });
 
     it('로그인 없이 목록 조회', async () => {
-      await prismaService.post.create({ data: createDto });
+      await prismaService.post.create({data: createDto});
 
-      const { statusCode, body } = await request(app.getHttpServer())
-        .get(`/post?page=1&take=10&orderby=id&direction=desc`)
+      const {statusCode, body} = await request(app.getHttpServer()).get(
+        `/post?page=1&take=10&orderby=id&direction=desc`,
+      );
 
       expect(statusCode).toEqual(200);
       expect(body.data.length).toEqual(1);
@@ -642,11 +671,11 @@ describe('SeriesController (e2e)', () => {
 
   describe('GET - /post/:title', () => {
     it('게시글 단건 조회하기', async () => {
-      const { id, title } = await prismaService.post.create({
-        data: { ...createDto, title: createDto.title.replaceAll(" ", "_") }
+      const {id, title} = await prismaService.post.create({
+        data: {...createDto, title: createDto.title.replaceAll(' ', '_')},
       });
 
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .get(`/post/${encodeURI(title)}`)
         .set('Cookie', su);
 
@@ -656,11 +685,11 @@ describe('SeriesController (e2e)', () => {
     });
 
     it('띄어쓰기로 게시글 단건 조회하기', async () => {
-      const { id, title } = await prismaService.post.create({
-        data: { ...createDto, title: createDto.title.replaceAll(" ", "_") }
+      const {id, title} = await prismaService.post.create({
+        data: {...createDto, title: createDto.title.replaceAll(' ', '_')},
       });
 
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .get(`/post/${encodeURI(createDto.title)}`)
         .set('Cookie', su);
 
@@ -670,7 +699,7 @@ describe('SeriesController (e2e)', () => {
     });
 
     it('존재 하지 않는 게시글 조회', async () => {
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .get(`/post/none`)
         .set('Cookie', su);
 
@@ -679,11 +708,11 @@ describe('SeriesController (e2e)', () => {
     });
 
     it('권한 없이 게시글 조회', async () => {
-      const { id, title } = await prismaService.post.create({
-        data: { ...createDto, title: createDto.title.replaceAll(" ", "_") }
+      const {id, title} = await prismaService.post.create({
+        data: {...createDto, title: createDto.title.replaceAll(' ', '_')},
       });
 
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .get(`/post/${encodeURI(title)}`)
         .set('Cookie', su);
 
@@ -692,4 +721,4 @@ describe('SeriesController (e2e)', () => {
       expect(body.title).toEqual(title);
     });
   });
-})
+});

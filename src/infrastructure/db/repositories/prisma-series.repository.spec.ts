@@ -1,14 +1,14 @@
-import { ConfigModule, ConfigService } from "@nestjs/config";
-import { Test, TestingModule } from "@nestjs/testing";
-import { LoggerModule } from "src/infrastructure/module/logger.module";
-import { PrismaService } from "../prisma.service";
-import { Prisma } from "@prisma/client";
-import { SeriesRepository } from "src/domain/blog/infrastructure/series/series.repository";
-import { Series } from "src/domain/blog/domain/series/series.entity";
-import { Topic } from "src/domain/blog/domain/topic/topic.entity";
-import { iSeries } from "src/domain/blog/domain/series/series.interface";
-import { iTopic } from "src/domain/blog/domain/topic/topic.interface";
-import { PrismaSeriesRepository } from "./prisma-series.repository";
+import {ConfigModule, ConfigService} from '@nestjs/config';
+import {Test, TestingModule} from '@nestjs/testing';
+import {LoggerModule} from 'src/infrastructure/module/logger.module';
+import {PrismaService} from '../prisma.service';
+import {Prisma} from '@prisma/client';
+import {SeriesRepository} from 'src/domain/blog/infrastructure/series/series.repository';
+import {Series} from 'src/domain/blog/domain/series/series.entity';
+import {Topic} from 'src/domain/blog/domain/topic/topic.entity';
+import {iSeries} from 'src/domain/blog/domain/series/series.interface';
+import {iTopic} from 'src/domain/blog/domain/topic/topic.interface';
+import {PrismaSeriesRepository} from './prisma-series.repository';
 
 describe('PrismaSeriesRepository', () => {
   let repository: SeriesRepository;
@@ -18,12 +18,8 @@ describe('PrismaSeriesRepository', () => {
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [ConfigModule.forRoot({ isGlobal: true }), LoggerModule],
-      providers: [
-        PrismaService,
-        PrismaSeriesRepository,
-        ConfigService
-      ],
+      imports: [ConfigModule.forRoot({isGlobal: true}), LoggerModule],
+      providers: [PrismaService, PrismaSeriesRepository, ConfigService],
     }).compile();
 
     repository = module.get<SeriesRepository>(PrismaSeriesRepository);
@@ -31,16 +27,16 @@ describe('PrismaSeriesRepository', () => {
 
     const prismaTopic = await prisma.topic.create({
       data: {
-        name: "topic"
-      }
-    })
+        name: 'topic',
+      },
+    });
 
     topic = Topic.of(prismaTopic);
   });
 
   beforeEach(async () => {
     await prisma.cleanDatabase(['Series']);
-    series = new Series(1, "series", topic);
+    series = new Series(1, 'series', topic);
   });
 
   afterAll(async () => {
@@ -49,11 +45,11 @@ describe('PrismaSeriesRepository', () => {
 
   describe('findById', () => {
     it('id로 Series을 조회합니다.', async () => {
-      const { id } = await prisma.series.create({
+      const {id} = await prisma.series.create({
         data: {
           id: series.id,
           name: series.name,
-          topicId: topic.id
+          topicId: topic.id,
         },
       });
 
@@ -65,17 +61,19 @@ describe('PrismaSeriesRepository', () => {
     });
 
     it('존재하지 않는 Series을 조회합니다.', async () => {
-      await expect(() => repository.findById(1)).rejects.toThrow(Prisma.PrismaClientKnownRequestError)
+      await expect(() => repository.findById(1)).rejects.toThrow(
+        Prisma.PrismaClientKnownRequestError,
+      );
     });
   });
 
   describe('findByName', () => {
     it('name으로 Series을 조회합니다.', async () => {
-      const { name } = await prisma.series.create({
+      const {name} = await prisma.series.create({
         data: {
           id: series.id,
           name: series.name,
-          topicId: topic.id
+          topicId: topic.id,
         },
       });
 
@@ -87,7 +85,9 @@ describe('PrismaSeriesRepository', () => {
     });
 
     it('존재하지 않는 Series을 조회합니다.', async () => {
-      await expect(() => repository.findByName("Wrong")).rejects.toThrow(Prisma.PrismaClientKnownRequestError)
+      await expect(() => repository.findByName('Wrong')).rejects.toThrow(
+        Prisma.PrismaClientKnownRequestError,
+      );
     });
   });
 
@@ -105,22 +105,24 @@ describe('PrismaSeriesRepository', () => {
         data: {
           id: series.id,
           name: series.name,
-          topicId: topic.id
+          topicId: topic.id,
         },
       });
 
-      await expect(() => repository.save(new Series(0, series.name, topic))).rejects.toThrow(Prisma.PrismaClientKnownRequestError)
+      await expect(() =>
+        repository.save(new Series(0, series.name, topic)),
+      ).rejects.toThrow(Prisma.PrismaClientKnownRequestError);
     });
   });
 
   describe('update', () => {
     it('Series 이름을 수정합니다.', async () => {
-      const updateName = series.name + "2";
-      const { id } = await prisma.series.create({
+      const updateName = series.name + '2';
+      const {id} = await prisma.series.create({
         data: {
           id: series.id,
           name: series.name,
-          topicId: topic.id
+          topicId: topic.id,
         },
       });
 
@@ -136,14 +138,14 @@ describe('PrismaSeriesRepository', () => {
 
     it('Series 주제를 수정합니다.', async () => {
       const anotherTopic = await prisma.topic.create({
-        data: { name: "topic2" }
-      })
+        data: {name: 'topic2'},
+      });
 
-      const { id, name } = await prisma.series.create({
+      const {id, name} = await prisma.series.create({
         data: {
           id: series.id,
           name: series.name,
-          topicId: topic.id
+          topicId: topic.id,
         },
       });
 
@@ -162,41 +164,47 @@ describe('PrismaSeriesRepository', () => {
         data: {
           id: series.id,
           name: series.name,
-          topicId: topic.id
+          topicId: topic.id,
         },
       });
 
-      const { id } = await prisma.series.create({
+      const {id} = await prisma.series.create({
         data: {
-          name: series.name + "2",
-          topicId: topic.id
-        }
+          name: series.name + '2',
+          topicId: topic.id,
+        },
       });
 
       const updatedSeries = new Series(id, series.name, topic);
 
-      await expect(() => repository.update(updatedSeries)).rejects.toThrow(Prisma.PrismaClientKnownRequestError)
+      await expect(() => repository.update(updatedSeries)).rejects.toThrow(
+        Prisma.PrismaClientKnownRequestError,
+      );
     });
 
     it('존재하지 않는 Series을 수정합니다.', async () => {
-      await expect(() => repository.update(series)).rejects.toThrow(Prisma.PrismaClientKnownRequestError)
+      await expect(() => repository.update(series)).rejects.toThrow(
+        Prisma.PrismaClientKnownRequestError,
+      );
     });
   });
 
   describe('delete', () => {
     it('Series을 삭제합니다.', async () => {
-      const { id } = await prisma.series.create({
+      const {id} = await prisma.series.create({
         data: {
           name: series.name,
-          topicId: topic.id
-        }
+          topicId: topic.id,
+        },
       });
 
       expect(() => repository.delete(id)).resolves;
     });
 
     it('존재하지 않는 Series을 삭제합니다.', async () => {
-      await expect(() => repository.delete(series.id)).rejects.toThrow(Prisma.PrismaClientKnownRequestError)
+      await expect(() => repository.delete(series.id)).rejects.toThrow(
+        Prisma.PrismaClientKnownRequestError,
+      );
     });
   });
-})
+});

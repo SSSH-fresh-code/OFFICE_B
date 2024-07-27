@@ -1,17 +1,17 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { PagingService } from "../../../infrastructure/common/services/paging.service";
-import { CHAT_REPOSITORY, MESSENGER_FACTORY } from "../chatbot.const";
-import { PrismaChatBotRepository } from "../../../infrastructure/db/repositories/prisma-chatbot.repository";
-import { ChatBot, MessengerType } from "../domain/chatbot.entity";
-import { MessengerFactory } from '../infrastructure/messenger.factory';
-import { ChatService } from "./chat.service";
-import { Chat } from "../domain/chat.entity";
-import { CreateChatDto } from "../presentation/dto/create-chat.dto";
-import { LoggerModule } from "../../../infrastructure/module/logger.module";
-import { SsshException } from "../../../infrastructure/filter/exception/sssh.exception";
-import { ExceptionEnum } from "../../../infrastructure/filter/exception/exception.enum";
-import { HttpStatus } from "@nestjs/common";
-import { ChatPagingDto } from "../presentation/dto/chat-paging.dto";
+import {Test, TestingModule} from '@nestjs/testing';
+import {PagingService} from '../../../infrastructure/common/services/paging.service';
+import {CHAT_REPOSITORY, MESSENGER_FACTORY} from '../chatbot.const';
+import {PrismaChatBotRepository} from '../../../infrastructure/db/repositories/prisma-chatbot.repository';
+import {ChatBot, MessengerType} from '../domain/chatbot.entity';
+import {MessengerFactory} from '../infrastructure/messenger.factory';
+import {ChatService} from './chat.service';
+import {Chat} from '../domain/chat.entity';
+import {CreateChatDto} from '../presentation/dto/create-chat.dto';
+import {LoggerModule} from '../../../infrastructure/module/logger.module';
+import {SsshException} from '../../../infrastructure/filter/exception/sssh.exception';
+import {ExceptionEnum} from '../../../infrastructure/filter/exception/exception.enum';
+import {HttpStatus} from '@nestjs/common';
+import {ChatPagingDto} from '../presentation/dto/chat-paging.dto';
 
 /**
  * Mock User Repository
@@ -24,7 +24,7 @@ const mockChatRepository = () => ({
 });
 
 const mockMessengerFactory = () => ({
-  getMessengerService: jest.fn()
+  getMessengerService: jest.fn(),
 });
 /**
  * Mock Paging Service
@@ -40,8 +40,8 @@ describe('ChatBotService', () => {
   let pagingService;
   let messengerFactory;
 
-  const chatId = "7370566619";
-  const name = "chatbot";
+  const chatId = '7370566619';
+  const name = 'chatbot';
   const type = MessengerType.DISCORD;
 
   let chat: Chat;
@@ -54,8 +54,8 @@ describe('ChatBotService', () => {
           provide: MESSENGER_FACTORY,
           useFactory: mockMessengerFactory,
         },
-        { provide: CHAT_REPOSITORY, useFactory: mockChatRepository },
-        { provide: PagingService, useFactory: mockPagingService },
+        {provide: CHAT_REPOSITORY, useFactory: mockChatRepository},
+        {provide: PagingService, useFactory: mockPagingService},
         ChatService,
       ],
     }).compile();
@@ -68,12 +68,14 @@ describe('ChatBotService', () => {
 
   beforeEach(() => {
     chat = new Chat(1, chatId, name, type);
-  })
+  });
 
   describe('createChat - 챗봇 생성', () => {
     it('챗봇을 정상적으로 생성합니다.', async () => {
       const dto: CreateChatDto = {
-        chatId, name, type
+        chatId,
+        name,
+        type,
       };
 
       chatRepository.createChat.mockResolvedValue(chat);
@@ -81,23 +83,39 @@ describe('ChatBotService', () => {
       const createdChat = await chatService.createChat(dto);
 
       expect(createdChat).toEqual(chat.toDto());
-      expect(chatRepository.createChat).toHaveBeenCalledWith(new Chat(0, dto.chatId, dto.name, MessengerType[dto.type]));
+      expect(chatRepository.createChat).toHaveBeenCalledWith(
+        new Chat(0, dto.chatId, dto.name, MessengerType[dto.type]),
+      );
     });
 
     it('ChatId 없는 경우', async () => {
       const dto: CreateChatDto = {
-        chatId: null, name, type
+        chatId: null,
+        name,
+        type,
       };
 
-      await expect(() => chatService.createChat(dto)).rejects.toThrow(new SsshException(ExceptionEnum.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR));
+      await expect(() => chatService.createChat(dto)).rejects.toThrow(
+        new SsshException(
+          ExceptionEnum.INTERNAL_SERVER_ERROR,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        ),
+      );
     });
 
     it('Chat name 없는 경우', async () => {
       const dto: CreateChatDto = {
-        chatId, name: null, type
+        chatId,
+        name: null,
+        type,
       };
 
-      await expect(() => chatService.createChat(dto)).rejects.toThrow(new SsshException(ExceptionEnum.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR));
+      await expect(() => chatService.createChat(dto)).rejects.toThrow(
+        new SsshException(
+          ExceptionEnum.INTERNAL_SERVER_ERROR,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        ),
+      );
     });
   });
 
@@ -109,7 +127,7 @@ describe('ChatBotService', () => {
       } catch (e) {
         expect(false).toBeTruthy();
       }
-    })
+    });
   });
 
   describe('findChatsByType - 채팅 타입 조회', () => {
@@ -121,20 +139,19 @@ describe('ChatBotService', () => {
         page: 1,
         take: 10,
         orderby: 'createdAt',
-        direction: 'desc'
-      }
+        direction: 'desc',
+      };
 
       pagingService.getPagedResults.mockResolvedValue({
-        data: [chat], total: 1
+        data: [chat],
+        total: 1,
       });
 
       const chats = await chatService.getChatsByType(dto);
 
-      expect(pagingService.getPagedResults).toHaveBeenCalledWith(
-        'Chat'
-        , dto
-        , { type: MessengerType.DISCORD }
-      );
+      expect(pagingService.getPagedResults).toHaveBeenCalledWith('Chat', dto, {
+        type: MessengerType.DISCORD,
+      });
 
       expect(chats.total).toEqual(1);
     });
@@ -144,10 +161,16 @@ describe('ChatBotService', () => {
         page: 1,
         take: 10,
         orderby: 'createdAt',
-        direction: 'desc'
+        direction: 'desc',
       };
 
-      await expect(() => chatService.getChatsByType(dto)).rejects.toThrow(new SsshException(ExceptionEnum.PARAMETER_NOT_FOUND, HttpStatus.BAD_REQUEST, { param: "type" }));
+      await expect(() => chatService.getChatsByType(dto)).rejects.toThrow(
+        new SsshException(
+          ExceptionEnum.PARAMETER_NOT_FOUND,
+          HttpStatus.BAD_REQUEST,
+          {param: 'type'},
+        ),
+      );
     });
   });
 });

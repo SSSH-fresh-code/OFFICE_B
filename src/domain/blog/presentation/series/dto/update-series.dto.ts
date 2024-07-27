@@ -1,5 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber, IsOptional, IsString } from "class-validator";
+import {ApiProperty} from '@nestjs/swagger';
+import {IsNumber, IsOptional, IsString} from 'class-validator';
 
 export class UpdateSeriesDto {
   @ApiProperty({
@@ -10,7 +10,7 @@ export class UpdateSeriesDto {
 
   @ApiProperty({
     description: '시리즈 이름',
-    example: "sample",
+    example: 'sample',
   })
   @IsOptional()
   @IsString()
@@ -18,7 +18,7 @@ export class UpdateSeriesDto {
 
   @ApiProperty({
     description: '토픽 id',
-    example: "sample",
+    example: 'sample',
   })
   @IsOptional()
   @IsNumber()

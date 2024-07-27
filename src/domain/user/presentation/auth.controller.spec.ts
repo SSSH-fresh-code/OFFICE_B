@@ -1,10 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { AuthController } from './auth.controller';
-import { AuthService } from '../application/auth/auth.service';
-import { UserService } from '../application/user.service';
-import { LocalAuthGuard } from '../application/auth/local-auth.guard';
-import { Request, Response } from 'express';
-import { User } from '../domain/user.entity';
+import {Test, TestingModule} from '@nestjs/testing';
+import {AuthController} from './auth.controller';
+import {AuthService} from '../application/auth/auth.service';
+import {UserService} from '../application/user.service';
+import {LocalAuthGuard} from '../application/auth/local-auth.guard';
+import {Request, Response} from 'express';
+import {User} from '../domain/user.entity';
 
 /**
  * Mock Auth Service
@@ -51,11 +51,11 @@ describe('AuthController', () => {
 
   describe('login', () => {
     it('로그인을 성공적으로 수행해야 합니다.', async () => {
-      const req = { body: { email: "1@1.com", password: "password" } } as Request;
-      const res = { send: jest.fn() } as unknown as Response;
+      const req = {body: {email: '1@1.com', password: 'password'}} as Request;
+      const res = {send: jest.fn()} as unknown as Response;
 
       await authController.login(req, res);
-      expect(res.send).toHaveBeenCalledWith({ message: '로그인 성공' });
+      expect(res.send).toHaveBeenCalledWith({message: '로그인 성공'});
     });
   });
 
@@ -66,10 +66,10 @@ describe('AuthController', () => {
           destroy: jest.fn((callback) => callback(null)),
         },
       } as unknown as Request;
-      const res = { send: jest.fn() } as unknown as Response;
+      const res = {send: jest.fn()} as unknown as Response;
 
       await authController.logout(req, res);
-      expect(res.send).toHaveBeenCalledWith({ message: '로그아웃 성공' });
+      expect(res.send).toHaveBeenCalledWith({message: '로그아웃 성공'});
     });
 
     it('로그아웃 실패 시 에러를 던져야 합니다.', async () => {
@@ -78,11 +78,14 @@ describe('AuthController', () => {
           destroy: jest.fn((callback) => callback(new Error('로그아웃 실패'))),
         },
       } as unknown as Request;
-      const res = { status: jest.fn().mockReturnThis(), send: jest.fn() } as unknown as Response;
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        send: jest.fn(),
+      } as unknown as Response;
 
       await authController.logout(req, res);
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.send).toHaveBeenCalledWith({ message: '로그아웃 실패' });
+      expect(res.send).toHaveBeenCalledWith({message: '로그아웃 실패'});
     });
   });
 });

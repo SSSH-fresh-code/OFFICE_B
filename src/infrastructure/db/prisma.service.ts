@@ -1,9 +1,12 @@
-import { Prisma, PrismaClient } from '@prisma/client';
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import {Prisma, PrismaClient} from '@prisma/client';
+import {Injectable, OnModuleInit, OnModuleDestroy} from '@nestjs/common';
+import {ConfigService} from '@nestjs/config';
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+export class PrismaService
+  extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
   constructor(configService: ConfigService) {
     super({
       datasources: {
@@ -24,7 +27,6 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
 
   async cleanDatabase(names: Prisma.ModelName[]) {
     await this.$executeRaw`PRAGMA foreign_keys = OFF;`;
-    for (const name of names)
-      await this[name].deleteMany();
+    for (const name of names) await this[name].deleteMany();
   }
 }

@@ -1,5 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsDate, IsString } from "class-validator";
+import {ApiProperty} from '@nestjs/swagger';
+import {IsDate, IsString} from 'class-validator';
 
 export class ReadTopicDto {
   @ApiProperty({
@@ -10,11 +10,10 @@ export class ReadTopicDto {
 
   @ApiProperty({
     description: '토픽 이름',
-    example: "sample",
+    example: 'sample',
   })
   @IsString()
   name: string;
-
 
   @ApiProperty({
     description: '생성 일시',

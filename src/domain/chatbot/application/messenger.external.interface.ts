@@ -1,5 +1,5 @@
-import { iChat } from "../domain/chat.interface";
-import { iChatBot } from "../domain/chatbot.interface";
+import {iChat} from '../domain/chat.interface';
+import {iChatBot} from '../domain/chatbot.interface';
 
 export interface iMessengerExternalService {
   readonly API_URL: string;

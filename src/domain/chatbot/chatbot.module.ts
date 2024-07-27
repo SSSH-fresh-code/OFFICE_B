@@ -1,15 +1,19 @@
-import { Module } from '@nestjs/common';
-import { InfraModule } from '../../infrastructure/infra.module';
-import { MessengerType } from './domain/chatbot.entity';
-import { TelegramExternalService } from './application/telegram.external';
-import { MessengerFactory } from './infrastructure/messenger.factory';
-import { CHATBOT_REPOSITORY, CHAT_REPOSITORY, MESSENGER_FACTORY } from './chatbot.const';
-import { PrismaChatBotRepository } from '../../infrastructure/db/repositories/prisma-chatbot.repository';
-import { PrismaChatRepository } from '../../infrastructure/db/repositories/prisma-chat.repository';
-import { ChatBotController } from './presentation/chatbot.controller';
-import { ChatBotService } from './application/chatbot.service';
-import { ChatService } from './application/chat.service';
-import { ChatController } from './presentation/chat.controller';
+import {Module} from '@nestjs/common';
+import {InfraModule} from '../../infrastructure/infra.module';
+import {MessengerType} from './domain/chatbot.entity';
+import {TelegramExternalService} from './application/telegram.external';
+import {MessengerFactory} from './infrastructure/messenger.factory';
+import {
+  CHATBOT_REPOSITORY,
+  CHAT_REPOSITORY,
+  MESSENGER_FACTORY,
+} from './chatbot.const';
+import {PrismaChatBotRepository} from '../../infrastructure/db/repositories/prisma-chatbot.repository';
+import {PrismaChatRepository} from '../../infrastructure/db/repositories/prisma-chat.repository';
+import {ChatBotController} from './presentation/chatbot.controller';
+import {ChatBotService} from './application/chatbot.service';
+import {ChatService} from './application/chat.service';
+import {ChatController} from './presentation/chat.controller';
 
 @Module({
   imports: [InfraModule],
@@ -18,7 +22,7 @@ import { ChatController } from './presentation/chat.controller';
     ChatService,
     {
       provide: MESSENGER_FACTORY,
-      useClass: MessengerFactory
+      useClass: MessengerFactory,
     },
     {
       provide: MessengerType.TELEGRAM,
@@ -35,4 +39,4 @@ import { ChatController } from './presentation/chat.controller';
   ],
   controllers: [ChatBotController, ChatController],
 })
-export class ChatBotModule { }
+export class ChatBotModule {}

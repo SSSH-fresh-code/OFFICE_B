@@ -1,6 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { ReadChatBotDto } from './read-chatbot.dto';
-import { ReadChatDto } from './read-chat.dto';
+import {ApiProperty} from '@nestjs/swagger';
+import {ReadChatBotDto} from './read-chatbot.dto';
+import {ReadChatDto} from './read-chat.dto';
 
 export class SendResultDto {
   @ApiProperty({

@@ -1,17 +1,17 @@
 import * as request from 'supertest';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { PrismaService } from '../../../infrastructure/db/prisma.service';
-import { Test, TestingModule } from '@nestjs/testing';
-import { AppModule } from '../../../app.module';
+import {INestApplication, ValidationPipe} from '@nestjs/common';
+import {PrismaService} from '../../../infrastructure/db/prisma.service';
+import {Test, TestingModule} from '@nestjs/testing';
+import {AppModule} from '../../../app.module';
 import * as session from 'express-session';
 import * as bcrypt from 'bcrypt';
 import * as passport from 'passport';
-import { PrismaClientExceptionFilter } from '../../../infrastructure/filter/exception/prisma-exception.filter';
-import { PermissionEnum } from '../../../domain/permission/domain/permission.enum';
-import { formatMessage } from '../../../infrastructure/util/message.util';
-import { ExceptionEnum } from '../../../infrastructure/filter/exception/exception.enum';
-import { CreatePermissionDto } from './dto/create-permission.dto';
-import { UpdatePermissionDto } from './dto/update-permission.dto';
+import {PrismaClientExceptionFilter} from '../../../infrastructure/filter/exception/prisma-exception.filter';
+import {PermissionEnum} from '../../../domain/permission/domain/permission.enum';
+import {formatMessage} from '../../../infrastructure/util/message.util';
+import {ExceptionEnum} from '../../../infrastructure/filter/exception/exception.enum';
+import {CreatePermissionDto} from './dto/create-permission.dto';
+import {UpdatePermissionDto} from './dto/update-permission.dto';
 
 describe('PermissionController (e2e)', () => {
   let app: INestApplication;
@@ -20,20 +20,20 @@ describe('PermissionController (e2e)', () => {
   let gu: string;
 
   const createDto: CreatePermissionDto = {
-    name: "TEST001",
-    description: "테스트를 위한 권한입니다."
-  }
+    name: 'TEST001',
+    description: '테스트를 위한 권한입니다.',
+  };
 
   const superUser = {
-    email: "super@super.com",
-    password: bcrypt.hashSync("password", 10),
-    name: "super"
-  }
+    email: 'super@super.com',
+    password: bcrypt.hashSync('password', 10),
+    name: 'super',
+  };
   const guestUser = {
-    email: "guest@guest.com",
-    password: bcrypt.hashSync("password", 10),
-    name: "guest"
-  }
+    email: 'guest@guest.com',
+    password: bcrypt.hashSync('password', 10),
+    name: 'guest',
+  };
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -64,37 +64,43 @@ describe('PermissionController (e2e)', () => {
       data: {
         ...superUser,
         permissions: {
-          connect: [{
-            name: PermissionEnum.CAN_LOGIN
-          }, {
-            name: PermissionEnum.CAN_WRITE_PERMISSION
-          }, {
-            name: PermissionEnum.CAN_READ_PERMISSION
-          }]
-        }
-      }
+          connect: [
+            {
+              name: PermissionEnum.CAN_LOGIN,
+            },
+            {
+              name: PermissionEnum.CAN_WRITE_PERMISSION,
+            },
+            {
+              name: PermissionEnum.CAN_READ_PERMISSION,
+            },
+          ],
+        },
+      },
     });
 
     await prismaService.user.create({
       data: {
         ...guestUser,
         permissions: {
-          connect: [{
-            name: PermissionEnum.CAN_LOGIN
-          }]
-        }
-      }
+          connect: [
+            {
+              name: PermissionEnum.CAN_LOGIN,
+            },
+          ],
+        },
+      },
     });
 
     let response = await request(app.getHttpServer())
       .post('/auth/login')
-      .send({ email: superUser.email, password: "password" });
+      .send({email: superUser.email, password: 'password'});
 
     su = response.headers['set-cookie'];
 
     response = await request(app.getHttpServer())
       .post('/auth/login')
-      .send({ email: guestUser.email, password: "password" });
+      .send({email: guestUser.email, password: 'password'});
 
     gu = response.headers['set-cookie'];
   });
@@ -105,7 +111,7 @@ describe('PermissionController (e2e)', () => {
 
   describe('POST - /permission', () => {
     it('권한 생성', async () => {
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .post('/permission')
         .set('Cookie', su)
         .send(createDto);
@@ -119,22 +125,24 @@ describe('PermissionController (e2e)', () => {
 
     it('권한 중복 생성', async () => {
       await prismaService.permission.create({
-        data: createDto
+        data: createDto,
       });
 
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .post('/permission')
         .set('Cookie', su)
         .send(createDto);
 
       expect(statusCode).toEqual(400);
-      expect(body.message).toEqual(formatMessage(ExceptionEnum.ALREADY_EXISTS, { param: "name" }))
+      expect(body.message).toEqual(
+        formatMessage(ExceptionEnum.ALREADY_EXISTS, {param: 'name'}),
+      );
 
       return;
     });
 
     it('권한 없이 권한 생성', async () => {
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .post('/permission')
         .set('Cookie', gu)
         .send(createDto);
@@ -145,7 +153,7 @@ describe('PermissionController (e2e)', () => {
       return;
     });
     it('로그인 없이 권한 생성', async () => {
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .post('/permission')
         .send(createDto);
 
@@ -158,11 +166,11 @@ describe('PermissionController (e2e)', () => {
 
   describe('DELETE - /permission', () => {
     it('권한 삭제', async () => {
-      const { name } = await prismaService.permission.create({
-        data: createDto
+      const {name} = await prismaService.permission.create({
+        data: createDto,
       });
 
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .delete(`/permission/${name}`)
         .set('Cookie', su);
 
@@ -170,9 +178,8 @@ describe('PermissionController (e2e)', () => {
       expect(body).toEqual({});
     });
 
-
     it('존재 하지 않는 권한 삭제', async () => {
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .delete(`/permission/WRONG001`)
         .set('Cookie', su);
 
@@ -181,7 +188,7 @@ describe('PermissionController (e2e)', () => {
     });
 
     it('권한 없이 권한 삭제', async () => {
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .delete(`/permission/FAKE0001`)
         .set('Cookie', gu);
 
@@ -193,25 +200,24 @@ describe('PermissionController (e2e)', () => {
   describe('GET - /permission', () => {
     it('권한 목록 조회하기', async () => {
       const dto2: CreatePermissionDto = {
-        name: "TEST0002",
-        description: "테스트권한2"
+        name: 'TEST0002',
+        description: '테스트권한2',
       };
 
       await prismaService.permission.createMany({
-        data: [createDto, dto2]
+        data: [createDto, dto2],
       });
 
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .get(`/permission`)
         .set('Cookie', su);
-
 
       expect(statusCode).toEqual(200);
       expect(body.length).toEqual(2);
     });
 
     it('권한 없이 목록 조회', async () => {
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .get(`/permission`)
         .set('Cookie', gu);
 
@@ -222,15 +228,15 @@ describe('PermissionController (e2e)', () => {
 
   describe('PUT - /permission', () => {
     it('권한 수정하기', async () => {
-      const { name } = await prismaService.permission.create({
-        data: createDto
+      const {name} = await prismaService.permission.create({
+        data: createDto,
       });
       const updateDto: UpdatePermissionDto = {
         name,
-        description: "수정한권한1"
-      }
+        description: '수정한권한1',
+      };
 
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .put(`/permission`)
         .set('Cookie', su)
         .send(updateDto);
@@ -241,11 +247,11 @@ describe('PermissionController (e2e)', () => {
 
     it('존재하지 않는 수정하기', async () => {
       const updateDto: UpdatePermissionDto = {
-        name: "WRONG001",
-        description: "수정한권한1"
-      }
+        name: 'WRONG001',
+        description: '수정한권한1',
+      };
 
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .put(`/permission`)
         .set('Cookie', su)
         .send(updateDto);
@@ -254,9 +260,8 @@ describe('PermissionController (e2e)', () => {
       expect(body.message).toEqual(ExceptionEnum.NOT_FOUND);
     });
 
-
     it('권한 없이 권한 수정', async () => {
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .put(`/permission`)
         .set('Cookie', gu);
 
@@ -265,8 +270,9 @@ describe('PermissionController (e2e)', () => {
     });
 
     it('로그인 없이 권한 수정', async () => {
-      const { statusCode, body } = await request(app.getHttpServer())
-        .put(`/permission`);
+      const {statusCode, body} = await request(app.getHttpServer()).put(
+        `/permission`,
+      );
 
       expect(statusCode).toEqual(403);
       expect(body.message).toEqual(ExceptionEnum.NOT_LOGGED_IN);
@@ -275,11 +281,11 @@ describe('PermissionController (e2e)', () => {
 
   describe('GET - /permission/:name', () => {
     it('권한 단건 조회', async () => {
-      const { name, description } = await prismaService.permission.create({
-        data: createDto
+      const {name, description} = await prismaService.permission.create({
+        data: createDto,
       });
 
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .get(`/permission/${name}`)
         .set('Cookie', su);
 
@@ -289,7 +295,7 @@ describe('PermissionController (e2e)', () => {
     });
 
     it('존재하지 않는 권한 단건 조회', async () => {
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .get(`/permission/WRONG001`)
         .set('Cookie', su);
 
@@ -298,7 +304,7 @@ describe('PermissionController (e2e)', () => {
     });
 
     it('권한없이 권한 단건 조회', async () => {
-      const { statusCode, body } = await request(app.getHttpServer())
+      const {statusCode, body} = await request(app.getHttpServer())
         .get(`/permission/WRONG001`)
         .set('Cookie', gu);
 
@@ -307,11 +313,12 @@ describe('PermissionController (e2e)', () => {
     });
 
     it('로그인 없이 권한 단건 조회', async () => {
-      const { statusCode, body } = await request(app.getHttpServer())
-        .get(`/permission/WRONG001`);
+      const {statusCode, body} = await request(app.getHttpServer()).get(
+        `/permission/WRONG001`,
+      );
 
       expect(statusCode).toEqual(403);
       expect(body.message).toEqual(ExceptionEnum.NOT_LOGGED_IN);
     });
-  })
-})
+  });
+});

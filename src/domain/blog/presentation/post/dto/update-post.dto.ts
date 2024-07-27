@@ -1,5 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber, IsOptional, IsString } from "class-validator";
+import {ApiProperty} from '@nestjs/swagger';
+import {IsNumber, IsOptional, IsString} from 'class-validator';
 
 export class UpdatePostDto {
   @ApiProperty({
@@ -9,11 +9,10 @@ export class UpdatePostDto {
   @IsNumber()
   id: number;
 
-
   @IsOptional()
   @ApiProperty({
     description: '게시글 제목',
-    example: "sample",
+    example: 'sample',
   })
   @IsString()
   title?: string;
@@ -21,14 +20,14 @@ export class UpdatePostDto {
   @IsOptional()
   @ApiProperty({
     description: '게시글 내용',
-    example: "sample",
+    example: 'sample',
   })
   @IsString()
   content?: string;
 
   @ApiProperty({
     description: '게시글 썸네일',
-    example: "",
+    example: '',
   })
   @IsOptional()
   @IsString()
@@ -37,7 +36,7 @@ export class UpdatePostDto {
   @IsOptional()
   @ApiProperty({
     description: '유저 name',
-    example: "",
+    example: '',
   })
   @IsString()
   authorName?: string;

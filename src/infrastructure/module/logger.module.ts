@@ -1,5 +1,5 @@
-import { Module } from '@nestjs/common';
-import { WinstonModule } from 'nest-winston';
+import {Module} from '@nestjs/common';
+import {WinstonModule} from 'nest-winston';
 import * as winston from 'winston';
 import 'winston-daily-rotate-file';
 
@@ -16,7 +16,7 @@ import 'winston-daily-rotate-file';
           format: winston.format.combine(
             winston.format.timestamp(),
             winston.format.colorize(),
-            winston.format.printf(({ timestamp, level, message, ...meta }) => {
+            winston.format.printf(({timestamp, level, message, ...meta}) => {
               return `${timestamp} [${level}] ${message} ${meta ? JSON.stringify(meta) : ''}`;
             }),
           ),
@@ -31,7 +31,7 @@ import 'winston-daily-rotate-file';
           maxFiles: '14d',
           format: winston.format.combine(
             winston.format.timestamp(),
-            winston.format.printf(({ timestamp, level, message, ...meta }) => {
+            winston.format.printf(({timestamp, level, message, ...meta}) => {
               return `${timestamp} [${level}] ${message} ${meta ? JSON.stringify(meta) : ''}`;
             }),
           ),
@@ -41,4 +41,4 @@ import 'winston-daily-rotate-file';
   ],
   exports: [WinstonModule],
 })
-export class LoggerModule { }
+export class LoggerModule {}

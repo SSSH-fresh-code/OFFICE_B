@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Permission } from '../../domain/permission.entity';
+import {ApiProperty} from '@nestjs/swagger';
+import {Permission} from '../../domain/permission.entity';
 
 export class ReadPermissionDto {
   @ApiProperty({

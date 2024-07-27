@@ -1,6 +1,6 @@
-import { IsOptional, IsString, IsInt, Min } from 'class-validator';
-import { PagingDto } from '../../../../infrastructure/common/dto/paging.dto';
-import { ApiProperty } from '@nestjs/swagger';
+import {IsOptional, IsString, IsInt, Min} from 'class-validator';
+import {PagingDto} from '../../../../infrastructure/common/dto/paging.dto';
+import {ApiProperty} from '@nestjs/swagger';
 
 /**
  * 유저 페이징 DTO 클래스

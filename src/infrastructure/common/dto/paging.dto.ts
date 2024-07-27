@@ -1,6 +1,6 @@
-import { IsInt, IsOptional, IsString, Min } from 'class-validator';
-import { Type } from 'class-transformer';
-import { ApiProperty } from '@nestjs/swagger';
+import {IsInt, IsOptional, IsString, Min} from 'class-validator';
+import {Type} from 'class-transformer';
+import {ApiProperty} from '@nestjs/swagger';
 
 /**
  * 공통 페이징 DTO 클래스

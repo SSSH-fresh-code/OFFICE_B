@@ -1,10 +1,10 @@
-import { SsshException } from "../../../infrastructure/filter/exception/sssh.exception";
-import { iChat } from "./chat.interface";
-import { MessengerType } from "./chatbot.entity";
-import { ExceptionEnum } from "../../../infrastructure/filter/exception/exception.enum";
-import { HttpStatus } from "@nestjs/common";
-import { Chat as PrismaChat } from "@prisma/client";
-import { ReadChatDto } from "../presentation/dto/read-chat.dto";
+import {SsshException} from '../../../infrastructure/filter/exception/sssh.exception';
+import {iChat} from './chat.interface';
+import {MessengerType} from './chatbot.entity';
+import {ExceptionEnum} from '../../../infrastructure/filter/exception/exception.enum';
+import {HttpStatus} from '@nestjs/common';
+import {Chat as PrismaChat} from '@prisma/client';
+import {ReadChatDto} from '../presentation/dto/read-chat.dto';
 
 /**
  * Chat 엔티티 클래스
@@ -24,18 +24,31 @@ export class Chat implements iChat {
    * @param name - 채팅방 이름
    * @param type - 채팅방 타입
    */
-  constructor(id: number, chatId: string, name: string, type: MessengerType, createdAt?: Date, updatedAt?: Date) {
+  constructor(
+    id: number,
+    chatId: string,
+    name: string,
+    type: MessengerType,
+    createdAt?: Date,
+    updatedAt?: Date,
+  ) {
     this._id = id;
     this._chatId = chatId;
     this._name = name;
     this._type = type;
     this._createdAt = createdAt;
     this._updatedAt = updatedAt;
-
   }
 
-  static of({ id, chatId, name, type, createdAt, updatedAt }: PrismaChat) {
-    return new this(id, chatId, name, MessengerType[type], createdAt, updatedAt);
+  static of({id, chatId, name, type, createdAt, updatedAt}: PrismaChat) {
+    return new this(
+      id,
+      chatId,
+      name,
+      MessengerType[type],
+      createdAt,
+      updatedAt,
+    );
   }
 
   /**
@@ -45,7 +58,6 @@ export class Chat implements iChat {
   get id(): number {
     return this._id;
   }
-
 
   /**
    * 채팅방 ID getter
@@ -88,15 +100,19 @@ export class Chat implements iChat {
 
   validate(): void {
     if (
-      (this._chatId && this._chatId.length > 0)
-      && (this._name && this._name.length > 0)
+      this._chatId &&
+      this._chatId.length > 0 &&
+      this._name &&
+      this._name.length > 0
     ) {
       const keys = Object.keys(MessengerType);
 
-      for (const key of keys)
-        if (MessengerType[key] === this._type) return;
+      for (const key of keys) if (MessengerType[key] === this._type) return;
     } else {
-      throw new SsshException(ExceptionEnum.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new SsshException(
+        ExceptionEnum.INTERNAL_SERVER_ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -108,7 +124,6 @@ export class Chat implements iChat {
       type: this._type,
       createdAt: this._createdAt,
       updatedAt: this._updatedAt,
-    }
+    };
   }
-
 }

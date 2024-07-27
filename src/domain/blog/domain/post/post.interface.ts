@@ -1,10 +1,9 @@
-import { ReadPostDto } from "../../presentation/post/dto/read-post.dto";
-import { iSeries } from "../series/series.interface";
-import { iTopic } from "../topic/topic.interface";
-import { iUser } from "src/domain/user/domain/user.interface";
+import {ReadPostDto} from '../../presentation/post/dto/read-post.dto';
+import {iSeries} from '../series/series.interface';
+import {iTopic} from '../topic/topic.interface';
+import {iUser} from 'src/domain/user/domain/user.interface';
 
 export interface iPost {
-
   /**
    * 게시글 id를 반환합니다.
    */
@@ -83,7 +82,6 @@ export interface iPost {
    * 수정일을 반환합니다.
    */
   get updatedAt(): Date;
-
 
   /**
    * dto로 변환합니다.

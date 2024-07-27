@@ -1,9 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { LoggerModule } from '../../../infrastructure/module/logger.module';
-import { iMessengerExternalService } from './messenger.external.interface';
-import { TelegramExternalService } from './telegram.external';
-import { ChatBot, MessengerType } from '../domain/chatbot.entity';
-import { Chat } from '../domain/chat.entity';
+import {Test, TestingModule} from '@nestjs/testing';
+import {LoggerModule} from '../../../infrastructure/module/logger.module';
+import {iMessengerExternalService} from './messenger.external.interface';
+import {TelegramExternalService} from './telegram.external';
+import {ChatBot, MessengerType} from '../domain/chatbot.entity';
+import {Chat} from '../domain/chat.entity';
 
 /**
  * Mock User Service
@@ -18,9 +18,7 @@ describe('TelegramExternalService', () => {
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [LoggerModule],
-      providers: [
-        TelegramExternalService
-      ],
+      providers: [TelegramExternalService],
     }).compile();
 
     service = module.get<iMessengerExternalService>(TelegramExternalService);
@@ -30,20 +28,20 @@ describe('TelegramExternalService', () => {
     it('메세지를 정상적으로 전송해야합니다.', async () => {
       const chatbot = new ChatBot(
         0,
-        "botid",
-        "token",
-        "name",
-        "description",
-        MessengerType.TELEGRAM
+        'botid',
+        'token',
+        'name',
+        'description',
+        MessengerType.TELEGRAM,
       );
 
-      const chat = new Chat(0, "chatId", "testChat", MessengerType.DISCORD);
+      const chat = new Chat(0, 'chatId', 'testChat', MessengerType.DISCORD);
 
       (fetch as jest.Mock).mockResolvedValue({
-        ok: true
+        ok: true,
       });
 
-      const result = await service.chat(chatbot, chat, "테스트 메세지");
+      const result = await service.chat(chatbot, chat, '테스트 메세지');
     });
   });
 });

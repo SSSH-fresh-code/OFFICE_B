@@ -1,13 +1,12 @@
 import * as bcrypt from 'bcrypt';
-import { iUser } from './user.interface';
-import { ReadUserDto } from '../presentation/dto/read-user.dto';
-import { User as PrismaUser } from "@prisma/client";
+import {iUser} from './user.interface';
+import {ReadUserDto} from '../presentation/dto/read-user.dto';
+import {User as PrismaUser} from '@prisma/client';
 
 /**
  * UserEntity 클래스
  */
 export class User implements iUser {
-
   constructor(
     private _id: string,
     private _email: string,
@@ -16,20 +15,10 @@ export class User implements iUser {
     private _permissions: string[] = [],
     private _createdAt?: Date,
     private _updatedAt?: Date,
-  ) {
-  }
+  ) {}
 
-
-  static of({ id, email, password, name, createdAt, updatedAt }: PrismaUser) {
-    return new this(
-      id,
-      email,
-      password,
-      name,
-      [],
-      createdAt,
-      updatedAt
-    );
+  static of({id, email, password, name, createdAt, updatedAt}: PrismaUser) {
+    return new this(id, email, password, name, [], createdAt, updatedAt);
   }
 
   /**
@@ -70,7 +59,7 @@ export class User implements iUser {
    */
   resetPassword(): void {
     this._password = '12345678a';
-    this.encryptPassword()
+    this.encryptPassword();
   }
 
   encryptPassword() {
@@ -126,20 +115,24 @@ export class User implements iUser {
     return this._updatedAt;
   }
   /**
-     * 권한 할당 메서드
-     * @param permissions 할당할 권한들
-     */
-  public assignPermissions(permissions: {
-    name: string;
-    description: string;
-    createdAt: Date;
-    updatedAt: Date;
-  }[] | string[]): void {
+   * 권한 할당 메서드
+   * @param permissions 할당할 권한들
+   */
+  public assignPermissions(
+    permissions:
+      | {
+          name: string;
+          description: string;
+          createdAt: Date;
+          updatedAt: Date;
+        }[]
+      | string[],
+  ): void {
     let _permissions = [];
 
     for (const p of permissions) {
-      if (typeof p === "string") _permissions = permissions.map(n => n);
-      else _permissions = permissions.map(n => n.name);
+      if (typeof p === 'string') _permissions = permissions.map((n) => n);
+      else _permissions = permissions.map((n) => n.name);
 
       break;
     }
@@ -169,7 +162,7 @@ export class User implements iUser {
       email: this.email,
       name: this._name,
       createdAt: this._createdAt,
-      updatedAt: this._updatedAt
-    }
+      updatedAt: this._updatedAt,
+    };
   }
 }

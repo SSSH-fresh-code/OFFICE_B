@@ -1,38 +1,44 @@
-import { ExceptionEnum } from "src/infrastructure/filter/exception/exception.enum";
-import { Post as PrismaPost } from "@prisma/client";
-import { formatMessage } from "src/infrastructure/util/message.util";
-import { Topic } from "../topic/topic.entity";
-import { iPost } from "./post.interface";
-import { Series } from "../series/series.entity";
-import { User } from "src/domain/user/domain/user.entity";
-import { Post, ofPost } from "./post.entity";
-import { CreatePostDto } from "../../presentation/post/dto/create-post.dto";
+import {ExceptionEnum} from 'src/infrastructure/filter/exception/exception.enum';
+import {Post as PrismaPost} from '@prisma/client';
+import {formatMessage} from 'src/infrastructure/util/message.util';
+import {Topic} from '../topic/topic.entity';
+import {iPost} from './post.interface';
+import {Series} from '../series/series.entity';
+import {User} from 'src/domain/user/domain/user.entity';
+import {Post, ofPost} from './post.entity';
+import {CreatePostDto} from '../../presentation/post/dto/create-post.dto';
 
 describe('Post Entity', () => {
   let post: iPost;
-  let user = new User("mmm-mmmmm-mmm", "email@email.com", "password", "name", []);
-  let topic = new Topic(1, "topic");
-  let series = new Series(1, "series", topic);
+  let user = new User(
+    'mmm-mmmmm-mmm',
+    'email@email.com',
+    'password',
+    'name',
+    [],
+  );
+  let topic = new Topic(1, 'topic');
+  let series = new Series(1, 'series', topic);
 
   beforeEach(() => {
     post = null;
   });
 
-  const convertName = (str: string) => str.replaceAll(" ", "_");
+  const convertName = (str: string) => str.replaceAll(' ', '_');
   const dto: CreatePostDto = {
-    title: "제목 입니다",
-    content: "내용입니다.",
-    thumbnail: "001.avif",
+    title: '제목 입니다',
+    content: '내용입니다.',
+    thumbnail: '001.avif',
     authorName: user.name,
     topicId: topic.id,
-    seriesId: series.id
-  }
+    seriesId: series.id,
+  };
 
   describe('생성자', () => {
     it('생성자 사용하여 객체 생성', () => {
       const id = 1;
 
-      const { title, content, thumbnail } = dto
+      const {title, content, thumbnail} = dto;
       post = new Post(id, title, content, user, topic, series, thumbnail);
 
       expect(post.id).toEqual(id);
@@ -48,7 +54,7 @@ describe('Post Entity', () => {
     it('생성자 사용하여 썸네일 없는 객체 생성', () => {
       const id = 1;
 
-      const { title, content } = dto
+      const {title, content} = dto;
       post = new Post(id, title, content, user, topic, series);
 
       expect(post.id).toEqual(id);
@@ -64,7 +70,7 @@ describe('Post Entity', () => {
     it('생성자 사용하여 시리즈 없는 객체 생성', () => {
       const id = 1;
 
-      const { title, content, thumbnail } = dto
+      const {title, content, thumbnail} = dto;
       post = new Post(id, title, content, user, topic, undefined, thumbnail);
 
       expect(post.id).toEqual(id);
@@ -80,7 +86,7 @@ describe('Post Entity', () => {
     it('생성자 사용하여 시리즈, 썸네일 없는 객체 생성', () => {
       const id = 1;
 
-      const { title, content } = dto
+      const {title, content} = dto;
       post = new Post(id, title, content, user, topic);
 
       expect(post.id).toEqual(id);
@@ -98,7 +104,7 @@ describe('Post Entity', () => {
     it('아이디 조회', () => {
       const id = 1;
 
-      const { title, content, thumbnail } = dto
+      const {title, content, thumbnail} = dto;
       post = new Post(id, title, content, user, topic, series, thumbnail);
 
       expect(post.id).toEqual(1);
@@ -107,7 +113,7 @@ describe('Post Entity', () => {
 
   describe('get title()', () => {
     it('제목 조회', () => {
-      const { title, content, thumbnail } = dto
+      const {title, content, thumbnail} = dto;
       post = new Post(1, title, content, user, topic, series, thumbnail);
 
       expect(post.title).toEqual(convertName(title));
@@ -116,8 +122,8 @@ describe('Post Entity', () => {
 
   describe('set title()', () => {
     it('제목 설정', () => {
-      const updateTitle = "수정된 제목";
-      const { title, content, thumbnail } = dto
+      const updateTitle = '수정된 제목';
+      const {title, content, thumbnail} = dto;
       post = new Post(1, title, content, user, topic, series, thumbnail);
 
       post.title = updateTitle;
@@ -126,21 +132,25 @@ describe('Post Entity', () => {
     });
 
     it('50자 이상으로 제목 설정', () => {
-      let text = "";
-      while (text.length < 52) { text += "d" }
+      let text = '';
+      while (text.length < 52) {
+        text += 'd';
+      }
 
-      const { title, content, thumbnail } = dto
+      const {title, content, thumbnail} = dto;
       post = new Post(1, title, content, user, topic, series, thumbnail);
 
       expect(() => {
         post.title = text;
-      }).toThrow(formatMessage(ExceptionEnum.INVALID_PARAMETER, { param: "title" }));
+      }).toThrow(
+        formatMessage(ExceptionEnum.INVALID_PARAMETER, {param: 'title'}),
+      );
     });
   });
 
   describe('get content()', () => {
     it('내용 조회', () => {
-      const { title, content, thumbnail } = dto
+      const {title, content, thumbnail} = dto;
       post = new Post(1, title, content, user, topic, series, thumbnail);
 
       expect(post.content).toEqual(content);
@@ -149,8 +159,8 @@ describe('Post Entity', () => {
 
   describe('set content()', () => {
     it('내용 설정', () => {
-      const updateContent = "수정된 내용";
-      const { title, content, thumbnail } = dto
+      const updateContent = '수정된 내용';
+      const {title, content, thumbnail} = dto;
       post = new Post(1, title, content, user, topic, series, thumbnail);
 
       post.content = updateContent;
@@ -161,7 +171,7 @@ describe('Post Entity', () => {
 
   describe('get thumbnail()', () => {
     it('썸네일 조회', () => {
-      const { title, content, thumbnail } = dto
+      const {title, content, thumbnail} = dto;
       post = new Post(1, title, content, user, topic, series, thumbnail);
 
       expect(post.thumbnail).toEqual(thumbnail);
@@ -170,9 +180,9 @@ describe('Post Entity', () => {
 
   describe('set thumbnail()', () => {
     it('썸네일 설정', () => {
-      const updateThumbnail = "modified001.avif";
+      const updateThumbnail = 'modified001.avif';
 
-      const { title, content, thumbnail } = dto
+      const {title, content, thumbnail} = dto;
       post = new Post(1, title, content, user, topic, series, thumbnail);
 
       post.thumbnail = updateThumbnail;
@@ -181,7 +191,7 @@ describe('Post Entity', () => {
     });
 
     it('썸네일 제거', () => {
-      const { title, content, thumbnail } = dto
+      const {title, content, thumbnail} = dto;
       post = new Post(1, title, content, user, topic, series, thumbnail);
 
       post.thumbnail = undefined;
@@ -192,7 +202,7 @@ describe('Post Entity', () => {
 
   describe('get author()', () => {
     it('작성자 조회', () => {
-      const { title, content, thumbnail } = dto
+      const {title, content, thumbnail} = dto;
       post = new Post(1, title, content, user, topic, series, thumbnail);
 
       expect(post.author.id).toEqual(user.id);
@@ -202,9 +212,14 @@ describe('Post Entity', () => {
 
   describe('set author()', () => {
     it('작성자 설정', () => {
-      const newUser = new User("aaaaa-aaa-aaaaa", "new@user.com", "passssss", "name2");
+      const newUser = new User(
+        'aaaaa-aaa-aaaaa',
+        'new@user.com',
+        'passssss',
+        'name2',
+      );
 
-      const { title, content, thumbnail } = dto
+      const {title, content, thumbnail} = dto;
       post = new Post(1, title, content, user, topic, series, thumbnail);
 
       post.author = newUser;
@@ -218,7 +233,7 @@ describe('Post Entity', () => {
 
   describe('get topic()', () => {
     it('주제 조회', () => {
-      const { title, content, thumbnail } = dto
+      const {title, content, thumbnail} = dto;
       post = new Post(1, title, content, user, topic, series, thumbnail);
 
       expect(post.topic.id).toEqual(topic.id);
@@ -228,9 +243,9 @@ describe('Post Entity', () => {
 
   describe('set topic()', () => {
     it('주제 설정', () => {
-      const newTopic = new Topic(2, "topic2");
+      const newTopic = new Topic(2, 'topic2');
 
-      const { title, content, thumbnail } = dto
+      const {title, content, thumbnail} = dto;
       post = new Post(1, title, content, user, topic, series, thumbnail);
 
       post.topic = newTopic;
@@ -244,7 +259,7 @@ describe('Post Entity', () => {
 
   describe('get series()', () => {
     it('시리즈 조회', () => {
-      const { title, content, thumbnail } = dto
+      const {title, content, thumbnail} = dto;
       post = new Post(1, title, content, user, topic, series, thumbnail);
 
       expect(post.series.id).toEqual(series.id);
@@ -254,9 +269,9 @@ describe('Post Entity', () => {
 
   describe('set series()', () => {
     it('시리즈 설정', () => {
-      const newSeries = new Series(2, "series2", topic);
+      const newSeries = new Series(2, 'series2', topic);
 
-      const { title, content, thumbnail } = dto
+      const {title, content, thumbnail} = dto;
       post = new Post(1, title, content, user, topic, series, thumbnail);
 
       post.series = newSeries;
@@ -268,7 +283,7 @@ describe('Post Entity', () => {
     });
 
     it('시리즈 제거', () => {
-      const { title, content, thumbnail } = dto
+      const {title, content, thumbnail} = dto;
       post = new Post(1, title, content, user, topic, series, thumbnail);
 
       post.series = undefined;
@@ -281,8 +296,18 @@ describe('Post Entity', () => {
     it('생성일자 조회', () => {
       const date = new Date();
 
-      const { title, content, thumbnail } = dto
-      post = new Post(1, title, content, user, topic, series, thumbnail, date, date);
+      const {title, content, thumbnail} = dto;
+      post = new Post(
+        1,
+        title,
+        content,
+        user,
+        topic,
+        series,
+        thumbnail,
+        date,
+        date,
+      );
 
       expect(post.createdAt).toEqual(date);
     });
@@ -292,8 +317,18 @@ describe('Post Entity', () => {
     it('수정일자 조회', () => {
       const date = new Date();
 
-      const { title, content, thumbnail } = dto
-      post = new Post(1, title, content, user, topic, series, thumbnail, date, date);
+      const {title, content, thumbnail} = dto;
+      post = new Post(
+        1,
+        title,
+        content,
+        user,
+        topic,
+        series,
+        thumbnail,
+        date,
+        date,
+      );
 
       expect(post.updatedAt).toEqual(date);
     });
@@ -303,16 +338,16 @@ describe('Post Entity', () => {
     it('정적 생성자 사용', () => {
       const p: ofPost = {
         id: 1,
-        title: "제목_입니다",
-        content: "내용입니다.",
-        thumbnail: "001.avif",
+        title: '제목_입니다',
+        content: '내용입니다.',
+        thumbnail: '001.avif',
         author: {
           id: user.id,
           email: user.email,
           password: user.password,
           name: user.name,
           createdAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
         },
         authorName: user.name,
         topicId: topic.id,
@@ -321,17 +356,17 @@ describe('Post Entity', () => {
           id: topic.id,
           name: topic.name,
           createdAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
         },
         series: {
           id: series.id,
           name: series.name,
           topicId: series.topic.id,
           createdAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
         },
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       const ofPost = Post.of(p);
@@ -341,17 +376,27 @@ describe('Post Entity', () => {
       expect(p.author.name).toEqual(ofPost.author.name);
       expect(p.topic.id).toEqual(ofPost.topic.id);
       expect(p.series.id).toEqual(ofPost.series.id);
-    })
+    });
   });
 
   describe('toDto', () => {
     it('ReadPostDto 로 변환', () => {
       const date = new Date();
 
-      const { title, content, thumbnail } = dto;
-      post = new Post(1, title, content, user, topic, series, thumbnail, date, date);
+      const {title, content, thumbnail} = dto;
+      post = new Post(
+        1,
+        title,
+        content,
+        user,
+        topic,
+        series,
+        thumbnail,
+        date,
+        date,
+      );
 
-      const postDto = post.toDto()
+      const postDto = post.toDto();
 
       expect(post.id).toEqual(postDto.id);
       expect(post.title).toEqual(postDto.title);
@@ -367,10 +412,20 @@ describe('Post Entity', () => {
     it('썸네일 없는 ReadPostDto 로 변환', () => {
       const date = new Date();
 
-      const { title, content } = dto;
-      post = new Post(1, title, content, user, topic, series, undefined, date, date);
+      const {title, content} = dto;
+      post = new Post(
+        1,
+        title,
+        content,
+        user,
+        topic,
+        series,
+        undefined,
+        date,
+        date,
+      );
 
-      const postDto = post.toDto()
+      const postDto = post.toDto();
 
       expect(post.id).toEqual(postDto.id);
       expect(post.title).toEqual(postDto.title);
@@ -386,10 +441,20 @@ describe('Post Entity', () => {
     it('시리즈 없는 ReadPostDto 로 변환', () => {
       const date = new Date();
 
-      const { title, content, thumbnail } = dto;
-      post = new Post(1, title, content, user, topic, undefined, thumbnail, date, date);
+      const {title, content, thumbnail} = dto;
+      post = new Post(
+        1,
+        title,
+        content,
+        user,
+        topic,
+        undefined,
+        thumbnail,
+        date,
+        date,
+      );
 
-      const postDto = post.toDto()
+      const postDto = post.toDto();
 
       expect(post.id).toEqual(postDto.id);
       expect(post.title).toEqual(postDto.title);
@@ -405,10 +470,20 @@ describe('Post Entity', () => {
     it('시리즈, 썸네일 없는 ReadPostDto 로 변환', () => {
       const date = new Date();
 
-      const { title, content } = dto;
-      post = new Post(1, title, content, user, topic, undefined, undefined, date, date);
+      const {title, content} = dto;
+      post = new Post(
+        1,
+        title,
+        content,
+        user,
+        topic,
+        undefined,
+        undefined,
+        date,
+        date,
+      );
 
-      const postDto = post.toDto()
+      const postDto = post.toDto();
 
       expect(post.id).toEqual(postDto.id);
       expect(post.title).toEqual(postDto.title);
@@ -421,5 +496,4 @@ describe('Post Entity', () => {
       expect(post.updatedAt).toEqual(postDto.updatedAt);
     });
   });
-
 });

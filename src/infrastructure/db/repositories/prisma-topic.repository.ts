@@ -1,16 +1,15 @@
-import { TopicRepository } from "src/domain/blog/infrastructure/topic/topic.repository";
-import { PrismaService } from "../prisma.service";
-import { Topic } from "src/domain/blog/domain/topic/topic.entity";
-import { Injectable } from "@nestjs/common";
+import {TopicRepository} from 'src/domain/blog/infrastructure/topic/topic.repository';
+import {PrismaService} from '../prisma.service';
+import {Topic} from 'src/domain/blog/domain/topic/topic.entity';
+import {Injectable} from '@nestjs/common';
 
 @Injectable()
 export class PrismaTopicRepository implements TopicRepository {
-  constructor(private readonly prisma: PrismaService) { }
-
+  constructor(private readonly prisma: PrismaService) {}
 
   async findById(id: number): Promise<Topic> {
     const topic = await this.prisma.topic.findUniqueOrThrow({
-      where: { id }
+      where: {id},
     });
 
     return Topic.of(topic);
@@ -18,7 +17,7 @@ export class PrismaTopicRepository implements TopicRepository {
 
   async findByName(name: string): Promise<Topic> {
     const topic = await this.prisma.topic.findUniqueOrThrow({
-      where: { name }
+      where: {name},
     });
 
     return Topic.of(topic);
@@ -26,18 +25,18 @@ export class PrismaTopicRepository implements TopicRepository {
 
   async save(topic: Topic): Promise<Topic> {
     const entity = await this.prisma.topic.create({
-      data: { name: topic.name }
-    })
+      data: {name: topic.name},
+    });
 
     return Topic.of(entity);
   }
 
   async update(topic: Topic): Promise<Topic> {
     const entity = await this.prisma.topic.update({
-      where: { id: topic.id },
+      where: {id: topic.id},
       data: {
-        name: topic.name
-      }
+        name: topic.name,
+      },
     });
 
     return Topic.of(entity);
@@ -45,7 +44,7 @@ export class PrismaTopicRepository implements TopicRepository {
 
   async delete(id: number): Promise<void> {
     await this.prisma.topic.delete({
-      where: { id }
+      where: {id},
     });
   }
 }

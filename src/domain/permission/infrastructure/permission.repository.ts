@@ -1,4 +1,4 @@
-import { Permission } from '../domain/permission.entity';
+import {Permission} from '../domain/permission.entity';
 
 /**
  * IPermissionRepository 인터페이스

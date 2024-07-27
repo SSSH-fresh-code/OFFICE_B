@@ -1,13 +1,13 @@
-import { Module } from '@nestjs/common';
-import { PrismaModule } from './db/prisma.module';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
-import { ClassSerializerInterceptor } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { PagingService } from './common/services/paging.service';
-import { PrismaService } from './db/prisma.service';
-import { PermissionGuard } from './guard/permission.guard';
-import { LoggerModule } from './module/logger.module';
+import {Module} from '@nestjs/common';
+import {PrismaModule} from './db/prisma.module';
+import {APP_GUARD, APP_INTERCEPTOR} from '@nestjs/core';
+import {ClassSerializerInterceptor} from '@nestjs/common';
+import {ConfigModule} from '@nestjs/config';
+import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
+import {PagingService} from './common/services/paging.service';
+import {PrismaService} from './db/prisma.service';
+import {PermissionGuard} from './guard/permission.guard';
+import {LoggerModule} from './module/logger.module';
 
 @Module({
   imports: [
@@ -29,7 +29,13 @@ import { LoggerModule } from './module/logger.module';
     PagingService,
     PrismaService,
   ],
-  exports: [PrismaModule, ConfigModule, PagingService, PrismaService, LoggerModule],
+  exports: [
+    PrismaModule,
+    ConfigModule,
+    PagingService,
+    PrismaService,
+    LoggerModule,
+  ],
 })
 export class InfraModule {
   async configureSwagger(app: any) {

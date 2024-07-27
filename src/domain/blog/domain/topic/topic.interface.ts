@@ -1,8 +1,7 @@
-import { AggregateRoot } from "src/domain/aggregate-root.interface";
-import { ReadTopicDto } from "../../presentation/topic/dto/read-topic.dto";
+import {AggregateRoot} from 'src/domain/aggregate-root.interface';
+import {ReadTopicDto} from '../../presentation/topic/dto/read-topic.dto';
 
 export interface iTopic {
-
   /**
    * 토피 id를 반환합니다.
    */
@@ -28,7 +27,6 @@ export interface iTopic {
    * 수정일을 반환합니다.
    */
   get updatedAt(): Date;
-
 
   /**
    * dto로 변환합니다.

@@ -1,4 +1,4 @@
-import { ChatBot } from "../domain/chatbot.entity";
+import {ChatBot} from '../domain/chatbot.entity';
 
 /**
  * IChatBotRepository 인터페이스

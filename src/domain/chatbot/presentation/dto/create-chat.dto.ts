@@ -1,6 +1,6 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsEnum, IsString } from "class-validator";
-import { MessengerType } from "../../domain/chatbot.entity";
+import {ApiProperty} from '@nestjs/swagger';
+import {IsEnum, IsString} from 'class-validator';
+import {MessengerType} from '../../domain/chatbot.entity';
 
 export class CreateChatDto {
   @ApiProperty({

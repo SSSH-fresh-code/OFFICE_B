@@ -1,6 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
-import { PagingDto } from 'src/infrastructure/common/dto/paging.dto';
+import {ApiProperty} from '@nestjs/swagger';
+import {IsOptional, IsString} from 'class-validator';
+import {PagingDto} from 'src/infrastructure/common/dto/paging.dto';
 
 export class PagingTopicDto extends PagingDto {
   @IsOptional()
@@ -8,8 +8,7 @@ export class PagingTopicDto extends PagingDto {
   @ApiProperty({
     description: '이름 필터링(부분 일치)',
     example: '',
-    required: false
+    required: false,
   })
   like__name?: string;
-
 }

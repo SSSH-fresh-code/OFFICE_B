@@ -1,24 +1,24 @@
-import { PagingService } from "src/infrastructure/common/services/paging.service";
-import { TopicRepository } from "../../infrastructure/topic/topic.repository";
-import { iTopicService } from "./topic.service.interface";
-import { Test, TestingModule } from "@nestjs/testing";
-import { TopicService } from "./topic.service";
-import { TOPIC_REPOSITORY } from "../../blog.const";
-import { CreateTopicDto } from "../../presentation/topic/dto/create-topic.dto";
-import { UpdateTopicDto } from "../../presentation/topic/dto/update-topic.dto";
-import { Topic } from "../../domain/topic/topic.entity";
-import { PagingTopicDto } from "../../presentation/topic/dto/paging-topic.dto";
+import {PagingService} from 'src/infrastructure/common/services/paging.service';
+import {TopicRepository} from '../../infrastructure/topic/topic.repository';
+import {iTopicService} from './topic.service.interface';
+import {Test, TestingModule} from '@nestjs/testing';
+import {TopicService} from './topic.service';
+import {TOPIC_REPOSITORY} from '../../blog.const';
+import {CreateTopicDto} from '../../presentation/topic/dto/create-topic.dto';
+import {UpdateTopicDto} from '../../presentation/topic/dto/update-topic.dto';
+import {Topic} from '../../domain/topic/topic.entity';
+import {PagingTopicDto} from '../../presentation/topic/dto/paging-topic.dto';
 
 const mockTopicRepository = (): TopicRepository => ({
   findById: jest.fn(),
   findByName: jest.fn(),
   save: jest.fn(),
   update: jest.fn(),
-  delete: jest.fn()
+  delete: jest.fn(),
 });
 
 const mockPagingService = () => ({
-  getPagedResults: jest.fn()
+  getPagedResults: jest.fn(),
 });
 
 describe('TopicService', () => {
@@ -28,21 +28,21 @@ describe('TopicService', () => {
   let topic: Topic;
 
   const createDto: CreateTopicDto = {
-    name: "Test Topic"
-  }
+    name: 'Test Topic',
+  };
 
   const updateDto: UpdateTopicDto = {
     id: 1,
-    name: "Test Topic2"
-  }
+    name: 'Test Topic2',
+  };
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         TopicService,
-        { provide: TOPIC_REPOSITORY, useFactory: mockTopicRepository },
-        { provide: PagingService, useFactory: mockPagingService }
-      ]
+        {provide: TOPIC_REPOSITORY, useFactory: mockTopicRepository},
+        {provide: PagingService, useFactory: mockPagingService},
+      ],
     }).compile();
 
     topicService = module.get<TopicService>(TopicService);
@@ -50,7 +50,9 @@ describe('TopicService', () => {
     pagingService = module.get<PagingService<Topic>>(PagingService);
   });
 
-  beforeEach(() => { topic = new Topic(updateDto.id, createDto.name) })
+  beforeEach(() => {
+    topic = new Topic(updateDto.id, createDto.name);
+  });
 
   describe('getTopicByName', () => {
     it('정상적으로 name으로 주제를 조회합니다.', async () => {
@@ -71,20 +73,21 @@ describe('TopicService', () => {
         page: 1,
         take: 10,
         orderby: 'createdAt',
-        direction: 'desc'
-      }
+        direction: 'desc',
+      };
 
       pagingService.getPagedResults.mockResolvedValue({
-        data: [topic], total: 1
+        data: [topic],
+        total: 1,
       });
 
       const result = await topicService.getTopics(dto);
 
       expect(pagingService.getPagedResults).toHaveBeenCalledWith(
-        'Topic'
-        , dto
-        , {}
-      )
+        'Topic',
+        dto,
+        {},
+      );
       expect(result.total).toEqual(1);
     });
 
@@ -94,20 +97,19 @@ describe('TopicService', () => {
         page: 1,
         take: 10,
         orderby: 'createdAt',
-        direction: 'desc'
-      }
+        direction: 'desc',
+      };
 
       pagingService.getPagedResults.mockResolvedValue({
-        data: [topic], total: 1
+        data: [topic],
+        total: 1,
       });
 
       const result = await topicService.getTopics(dto);
 
-      expect(pagingService.getPagedResults).toHaveBeenCalledWith(
-        'Topic'
-        , dto
-        , { like__name: 'test' }
-      )
+      expect(pagingService.getPagedResults).toHaveBeenCalledWith('Topic', dto, {
+        like__name: 'test',
+      });
       expect(result.total).toEqual(1);
     });
   });
@@ -119,14 +121,16 @@ describe('TopicService', () => {
       const result = await topicService.createTopic(createDto);
 
       expect(result).toEqual(topic.toDto());
-      expect(repository.save).toHaveBeenCalledWith(new Topic(0, createDto.name));
+      expect(repository.save).toHaveBeenCalledWith(
+        new Topic(0, createDto.name),
+      );
     });
   });
 
   describe('updateTopic', () => {
     it('토픽을 수정합니다.', async () => {
       const updatedTopic = topic;
-      updatedTopic.name = "updated";
+      updatedTopic.name = 'updated';
 
       repository.findById.mockResolvedValue(topic);
       repository.update.mockResolvedValue(updatedTopic);
@@ -135,7 +139,9 @@ describe('TopicService', () => {
 
       expect(result).toEqual(updatedTopic.toDto());
       expect(repository.findById).toHaveBeenCalledWith(updateDto.id);
-      expect(repository.update).toHaveBeenCalledWith(new Topic(updateDto.id, updateDto.name));
+      expect(repository.update).toHaveBeenCalledWith(
+        new Topic(updateDto.id, updateDto.name),
+      );
     });
   });
 

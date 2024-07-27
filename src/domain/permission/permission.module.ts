@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
-import { PermissionController } from './presentation/permission.controller';
-import { InfraModule } from '../../infrastructure/infra.module';
-import { PrismaPermissionRepository } from '../../infrastructure/db/repositories/prisma-permission.repository';
-import { PERMISSION_REPOSITORY } from './permission.const';
-import { PermissionService } from './application/permission.service';
+import {Module} from '@nestjs/common';
+import {PermissionController} from './presentation/permission.controller';
+import {InfraModule} from '../../infrastructure/infra.module';
+import {PrismaPermissionRepository} from '../../infrastructure/db/repositories/prisma-permission.repository';
+import {PERMISSION_REPOSITORY} from './permission.const';
+import {PermissionService} from './application/permission.service';
 
 @Module({
   imports: [InfraModule],
@@ -16,4 +16,4 @@ import { PermissionService } from './application/permission.service';
   ],
   controllers: [PermissionController],
 })
-export class PermissionModule { }
+export class PermissionModule {}

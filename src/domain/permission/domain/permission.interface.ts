@@ -1,6 +1,6 @@
 // src/domain/permission/domain/permission.interface.ts
 
-import { AggregateRoot } from "../../../domain/aggregate-root.interface";
+import {AggregateRoot} from '../../../domain/aggregate-root.interface';
 
 export interface IPermission extends AggregateRoot {
   /**

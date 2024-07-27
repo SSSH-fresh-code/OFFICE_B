@@ -1,9 +1,9 @@
 // src/infrastructure/services/paging.service.ts
-import { PrismaService } from '../../db/prisma.service';
-import { PagingDto } from '../dto/paging.dto';
-import { Prisma } from '@prisma/client';
-import { Injectable } from '@nestjs/common';
-import { iPagingService } from './paging.interface';
+import {PrismaService} from '../../db/prisma.service';
+import {PagingDto} from '../dto/paging.dto';
+import {Prisma} from '@prisma/client';
+import {Injectable} from '@nestjs/common';
+import {iPagingService} from './paging.interface';
 
 export interface WhereClause {
   [key: string]: string;
@@ -13,7 +13,7 @@ export interface OrderByClause {
   [key: string]: Prisma.SortOrder;
 }
 
-export type Page<T> = { data: T[]; total: number };
+export type Page<T> = {data: T[]; total: number};
 
 /**
  * 공통 페이징 서비스 클래스
@@ -21,7 +21,7 @@ export type Page<T> = { data: T[]; total: number };
  */
 @Injectable()
 export class PagingService<T> implements iPagingService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   /**
    * 페이징 결과를 가져옵니다.
@@ -36,23 +36,22 @@ export class PagingService<T> implements iPagingService {
     pagingDto: PagingDto,
     where?: WhereClause,
   ): Promise<Page<T>> {
-    const { page, orderby, direction } = pagingDto;
+    const {page, orderby, direction} = pagingDto;
 
     const take = Number(pagingDto.take);
     const skip = (page - 1) * take;
-    const order = orderby ? { [orderby]: direction } : { id: 'desc' };
+    const order = orderby ? {[orderby]: direction} : {id: 'desc'};
     const include = {};
 
     where = this.parseWhereClause(pagingDto, where);
 
-    if (model === "Series") {
-      include["topic"] = true;
-    } else if (model === "Post") {
-      include["author"] = true;
-      include["topic"] = true;
-      include["series"] = true;
+    if (model === 'Series') {
+      include['topic'] = true;
+    } else if (model === 'Post') {
+      include['author'] = true;
+      include['topic'] = true;
+      include['series'] = true;
     }
-
 
     const [data, total] = await this.prisma.$transaction([
       this.prisma[model].findMany({
@@ -60,15 +59,18 @@ export class PagingService<T> implements iPagingService {
         skip,
         take,
         orderBy: order,
-        include
+        include,
       }),
-      this.prisma[model].count({ where }),
+      this.prisma[model].count({where}),
     ]);
 
-    return { data, total };
+    return {data, total};
   }
 
-  private parseWhereClause(pagingDto: PagingDto, where?: WhereClause): WhereClause {
+  private parseWhereClause(
+    pagingDto: PagingDto,
+    where?: WhereClause,
+  ): WhereClause {
     const result = {};
     if (where) {
       for (const key of Object.keys(where)) {
@@ -84,8 +86,8 @@ export class PagingService<T> implements iPagingService {
             break;
           case 'like':
             result[splitKey[1]] = {
-              contains: where[key]
-            }
+              contains: where[key],
+            };
             break;
           default:
             break;
@@ -107,8 +109,8 @@ export class PagingService<T> implements iPagingService {
             break;
           case 'like':
             result[splitKey[1]] = {
-              contains: pagingDto[key]
-            }
+              contains: pagingDto[key],
+            };
             break;
           default:
             break;

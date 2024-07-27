@@ -1,19 +1,22 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { UserRepository } from '../infrastructure/user.repository';
-import { USER_REPOSITORY } from '../user.const';
-import { Page, PagingService } from '../../../infrastructure/common/services/paging.service';
-import { User } from '../domain/user.entity';
-import { ReadUserDto } from '../presentation/dto/read-user.dto';
-import { UserPagingDto } from '../presentation/dto/user-paging.dto';
-import { v4 as uuidv4 } from 'uuid';
-import { UpdateUserDto } from '../presentation/dto/update-user.dto';
+import {Injectable, Inject} from '@nestjs/common';
+import {UserRepository} from '../infrastructure/user.repository';
+import {USER_REPOSITORY} from '../user.const';
+import {
+  Page,
+  PagingService,
+} from '../../../infrastructure/common/services/paging.service';
+import {User} from '../domain/user.entity';
+import {ReadUserDto} from '../presentation/dto/read-user.dto';
+import {UserPagingDto} from '../presentation/dto/user-paging.dto';
+import {v4 as uuidv4} from 'uuid';
+import {UpdateUserDto} from '../presentation/dto/update-user.dto';
 
 @Injectable()
 export class UserService {
   constructor(
     @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
     private readonly pagingService: PagingService<User>,
-  ) { }
+  ) {}
 
   async createUser(
     email: string,

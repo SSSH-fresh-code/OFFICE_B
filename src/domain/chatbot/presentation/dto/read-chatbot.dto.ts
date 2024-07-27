@@ -1,6 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { MessengerType } from '../../domain/chatbot.entity';
-import { ReadChatDto } from './read-chat.dto';
+import {ApiProperty} from '@nestjs/swagger';
+import {MessengerType} from '../../domain/chatbot.entity';
+import {ReadChatDto} from './read-chat.dto';
 export class ReadChatBotDto {
   @ApiProperty({
     description: '챗봇 ID(internal)',
@@ -56,4 +56,3 @@ export class ReadChatBotDto {
   })
   updatedAt: Date;
 }
-

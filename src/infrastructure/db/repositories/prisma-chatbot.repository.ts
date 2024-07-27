@@ -1,11 +1,14 @@
-import { Injectable } from '@nestjs/common';
-import { IChatBotRepository } from '../../../domain/chatbot/infrastructure/chatbot.repository';
-import { PrismaService } from '../prisma.service';
-import { ChatBot, MessengerType } from '../../../domain/chatbot/domain/chatbot.entity';
+import {Injectable} from '@nestjs/common';
+import {IChatBotRepository} from '../../../domain/chatbot/infrastructure/chatbot.repository';
+import {PrismaService} from '../prisma.service';
+import {
+  ChatBot,
+  MessengerType,
+} from '../../../domain/chatbot/domain/chatbot.entity';
 
 @Injectable()
 export class PrismaChatBotRepository implements IChatBotRepository {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
   async createChatBot(bot: ChatBot): Promise<ChatBot> {
     const savedBot = await this.prisma.chatBot.create({
       data: {
@@ -13,8 +16,8 @@ export class PrismaChatBotRepository implements IChatBotRepository {
         token: bot.token,
         name: bot.name,
         description: bot.description,
-        type: bot.type
-      }
+        type: bot.type,
+      },
     });
 
     return ChatBot.of(savedBot);
@@ -22,7 +25,7 @@ export class PrismaChatBotRepository implements IChatBotRepository {
 
   async updateChatBot(bot: ChatBot, chatIds: number[] = []): Promise<ChatBot> {
     const updatedBot = await this.prisma.chatBot.update({
-      where: { id: bot.id },
+      where: {id: bot.id},
       data: {
         botId: bot.botId,
         token: bot.token,
@@ -30,14 +33,14 @@ export class PrismaChatBotRepository implements IChatBotRepository {
         description: bot.description,
         type: bot.type,
         chats: {
-          set: chatIds.map(i => ({
-            id: i
-          }))
-        }
+          set: chatIds.map((i) => ({
+            id: i,
+          })),
+        },
       },
       include: {
-        chats: true
-      }
+        chats: true,
+      },
     });
 
     return ChatBot.of(updatedBot);
@@ -45,15 +48,14 @@ export class PrismaChatBotRepository implements IChatBotRepository {
 
   async deleteChatBot(id: number): Promise<void> {
     await this.prisma.chatBot.delete({
-      where: { id },
-
+      where: {id},
     });
   }
 
   async findChatBotById(id: number): Promise<ChatBot> {
     const bot = await this.prisma.chatBot.findUniqueOrThrow({
-      where: { id },
-      include: { chats: true }
+      where: {id},
+      include: {chats: true},
     });
 
     return ChatBot.of(bot);

@@ -1,6 +1,6 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsDate, IsObject, IsString } from "class-validator";
-import { ReadTopicDto } from "../../topic/dto/read-topic.dto";
+import {ApiProperty} from '@nestjs/swagger';
+import {IsDate, IsObject, IsString} from 'class-validator';
+import {ReadTopicDto} from '../../topic/dto/read-topic.dto';
 
 export class ReadSeriesDto {
   @ApiProperty({
@@ -11,14 +11,14 @@ export class ReadSeriesDto {
 
   @ApiProperty({
     description: '시리즈 이름',
-    example: "sample",
+    example: 'sample',
   })
   @IsString()
   name: string;
 
   @ApiProperty({
     description: '시리즈 주제',
-    example: {}
+    example: {},
   })
   @IsObject()
   topic: ReadTopicDto;

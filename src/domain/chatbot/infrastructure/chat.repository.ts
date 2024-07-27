@@ -1,5 +1,5 @@
-import { Chat } from "../domain/chat.entity";
-import { MessengerType } from "../domain/chatbot.entity";
+import {Chat} from '../domain/chat.entity';
+import {MessengerType} from '../domain/chatbot.entity';
 
 /**
  * IChatRepository 인터페이스

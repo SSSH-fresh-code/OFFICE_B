@@ -1,8 +1,8 @@
-import { Page } from "src/infrastructure/common/services/paging.service";
-import { PagingPostDto } from "../../presentation/post/dto/paging-post.dto";
-import { ReadPostDto } from "../../presentation/post/dto/read-post.dto";
-import { CreatePostDto } from "../../presentation/post/dto/create-post.dto";
-import { UpdatePostDto } from "../../presentation/post/dto/update-post.dto";
+import {Page} from 'src/infrastructure/common/services/paging.service';
+import {PagingPostDto} from '../../presentation/post/dto/paging-post.dto';
+import {ReadPostDto} from '../../presentation/post/dto/read-post.dto';
+import {CreatePostDto} from '../../presentation/post/dto/create-post.dto';
+import {UpdatePostDto} from '../../presentation/post/dto/update-post.dto';
 
 export interface iPostService {
   getPostById(id: number): Promise<ReadPostDto>;

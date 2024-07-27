@@ -1,8 +1,8 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsDate, IsObject, IsOptional, IsString } from "class-validator";
-import { ReadTopicDto } from "../../topic/dto/read-topic.dto";
-import { ReadSeriesDto } from "../../series/dto/read-series.dto";
-import { ReadUserDto } from "src/domain/user/presentation/dto/read-user.dto";
+import {ApiProperty} from '@nestjs/swagger';
+import {IsDate, IsObject, IsOptional, IsString} from 'class-validator';
+import {ReadTopicDto} from '../../topic/dto/read-topic.dto';
+import {ReadSeriesDto} from '../../series/dto/read-series.dto';
+import {ReadUserDto} from 'src/domain/user/presentation/dto/read-user.dto';
 
 export class ReadPostDto {
   @ApiProperty({
@@ -13,21 +13,21 @@ export class ReadPostDto {
 
   @ApiProperty({
     description: '게시글 제목',
-    example: "sample",
+    example: 'sample',
   })
   @IsString()
   title: string;
 
   @ApiProperty({
     description: '게시글 내용',
-    example: "sample",
+    example: 'sample',
   })
   @IsString()
   content: string;
 
   @ApiProperty({
     description: '게시글 썸네일',
-    example: "sample",
+    example: 'sample',
   })
   @IsOptional()
   @IsString()
@@ -35,21 +35,21 @@ export class ReadPostDto {
 
   @ApiProperty({
     description: '게시글 작성자',
-    example: {}
+    example: {},
   })
   @IsObject()
   author: ReadUserDto;
 
   @ApiProperty({
     description: '게시글 주제',
-    example: {}
+    example: {},
   })
   @IsObject()
   topic: ReadTopicDto;
 
   @ApiProperty({
     description: '게시글 시리즈',
-    example: {}
+    example: {},
   })
   @IsOptional()
   @IsObject()

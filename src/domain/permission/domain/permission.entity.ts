@@ -1,6 +1,6 @@
-import { ReadPermissionDto } from "../presentation/dto/read-permission.dto";
-import { IPermission } from "./permission.interface";
-import { Permission as PrismaPermission } from "@prisma/client";
+import {ReadPermissionDto} from '../presentation/dto/read-permission.dto';
+import {IPermission} from './permission.interface';
+import {Permission as PrismaPermission} from '@prisma/client';
 /**
  * Permission 엔티티 클래스
  */
@@ -10,7 +10,7 @@ export class Permission implements IPermission {
     private _description?: string,
     private _createdAt?: Date,
     private _updatedAt?: Date,
-  ) { }
+  ) {}
 
   static of(permission: PrismaPermission): Permission {
     return new Permission(
@@ -18,7 +18,7 @@ export class Permission implements IPermission {
       permission.description,
       permission.createdAt,
       permission.updatedAt,
-    )
+    );
   }
 
   /**
@@ -76,9 +76,9 @@ export class Permission implements IPermission {
       description: this._description,
       createdAt: this._createdAt,
       updatedAt: this._updatedAt,
-    }
+    };
   }
   validate(): void {
-    throw new Error("not implements");
+    throw new Error('not implements');
   }
 }

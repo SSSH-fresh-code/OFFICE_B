@@ -1,7 +1,7 @@
-import { IsOptional, IsString, IsInt, Min, IsEnum } from 'class-validator';
-import { PagingDto } from '../../../../infrastructure/common/dto/paging.dto';
-import { ApiProperty } from '@nestjs/swagger';
-import { MessengerType } from '../../domain/chatbot.entity';
+import {IsOptional, IsString, IsInt, Min, IsEnum} from 'class-validator';
+import {PagingDto} from '../../../../infrastructure/common/dto/paging.dto';
+import {ApiProperty} from '@nestjs/swagger';
+import {MessengerType} from '../../domain/chatbot.entity';
 
 /**
  * 챗봇 페이징 DTO 클래스

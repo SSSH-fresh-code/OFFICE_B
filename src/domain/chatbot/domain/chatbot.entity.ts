@@ -1,10 +1,10 @@
-import { SsshException } from '../../../infrastructure/filter/exception/sssh.exception';
-import { Chat } from './chat.entity';
-import { iChatBot } from './chatbot.interface';
-import { Chat as PrismaChat, ChatBot as PrismaChatBot } from "@prisma/client";
-import { ExceptionEnum } from '../../../infrastructure/filter/exception/exception.enum';
-import { HttpStatus, Logger } from '@nestjs/common';
-import { ReadChatBotDto } from '../presentation/dto/read-chatbot.dto';
+import {SsshException} from '../../../infrastructure/filter/exception/sssh.exception';
+import {Chat} from './chat.entity';
+import {iChatBot} from './chatbot.interface';
+import {Chat as PrismaChat, ChatBot as PrismaChatBot} from '@prisma/client';
+import {ExceptionEnum} from '../../../infrastructure/filter/exception/exception.enum';
+import {HttpStatus, Logger} from '@nestjs/common';
+import {ReadChatBotDto} from '../presentation/dto/read-chatbot.dto';
 
 /**
  * ChatBot 엔티티 클래스
@@ -28,8 +28,16 @@ export class ChatBot implements iChatBot {
   }
 
   static of({
-    id, botId, token, name, description, type, chats, createdAt, updatedAt
-  }: PrismaChatBot & { chats?: PrismaChat[] }) {
+    id,
+    botId,
+    token,
+    name,
+    description,
+    type,
+    chats,
+    createdAt,
+    updatedAt,
+  }: PrismaChatBot & {chats?: PrismaChat[]}) {
     let messengerType = MessengerType.TELEGRAM;
 
     switch (type) {
@@ -48,13 +56,15 @@ export class ChatBot implements iChatBot {
       name,
       description,
       messengerType,
-      chats ? chats.map(c => new Chat(c.id, c.chatId, c.name, MessengerType[c.type])) : [],
+      chats
+        ? chats.map(
+            (c) => new Chat(c.id, c.chatId, c.name, MessengerType[c.type]),
+          )
+        : [],
       createdAt,
-      updatedAt
+      updatedAt,
     );
   }
-
-
 
   /**
    * ID getter
@@ -84,11 +94,9 @@ export class ChatBot implements iChatBot {
     return this._token;
   }
 
-
   public set token(token: string) {
     this._token = token;
   }
-
 
   /**
    * 이름 getter
@@ -98,11 +106,9 @@ export class ChatBot implements iChatBot {
     return this._name;
   }
 
-
   public set name(name: string) {
     this._name = name;
   }
-
 
   /**
    * 설명 getter
@@ -145,7 +151,7 @@ export class ChatBot implements iChatBot {
    * @param chatId 삭제할 채팅의 ID
    */
   removeChat(chatId: string): void {
-    this._chats = this._chats.filter(chat => chat.chatId !== chatId);
+    this._chats = this._chats.filter((chat) => chat.chatId !== chatId);
   }
 
   clearChat(): void {
@@ -153,19 +159,22 @@ export class ChatBot implements iChatBot {
   }
 
   validate(): void {
-    if (
-      !this._botId ||
-      !this._token ||
-      !this._name ||
-      !this._type
-    ) {
-      throw new SsshException(ExceptionEnum.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+    if (!this._botId || !this._token || !this._name || !this._type) {
+      throw new SsshException(
+        ExceptionEnum.INTERNAL_SERVER_ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
 
     for (const chat of this._chats) {
       if (chat.type != this._type) {
-        this.logger.error("ChatBot.validate() - 하위 채팅방의 타입이 상위 챗봇과 일치하지 않습니다.");
-        throw new SsshException(ExceptionEnum.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+        this.logger.error(
+          'ChatBot.validate() - 하위 채팅방의 타입이 상위 챗봇과 일치하지 않습니다.',
+        );
+        throw new SsshException(
+          ExceptionEnum.INTERNAL_SERVER_ERROR,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
     }
   }
@@ -178,10 +187,10 @@ export class ChatBot implements iChatBot {
       name: this._name,
       description: this._description,
       type: this._type,
-      chats: this._chats.map(chat => chat.toDto()),
+      chats: this._chats.map((chat) => chat.toDto()),
       createdAt: this._createdAt,
       updatedAt: this._updatedAt,
-    }
+    };
   }
 }
 
