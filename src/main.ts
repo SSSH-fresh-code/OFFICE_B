@@ -1,5 +1,3 @@
-import {WinstonModule} from 'nest-winston';
-import {permission} from 'process';
 import {NestFactory} from '@nestjs/core';
 import {AppModule} from './app.module';
 import {InfraModule} from './infrastructure/infra.module';
@@ -8,7 +6,6 @@ import {PrismaClientExceptionFilter} from './infrastructure/filter/exception/pri
 import * as session from 'express-session';
 import * as passport from 'passport';
 import * as SQLiteStore from 'connect-sqlite3';
-import {User} from './domain/user/domain/user.entity';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -22,7 +19,7 @@ async function bootstrap() {
       secret: 'your_secret_key', // 적절한 비밀 키로 변경하세요
       resave: false,
       saveUninitialized: false,
-      cookie: {maxAge: 3600000}, // 세션 쿠키의 유효기간 (예: 1시간)
+      cookie: {maxAge: 3600000, sameSite: 'none', httpOnly: true}, // 세션 쿠키의 유효기간 (예: 1시간)
     }),
   );
 
@@ -35,6 +32,11 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new PrismaClientExceptionFilter());
 
+  app.enableCors({
+    origin: ['http://localhost:5173'],
+    credentials: true,
+    allowedHeaders: ['content-type'],
+  });
   await app.listen(3000);
 }
 bootstrap();

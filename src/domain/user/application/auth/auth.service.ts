@@ -38,7 +38,7 @@ export class AuthService {
       } else if (user.validatePassword(password)) {
         this.logger.info(`로그인 `, {email: user.email});
 
-        return user;
+        return user.toDto();
       }
     }
 

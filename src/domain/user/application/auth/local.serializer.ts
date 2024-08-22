@@ -1,6 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import {PassportSerializer} from '@nestjs/passport';
-import {User} from '../../domain/user.entity';
+import {ReadUserDto} from '../../presentation/dto/read-user.dto';
 
 @Injectable()
 export class LocalSerializer extends PassportSerializer {
@@ -8,7 +8,7 @@ export class LocalSerializer extends PassportSerializer {
     super();
   }
 
-  serializeUser(user: User, done: CallableFunction) {
+  serializeUser(user: ReadUserDto, done: CallableFunction) {
     const {id, permissions} = user;
     done(null, `${id}:${permissions.join(',')}`);
   }

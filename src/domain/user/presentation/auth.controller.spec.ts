@@ -55,7 +55,7 @@ describe('AuthController', () => {
       const res = {send: jest.fn()} as unknown as Response;
 
       await authController.login(req, res);
-      expect(res.send).toHaveBeenCalledWith({message: '로그인 성공'});
+      expect(res.send).toHaveBeenCalledWith({user: undefined});
     });
   });
 

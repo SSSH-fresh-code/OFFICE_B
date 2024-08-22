@@ -161,6 +161,7 @@ export class User implements iUser {
       id: this._id,
       email: this.email,
       name: this._name,
+      permissions: this._permissions,
       createdAt: this._createdAt,
       updatedAt: this._updatedAt,
     };

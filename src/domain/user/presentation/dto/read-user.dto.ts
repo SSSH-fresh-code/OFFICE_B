@@ -20,6 +20,12 @@ export class ReadUserDto {
   name: string;
 
   @ApiProperty({
+    description: '권한',
+    example: ['LOGIN001'],
+  })
+  permissions: string[];
+
+  @ApiProperty({
     description: '계정 생성일',
     example: '2023-01-01T00:00:00.000Z',
   })

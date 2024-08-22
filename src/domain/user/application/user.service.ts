@@ -59,13 +59,7 @@ export class UserService {
   async getUserById(id: string): Promise<ReadUserDto> {
     const user = await this.userRepository.findById(id);
 
-    return {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    };
+    return user.toDto();
   }
 
   async getUserByEmailForLogin(email: string): Promise<User | null> {

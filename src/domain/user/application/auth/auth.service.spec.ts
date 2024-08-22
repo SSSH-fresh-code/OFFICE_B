@@ -46,7 +46,7 @@ describe('AuthService', () => {
         'test@example.com',
         'password123',
       );
-      expect(result).toEqual(user);
+      expect(result).toEqual(user.toDto());
       expect(userService.getUserByEmailForLogin).toHaveBeenCalledWith(
         'test@example.com',
       );
