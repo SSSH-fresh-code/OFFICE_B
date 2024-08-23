@@ -2,6 +2,7 @@ import {Module} from '@nestjs/common';
 import {InfraModule} from 'src/infrastructure/infra.module';
 import {TopicService} from './application/topic/topic.service';
 import {
+  BLOG_SERVICE,
   POST_REPOSITORY,
   POST_SERVICE,
   SERIES_REPOSITORY,
@@ -18,6 +19,8 @@ import {PrismaPostRepository} from 'src/infrastructure/db/repositories/prisma-po
 import {USER_REPOSITORY} from '../user/user.const';
 import {PrismaUserRepository} from 'src/infrastructure/db/repositories/prisma-user.repository';
 import {PostController} from './presentation/post/post.controller';
+import {BlogService} from './application/blog.service';
+import {BlogController} from './presentation/blog.controller';
 
 @Module({
   imports: [InfraModule],
@@ -47,7 +50,16 @@ import {PostController} from './presentation/post/post.controller';
       provide: POST_SERVICE,
       useClass: PostService,
     },
+    {
+      provide: BLOG_SERVICE,
+      useClass: BlogService,
+    },
   ],
-  controllers: [TopicController, SeriesController, PostController],
+  controllers: [
+    TopicController,
+    SeriesController,
+    PostController,
+    BlogController,
+  ],
 })
 export class BlogModule {}
