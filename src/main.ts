@@ -19,7 +19,7 @@ async function bootstrap() {
       secret: 'your_secret_key', // 적절한 비밀 키로 변경하세요
       resave: false,
       saveUninitialized: false,
-      cookie: {maxAge: 3600000, secure: 'auto', httpOnly: true}, // 세션 쿠키의 유효기간 (예: 1시간)
+      cookie: {maxAge: 36000000, secure: 'auto', httpOnly: true}, // 세션 쿠키의 유효기간 (예: 1시간)
     }),
   );
 
