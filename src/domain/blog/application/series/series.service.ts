@@ -25,6 +25,12 @@ export class SeriesService implements iSeriesService {
     private readonly seriesRepository: SeriesRepository,
     private readonly pagingService: PagingService<PrismaSeries>,
   ) {}
+  async getSeriesByTopicIdForSelect(
+    topicId: number,
+  ): Promise<Pick<ReadSeriesDto, 'id' | 'name'>[]> {
+    const series = await this.seriesRepository.findAllByTopicId(topicId);
+    return series;
+  }
 
   async getSeriesByName(name: string): Promise<ReadSeriesDto> {
     const series = await this.seriesRepository.findByName(name);
@@ -50,7 +56,7 @@ export class SeriesService implements iSeriesService {
       data: series.data.map((t: PrismaSeries & {topic: PrismaTopic}) => {
         return Series.of(t, Topic.of(t.topic)).toDto();
       }),
-      total: series.total,
+      info: series.info,
     };
   }
 

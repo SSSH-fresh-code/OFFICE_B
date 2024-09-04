@@ -77,7 +77,7 @@ export class ChatService {
 
     return {
       data: pagingChats.data.map((chat) => Chat.of(chat).toDto()),
-      total: pagingChats.total,
+      info: pagingChats.info,
     };
   }
 }

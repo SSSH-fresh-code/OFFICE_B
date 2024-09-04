@@ -1,4 +1,4 @@
-import {Controller, Post, Body, Param, Put, Query, Get} from '@nestjs/common';
+import {Body, Controller, Get, Param, Post, Put, Query} from '@nestjs/common';
 import {UserService} from '../application/user.service';
 import {CreateUserDto} from './dto/create-user.dto';
 import {ApiBody, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
@@ -8,11 +8,11 @@ import {ReadUserDto} from './dto/read-user.dto';
 import {UpdateUserDto} from './dto/update-user.dto';
 import {UpdateUserPermissonDto} from './dto/update-userPermission.dto';
 import {PermissionsMethod} from '../../../infrastructure/decorator/permissions.decorator';
-import {PermissionEnum} from '../../../domain/permission/domain/permission.enum';
+import {PermissionEnum} from '../../permission/domain/permission.enum';
 import {Page} from '../../../infrastructure/common/services/paging.service';
 
-@ApiTags('users')
-@Controller('users')
+@ApiTags('user')
+@Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -24,7 +24,7 @@ export class UserController {
   })
   @ApiResponse({status: 400, description: '잘못된 파라미터 값'})
   @ApiBody({type: CreateUserDto})
-  async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
+  async createUser(@Body() createUserDto: CreateUserDto): Promise<ReadUserDto> {
     const {email, password, name} = createUserDto;
     return this.userService.createUser(email, password, name);
   }
@@ -52,7 +52,7 @@ export class UserController {
   @PermissionsMethod(PermissionEnum.CAN_USE_USER, PermissionEnum.CAN_WRITE_USER)
   async updateUserName(
     @Body() updateUserDto: UpdateUserDto,
-  ): Promise<User | null> {
+  ): Promise<ReadUserDto | null> {
     return this.userService.updateUserName(updateUserDto);
   }
 

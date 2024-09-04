@@ -12,6 +12,7 @@ import {PagingTopicDto} from '../../presentation/topic/dto/paging-topic.dto';
 const mockTopicRepository = (): TopicRepository => ({
   findById: jest.fn(),
   findByName: jest.fn(),
+  findAll: jest.fn(),
   save: jest.fn(),
   update: jest.fn(),
   delete: jest.fn(),
@@ -54,6 +55,18 @@ describe('TopicService', () => {
     topic = new Topic(updateDto.id, createDto.name);
   });
 
+  describe('getTopicForSelect', () => {
+    it('정상적으로 주제를 조회합니다.', async () => {
+      const topicsForSelect = [{id: topic.id, name: topic.name}];
+      repository.findAll.mockResolvedValue(topicsForSelect);
+
+      const result = await topicService.getTopicForSelect();
+
+      expect(result).toEqual(topicsForSelect);
+      expect(repository.findAll).toHaveBeenCalledWith();
+    });
+  });
+
   describe('getTopicByName', () => {
     it('정상적으로 name으로 주제를 조회합니다.', async () => {
       repository.findByName.mockResolvedValue(topic);
@@ -78,7 +91,12 @@ describe('TopicService', () => {
 
       pagingService.getPagedResults.mockResolvedValue({
         data: [topic],
-        total: 1,
+        info: {
+          total: 1,
+          page: 1,
+          current: 1,
+          take: 10,
+        },
       });
 
       const result = await topicService.getTopics(dto);
@@ -88,7 +106,7 @@ describe('TopicService', () => {
         dto,
         {},
       );
-      expect(result.total).toEqual(1);
+      expect(result.info.total).toEqual(1);
     });
 
     it('name을 like로 검색하여 조회합니다.', async () => {
@@ -102,7 +120,12 @@ describe('TopicService', () => {
 
       pagingService.getPagedResults.mockResolvedValue({
         data: [topic],
-        total: 1,
+        info: {
+          total: 1,
+          page: 1,
+          current: 1,
+          take: 10,
+        },
       });
 
       const result = await topicService.getTopics(dto);
@@ -110,7 +133,7 @@ describe('TopicService', () => {
       expect(pagingService.getPagedResults).toHaveBeenCalledWith('Topic', dto, {
         like__name: 'test',
       });
-      expect(result.total).toEqual(1);
+      expect(result.info.total).toEqual(1);
     });
   });
 

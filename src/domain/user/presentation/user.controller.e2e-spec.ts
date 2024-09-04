@@ -3,7 +3,7 @@ import {INestApplication, ValidationPipe} from '@nestjs/common';
 import * as request from 'supertest';
 import {AppModule} from '../../../app.module';
 import {PrismaService} from '../../../infrastructure/db/prisma.service';
-import {PermissionEnum} from '../../../domain/permission/domain/permission.enum';
+import {PermissionEnum} from '../../permission/domain/permission.enum';
 import * as session from 'express-session';
 import {ExceptionEnum} from '../../../infrastructure/filter/exception/exception.enum';
 import {PrismaClientExceptionFilter} from '../../../infrastructure/filter/exception/prisma-exception.filter';
@@ -78,10 +78,10 @@ describe('AppController (e2e)', () => {
     await prismaService.cleanDatabase(['User']);
   });
 
-  describe('GET - /users', () => {
+  describe('GET - /user', () => {
     it('유저가 없는 경우 유저 목록 조회', async () => {
       const response = await request(app.getHttpServer())
-        .get('/users?page=1&take=10&orderby=name&direction=desc')
+        .get('/user?page=1&take=10&orderby=name&direction=desc')
         .set('Cookie', cookie);
 
       expect(response.statusCode).toBe(200);
@@ -92,12 +92,12 @@ describe('AppController (e2e)', () => {
       await prismaService.user.create({data: {email, password, name}});
 
       const response = await request(app.getHttpServer())
-        .get('/users?page=1&take=10&orderby=name&direction=desc')
+        .get('/user?page=1&take=10&orderby=name&direction=desc')
         .set('Cookie', cookie);
 
       expect(response.statusCode).toBe(200);
       expect(response.body.data.length).toEqual(1);
-      expect(response.body.total).toEqual(1);
+      expect(response.body.info.total).toEqual(1);
     });
 
     it('email 일치 검색 테스트', async () => {
@@ -112,7 +112,7 @@ describe('AppController (e2e)', () => {
 
       const response = await request(app.getHttpServer())
         .get(
-          `/users?page=1&take=10&orderby=name&direction=desc&where__email=${email2}`,
+          `/user?page=1&take=10&orderby=name&direction=desc&where__email=${email2}`,
         )
         .set('Cookie', cookie);
 
@@ -134,7 +134,7 @@ describe('AppController (e2e)', () => {
 
       const response = await request(app.getHttpServer())
         .get(
-          `/users?page=1&take=10&orderby=name&direction=desc&like__name=${nm1}`,
+          `/user?page=1&take=10&orderby=name&direction=desc&like__name=${nm1}`,
         )
         .set('Cookie', cookie);
 
@@ -146,14 +146,14 @@ describe('AppController (e2e)', () => {
 
     it('권한 없이 조회', async () => {
       const response = await request(app.getHttpServer()).get(
-        `/users?page=1&take=10`,
+        `/user?page=1&take=10`,
       );
 
       expect(response.statusCode).toBe(403);
     });
   });
 
-  describe('PATCH - /users', () => {
+  describe('PATCH - /user', () => {
     it('유저 이름 업데이트', async () => {
       const updateName = 'LimC2';
 
@@ -166,7 +166,7 @@ describe('AppController (e2e)', () => {
       });
 
       const response = await request(app.getHttpServer())
-        .put('/users')
+        .put('/user')
         .set('Cookie', cookie)
         .send({
           id: id,
@@ -176,9 +176,9 @@ describe('AppController (e2e)', () => {
         });
 
       expect(response.statusCode).toBe(200);
-      expect(response.body._id).toEqual(id);
-      expect(response.body._name).not.toEqual(name);
-      expect(response.body._name).toEqual(updateName);
+      expect(response.body.id).toEqual(id);
+      expect(response.body.name).not.toEqual(name);
+      expect(response.body.name).toEqual(updateName);
 
       return;
     });
@@ -190,7 +190,7 @@ describe('AppController (e2e)', () => {
       });
 
       const response = await request(app.getHttpServer())
-        .put('/users')
+        .put('/user')
         .set('Cookie', cookie)
         .send({
           id: user.id,
@@ -209,7 +209,7 @@ describe('AppController (e2e)', () => {
 
     it('없는 유저 업데이트', async () => {
       const response = await request(app.getHttpServer())
-        .put('/users')
+        .put('/user')
         .set('Cookie', cookie)
         .send({
           id: uuidv4(),
@@ -225,7 +225,7 @@ describe('AppController (e2e)', () => {
     });
 
     it('권한 없이 수정', async () => {
-      const response = await request(app.getHttpServer()).put('/users').send({
+      const response = await request(app.getHttpServer()).put('/user').send({
         id: uuidv4(),
         email: email,
         password: password,
@@ -236,9 +236,9 @@ describe('AppController (e2e)', () => {
     });
   });
 
-  describe('POST - /users', () => {
+  describe('POST - /user', () => {
     it('유저 생성', async () => {
-      const response = await request(app.getHttpServer()).post('/users').send({
+      const response = await request(app.getHttpServer()).post('/user').send({
         email,
         password,
         name,
@@ -252,7 +252,7 @@ describe('AppController (e2e)', () => {
     it('중복된 이메일로 유저 생성', async () => {
       await prismaService.user.create({data: {email, password, name}});
 
-      const response = await request(app.getHttpServer()).post('/users').send({
+      const response = await request(app.getHttpServer()).post('/user').send({
         email: email,
         password: 'password',
         name: 'LimC',
@@ -269,7 +269,7 @@ describe('AppController (e2e)', () => {
     it('중복된 이름으로 유저 생성', async () => {
       await prismaService.user.create({data: {email, password, name}});
 
-      const response = await request(app.getHttpServer()).post('/users').send({
+      const response = await request(app.getHttpServer()).post('/user').send({
         email: 'alma@naver.com',
         password: 'password',
         name: name,
@@ -284,7 +284,7 @@ describe('AppController (e2e)', () => {
     });
   });
 
-  describe('PUT - /users/permission', () => {
+  describe('PUT - /user/permission', () => {
     it('유저 권한 수정', async () => {
       const permissions = [
         PermissionEnum.CAN_READ_USER,
@@ -295,7 +295,7 @@ describe('AppController (e2e)', () => {
       });
 
       const response = await request(app.getHttpServer())
-        .put('/users/permission')
+        .put('/user/permission')
         .set('Cookie', cookie)
         .send({
           id,
@@ -303,8 +303,8 @@ describe('AppController (e2e)', () => {
         });
 
       expect(response.statusCode).toBe(200);
-      expect(response.body._id).toEqual(id);
-      expect(response.body._permissions).toEqual(permissions);
+      expect(response.body.id).toEqual(id);
+      expect(response.body.permissions).toEqual(permissions);
     });
 
     it('유저 권한 초기화(빈배열)', async () => {
@@ -326,7 +326,7 @@ describe('AppController (e2e)', () => {
       });
 
       const response = await request(app.getHttpServer())
-        .put('/users/permission')
+        .put('/user/permission')
         .set('Cookie', cookie)
         .send({
           id,
@@ -334,8 +334,8 @@ describe('AppController (e2e)', () => {
         });
 
       expect(response.statusCode).toBe(200);
-      expect(response.body._id).toEqual(id);
-      expect(response.body._permissions).toEqual([]);
+      expect(response.body.id).toEqual(id);
+      expect(response.body.permissions).toEqual([]);
     });
 
     it('존재하지 않는 권한 추가', async () => {
@@ -348,7 +348,7 @@ describe('AppController (e2e)', () => {
       });
 
       const response = await request(app.getHttpServer())
-        .put('/users/permission')
+        .put('/user/permission')
         .set('Cookie', cookie)
         .send({
           id,
@@ -361,7 +361,7 @@ describe('AppController (e2e)', () => {
 
     it('권한 없이 권한 수정', async () => {
       const response = await request(app.getHttpServer())
-        .put('/users/permission')
+        .put('/user/permission')
         .send({
           id: uuidv4(),
         });
@@ -370,7 +370,7 @@ describe('AppController (e2e)', () => {
     });
   });
 
-  describe('GET - /users/:id', () => {
+  describe('GET - /user/:id', () => {
     it('유저 정보 정상 조회', async () => {
       const user = await prismaService.user.create({
         select: {
@@ -386,7 +386,7 @@ describe('AppController (e2e)', () => {
       });
 
       const {statusCode, body} = await request(app.getHttpServer())
-        .get(`/users/${encodeURI(user.id)}`)
+        .get(`/user/${encodeURI(user.id)}`)
         .set('Cookie', cookie);
 
       expect(statusCode).toBe(200);
@@ -397,7 +397,7 @@ describe('AppController (e2e)', () => {
 
     it('없는 유저 조회', async () => {
       const {statusCode, body} = await request(app.getHttpServer())
-        .get(`/users/${uuidv4()}`)
+        .get(`/user/${uuidv4()}`)
         .set('Cookie', cookie);
 
       expect(statusCode).toBe(400);
@@ -406,7 +406,7 @@ describe('AppController (e2e)', () => {
 
     it('권한 없이 조회', async () => {
       const {statusCode, body} = await request(app.getHttpServer()).get(
-        `/users/${uuidv4()}`,
+        `/user/${uuidv4()}`,
       );
 
       expect(statusCode).toBe(403);

@@ -365,4 +365,30 @@ describe('TopicController (e2e)', () => {
       expect(body.message).toEqual(ExceptionEnum.FORBIDDEN);
     });
   });
+
+  describe('GET - /topic/all', () => {
+    it('주제 전체 조회하기', async () => {
+      const {id, name} = await prismaService.topic.create({
+        data: {name: createDto.name.replaceAll(' ', '_')},
+      });
+
+      const {statusCode, body} = await request(app.getHttpServer())
+        .get(`/topic/all`)
+        .set('Cookie', su);
+
+      expect(statusCode).toEqual(200);
+      expect(body.length).toEqual(1);
+      expect(body[0].id).toEqual(id);
+      expect(body[0].name).toEqual(name);
+    });
+
+    it('권한 없이 주제 조회', async () => {
+      const {statusCode, body} = await request(app.getHttpServer())
+        .get(`/topic/all`)
+        .set('Cookie', gu);
+
+      expect(statusCode).toEqual(403);
+      expect(body.message).toEqual(ExceptionEnum.FORBIDDEN);
+    });
+  });
 });

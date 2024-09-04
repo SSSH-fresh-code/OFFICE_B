@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  ExecutionContext,
-  UnauthorizedException,
-  HttpStatus,
-} from '@nestjs/common';
+import {ExecutionContext, HttpStatus, Injectable} from '@nestjs/common';
 import {AuthGuard} from '@nestjs/passport';
 import {ExceptionEnum} from '../../../../infrastructure/filter/exception/exception.enum';
 import {SsshException} from '../../../../infrastructure/filter/exception/sssh.exception';

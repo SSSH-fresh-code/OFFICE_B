@@ -1,6 +1,15 @@
 import {Topic} from '../../domain/topic/topic.entity';
+import {ReadTopicDto} from '../../presentation/topic/dto/read-topic.dto';
 
 export interface TopicRepository {
+  /**
+   * Select를 위한 전체 리스트를 불러옵니다.
+   *
+   * @returns {Promise<Topic>} - 조회된 Topic 정보를 반환합니다.
+   * @throws {Prisma.PrismaClientKnownRequestError} - 대상 Topic가 존재하지 않으면 오류를 반환합니다.
+   */
+  findAll(): Promise<Pick<ReadTopicDto, 'id' | 'name'>[]>;
+
   /**
    * ID로 Topic을 조회합니다.
    * 대상 Topic이 존재하지 않으면 오류를 반환합니다.

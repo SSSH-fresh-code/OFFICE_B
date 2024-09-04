@@ -10,7 +10,7 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import {ApiTags, ApiOperation, ApiBody, ApiResponse} from '@nestjs/swagger';
+import {ApiBody, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {Logger} from 'winston';
 import {WINSTON_MODULE_PROVIDER} from 'nest-winston';
 import {
@@ -33,6 +33,17 @@ export class TopicController {
     private readonly topicService: TopicService,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
+
+  @Get('all')
+  @ApiOperation({summary: '주제 전체 조회(Select 컴포넌트용)'})
+  @ApiResponse({
+    status: 200,
+    description: '주제들이 정상적으로 조회됨',
+  })
+  @PermissionsMethod(PermissionEnum.CAN_WRITE_BLOG)
+  async getTopicForSelect(): Promise<Pick<ReadTopicDto, 'name' | 'id'>[]> {
+    return await this.topicService.getTopicForSelect();
+  }
 
   @Get(':name')
   @ApiOperation({summary: '주제 단건 조회'})

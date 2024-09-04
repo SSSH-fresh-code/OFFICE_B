@@ -43,7 +43,7 @@ export class TopicService implements iTopicService {
       data: topics.data.map((t) => {
         return Topic.of(t as PrismaTopic).toDto();
       }),
-      total: topics.total,
+      info: topics.info,
     };
   }
 
@@ -67,5 +67,9 @@ export class TopicService implements iTopicService {
 
   async deleteTopic(id: number) {
     await this.topicRepository.delete(id);
+  }
+
+  async getTopicForSelect(): Promise<Pick<ReadTopicDto, 'id' | 'name'>[]> {
+    return this.topicRepository.findAll();
   }
 }

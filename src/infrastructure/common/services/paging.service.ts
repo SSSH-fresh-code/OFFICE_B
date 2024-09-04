@@ -13,7 +13,13 @@ export interface OrderByClause {
   [key: string]: Prisma.SortOrder;
 }
 
-export type Page<T> = {data: T[]; total: number};
+export type PageInfo = {
+  current: number;
+  last: number;
+  total: number;
+  take: number;
+};
+export type Page<T> = {data: T[]; info: PageInfo};
 
 /**
  * 공통 페이징 서비스 클래스
@@ -64,7 +70,18 @@ export class PagingService<T> implements iPagingService {
       this.prisma[model].count({where}),
     ]);
 
-    return {data, total};
+    return {
+      data: data,
+      info: {
+        take,
+        current: +page,
+        last:
+          total % take !== 0
+            ? Math.floor(total / take) + 1
+            : Math.floor(total / take),
+        total,
+      },
+    };
   }
 
   private parseWhereClause(

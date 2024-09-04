@@ -7,6 +7,7 @@ import {UpdateTopicDto} from '../../presentation/topic/dto/update-topic.dto';
 export interface iTopicService {
   getTopicByName(name: string): Promise<ReadTopicDto>;
   getTopics(dto: PagingTopicDto): Promise<Page<ReadTopicDto>>;
+  getTopicForSelect(): Promise<Pick<ReadTopicDto, 'id' | 'name'>[]>;
   createTopic(dto: CreateTopicDto): Promise<ReadTopicDto>;
   updateTopic(dto: UpdateTopicDto): Promise<ReadTopicDto>;
   deleteTopic(id: number): Promise<void>;

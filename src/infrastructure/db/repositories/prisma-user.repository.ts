@@ -34,7 +34,7 @@ export class PrismaUserRepository implements UserRepository {
       user.email,
       user.password,
       user.name,
-      [],
+      user.permissions.map((p) => p.name),
       user.createdAt,
       user.updatedAt,
     );

@@ -52,7 +52,12 @@ export class BlogService implements iBlogService {
 
         dto.recentPosts = {
           data: [],
-          total: 0,
+          info: {
+            total: 1,
+            current: 1,
+            take: 5,
+            last: 1,
+          },
         };
       }
     }
