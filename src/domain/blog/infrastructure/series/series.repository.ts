@@ -1,4 +1,5 @@
 import {iSeries} from '../../domain/series/series.interface';
+import {ReadSeriesDto} from '../../presentation/series/dto/read-series.dto';
 
 export interface SeriesRepository {
   /**
@@ -40,4 +41,15 @@ export interface SeriesRepository {
    * @param {number} id - 삭제할 Series 이름
    */
   delete(id: number): Promise<void>;
+
+  /**
+   * TopicId를 기준으로 Series 리스트를 조회합니다.
+   *
+   * @param {number} topicId - 조회할 Series의 topicId
+   * @returns {Pick<ReadSeriesDto, 'id' | 'name'>} - 조회된 Series 정보를 반환합니다.
+   * @throws {Prisma.PrismaClientKnownRequestError} - 대상 Series가 존재하지 않으면 오류를 반환합니다.
+   */
+  findAllByTopicId(
+    topicId: number,
+  ): Promise<Pick<ReadSeriesDto, 'id' | 'name'>[]>;
 }

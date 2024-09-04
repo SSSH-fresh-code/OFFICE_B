@@ -10,7 +10,7 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import {ApiTags, ApiOperation, ApiBody, ApiResponse} from '@nestjs/swagger';
+import {ApiBody, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {Logger} from 'winston';
 import {WINSTON_MODULE_PROVIDER} from 'nest-winston';
 import {
@@ -34,6 +34,19 @@ export class SeriesController {
     @Inject(SERIES_SERVICE) private readonly seriesService: iSeriesService,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
+
+  @Get('all/:topicId')
+  @ApiOperation({summary: '시리즈 단건 조회'})
+  @ApiResponse({
+    status: 200,
+    description: '시리즈가 정상적으로 조회됨',
+  })
+  @PermissionsMethod(PermissionEnum.CAN_WRITE_BLOG)
+  async getSeriesByTopicIdForSelect(
+    @Param('topicId', ParseIntPipe) topicId: number,
+  ): Promise<Pick<ReadSeriesDto, 'id' | 'name'>[]> {
+    return await this.seriesService.getSeriesByTopicIdForSelect(topicId);
+  }
 
   @Get(':name')
   @ApiOperation({summary: '시리즈 단건 조회'})

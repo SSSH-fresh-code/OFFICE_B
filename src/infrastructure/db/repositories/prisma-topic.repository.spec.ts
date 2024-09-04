@@ -31,6 +31,25 @@ describe('PrismaTopicRepository', () => {
     await prisma.$disconnect();
   });
 
+  describe('findAll', () => {
+    it('Topic 전체를 조회합니다.', async () => {
+      const t = await prisma.topic.create({
+        data: {
+          id: dummyTopic.id,
+          name: dummyTopic.name,
+        },
+      });
+
+      const topics = await repository.findAll();
+
+      expect(topics.length).toEqual(1);
+      expect(topics[0].id).toEqual(t.id);
+      expect(topics[0].name).toEqual(t.name);
+      expect(topics[0]['createdAt']).not.toBeDefined();
+      expect(topics[0]['updatedAt']).not.toBeDefined();
+    });
+  });
+
   describe('findById', () => {
     it('id로 Topic을 조회합니다.', async () => {
       const t = await prisma.topic.create({

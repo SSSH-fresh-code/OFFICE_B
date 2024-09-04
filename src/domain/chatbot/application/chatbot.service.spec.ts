@@ -204,7 +204,12 @@ describe('ChatBotService', () => {
 
       pagingService.getPagedResults.mockResolvedValue({
         data: [bot],
-        total: 1,
+        info: {
+          take: pagingDto.take,
+          total: 1,
+          current: pagingDto.page,
+          last: 1,
+        },
       });
 
       const chatbots = await chatBotService.getChatBots(pagingDto);
@@ -214,7 +219,7 @@ describe('ChatBotService', () => {
         pagingDto,
         {where__type: MessengerType.DISCORD},
       );
-      expect(chatbots.total).toEqual(1);
+      expect(chatbots.info.total).toEqual(1);
     });
   });
 

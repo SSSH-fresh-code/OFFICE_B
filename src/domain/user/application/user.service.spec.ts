@@ -105,7 +105,7 @@ describe('UserService', () => {
         permissions,
       );
 
-      expect(result).toEqual(hasPermissionUser);
+      expect(result).toEqual(hasPermissionUser.toDto());
       expect(userRepository.findById).toHaveBeenCalledWith(user.id);
       expect(userRepository.setPermission).toHaveBeenCalledWith(
         hasPermissionUser,
@@ -132,7 +132,7 @@ describe('UserService', () => {
 
       const result = await userService.updateUserPermission(user.id, []);
 
-      expect(result).toEqual(emptyPermissionUser);
+      expect(result).toEqual(emptyPermissionUser.toDto());
       expect(userRepository.findById).toHaveBeenCalledWith(user.id);
       expect(userRepository.setPermission).toHaveBeenCalledWith(
         emptyPermissionUser,

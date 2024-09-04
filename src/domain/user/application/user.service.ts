@@ -1,4 +1,4 @@
-import {Injectable, Inject} from '@nestjs/common';
+import {Inject, Injectable} from '@nestjs/common';
 import {UserRepository} from '../infrastructure/user.repository';
 import {USER_REPOSITORY} from '../user.const';
 import {
@@ -10,6 +10,7 @@ import {ReadUserDto} from '../presentation/dto/read-user.dto';
 import {UserPagingDto} from '../presentation/dto/user-paging.dto';
 import {v4 as uuidv4} from 'uuid';
 import {UpdateUserDto} from '../presentation/dto/update-user.dto';
+import {PermissionEnum} from '../../permission/domain/permission.enum';
 
 @Injectable()
 export class UserService {
@@ -22,18 +23,22 @@ export class UserService {
     email: string,
     password: string,
     name: string,
-  ): Promise<User> {
+  ): Promise<ReadUserDto> {
     const user = new User(uuidv4(), email, password, name);
     user.encryptPassword();
 
-    return this.userRepository.save(user);
+    user.assignPermissions([PermissionEnum.CAN_LOGIN]);
+
+    return (await this.userRepository.save(user)).toDto();
   }
 
-  async updateUserName(updateUserDto: UpdateUserDto): Promise<User | null> {
+  async updateUserName(
+    updateUserDto: UpdateUserDto,
+  ): Promise<ReadUserDto | null> {
     const user = await this.userRepository.findById(updateUserDto.id);
     user.name = updateUserDto.name;
 
-    return this.userRepository.save(user);
+    return (await this.userRepository.save(user)).toDto();
   }
 
   async getUsers(pagingDto: UserPagingDto): Promise<Page<User>> {
@@ -75,6 +80,6 @@ export class UserService {
 
     user.assignPermissions(permissions);
 
-    return await this.userRepository.setPermission(user);
+    return (await this.userRepository.setPermission(user)).toDto();
   }
 }

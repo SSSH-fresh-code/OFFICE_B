@@ -144,7 +144,9 @@ describe('ChatBotService', () => {
 
       pagingService.getPagedResults.mockResolvedValue({
         data: [chat],
-        total: 1,
+        info: {
+          total: 1,
+        },
       });
 
       const chats = await chatService.getChatsByType(dto);
@@ -153,7 +155,7 @@ describe('ChatBotService', () => {
         type: MessengerType.DISCORD,
       });
 
-      expect(chats.total).toEqual(1);
+      expect(chats.info.total).toEqual(1);
     });
 
     it('type없이 조회', async () => {

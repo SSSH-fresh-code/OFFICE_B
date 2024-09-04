@@ -127,7 +127,7 @@ describe('BlogController (e2e)', () => {
 
       expect(statusCode).toEqual(200);
       expect(body.recentPosts).toBeDefined();
-      expect(body.recentPosts.total).toBe(1);
+      expect(body.recentPosts.info.total).toBe(1);
 
       return;
     });

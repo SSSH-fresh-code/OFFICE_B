@@ -1,7 +1,7 @@
 import {Strategy} from 'passport-local';
 import {PassportStrategy} from '@nestjs/passport';
 import {Injectable} from '@nestjs/common';
-import {ApiTags, ApiOperation} from '@nestjs/swagger';
+import {ApiOperation, ApiTags} from '@nestjs/swagger';
 import {AuthService} from './auth.service';
 import {User} from '../../domain/user.entity';
 

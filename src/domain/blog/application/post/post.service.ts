@@ -16,7 +16,7 @@ import {ReadPostDto} from '../../presentation/post/dto/read-post.dto';
 import {PagingPostDto} from '../../presentation/post/dto/paging-post.dto';
 import {CreatePostDto} from '../../presentation/post/dto/create-post.dto';
 import {UpdatePostDto} from '../../presentation/post/dto/update-post.dto';
-import {Post, ofPost} from '../../domain/post/post.entity';
+import {ofPost, Post} from '../../domain/post/post.entity';
 import {Series} from '../../domain/series/series.entity';
 import {User} from 'src/domain/user/domain/user.entity';
 import {Topic} from '../../domain/topic/topic.entity';
@@ -59,7 +59,7 @@ export class PostService implements iPostService {
 
     return {
       data: readPosts,
-      total: posts.total,
+      info: posts.info,
     };
   }
 

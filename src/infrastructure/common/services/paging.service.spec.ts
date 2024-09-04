@@ -38,7 +38,15 @@ describe('PagingService', () => {
       prismaService.$transaction.mockResolvedValue([users, total]);
 
       const result = await pagingService.getPagedResults('User', pagingDto);
-      expect(result).toEqual({data: users, total});
+      expect(result).toEqual({
+        data: users,
+        info: {
+          current: 1,
+          last: 1,
+          take: 10,
+          total: 1,
+        },
+      });
       expect(prismaService.$transaction).toHaveBeenCalledWith([
         prismaService['User'].findMany({
           where: {},
@@ -64,7 +72,15 @@ describe('PagingService', () => {
         where,
       );
 
-      expect(result).toEqual({data: users, total});
+      expect(result).toEqual({
+        data: users,
+        info: {
+          current: 1,
+          last: 1,
+          take: 10,
+          total: 1,
+        },
+      });
       expect(prismaService.$transaction).toHaveBeenCalledWith([
         prismaService['User'].findMany({
           where,
@@ -89,7 +105,15 @@ describe('PagingService', () => {
       prismaService.$transaction.mockResolvedValue([users, total]);
 
       const result = await pagingService.getPagedResults('User', pagingDto);
-      expect(result).toEqual({data: users, total});
+      expect(result).toEqual({
+        data: users,
+        info: {
+          current: 1,
+          last: 1,
+          take: 10,
+          total: 1,
+        },
+      });
       expect(prismaService.$transaction).toHaveBeenCalledWith([
         prismaService['User'].findMany({
           where: {},
@@ -109,7 +133,15 @@ describe('PagingService', () => {
       prismaService.$transaction.mockResolvedValue([users, total]);
 
       const result = await pagingService.getPagedResults('User', pagingDto);
-      expect(result).toEqual({data: users, total});
+      expect(result).toEqual({
+        data: users,
+        info: {
+          current: 2,
+          last: 2,
+          take: 5,
+          total: 10,
+        },
+      });
       expect(prismaService.$transaction).toHaveBeenCalledWith([
         prismaService['User'].findMany({
           where: {},
@@ -129,7 +161,15 @@ describe('PagingService', () => {
       prismaService.$transaction.mockResolvedValue([users, total]);
 
       const result = await pagingService.getPagedResults('User', pagingDto);
-      expect(result).toEqual({data: users, total});
+      expect(result).toEqual({
+        data: users,
+        info: {
+          current: 1,
+          last: 0,
+          take: 10,
+          total: 0,
+        },
+      });
       expect(prismaService.$transaction).toHaveBeenCalledWith([
         prismaService['User'].findMany({
           where: {},

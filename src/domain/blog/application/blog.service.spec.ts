@@ -82,7 +82,12 @@ describe('BlogService', () => {
 
       const postPage: Page<ReadPostDto> = {
         data: [post.toDto()],
-        total: 1,
+        info: {
+          total: 1,
+          current: 1,
+          take: 5,
+          last: 1,
+        },
       };
 
       postService.getPosts.mockResolvedValue(postPage);

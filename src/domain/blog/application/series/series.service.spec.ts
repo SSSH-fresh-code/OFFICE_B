@@ -16,6 +16,7 @@ import {ExceptionEnum} from 'src/infrastructure/filter/exception/exception.enum'
 const mockSeriesRepository = (): SeriesRepository => ({
   findById: jest.fn(),
   findByName: jest.fn(),
+  findAllByTopicId: jest.fn(),
   save: jest.fn(),
   update: jest.fn(),
   delete: jest.fn(),
@@ -24,6 +25,7 @@ const mockSeriesRepository = (): SeriesRepository => ({
 const mockTopicRepository = (): TopicRepository => ({
   findById: jest.fn(),
   findByName: jest.fn(),
+  findAll: jest.fn(),
   save: jest.fn(),
   update: jest.fn(),
   delete: jest.fn(),
@@ -88,7 +90,12 @@ describe('SeriesService', () => {
 
       pagingService.getPagedResults.mockResolvedValue({
         data: [series],
-        total: 1,
+        info: {
+          total: 1,
+          current: dto.page,
+          take: dto.take,
+          last: 1,
+        },
       });
 
       const result = await seriesService.getSeries(dto);
@@ -98,7 +105,7 @@ describe('SeriesService', () => {
         dto,
         {},
       );
-      expect(result.total).toEqual(1);
+      expect(result.info.total).toEqual(1);
       expect(result.data).toEqual([series.toDto()]);
     });
 
@@ -113,7 +120,12 @@ describe('SeriesService', () => {
 
       pagingService.getPagedResults.mockResolvedValue({
         data: [series],
-        total: 1,
+        info: {
+          total: 1,
+          current: dto.page,
+          take: dto.take,
+          last: 1,
+        },
       });
 
       const result = await seriesService.getSeries(dto);
@@ -123,7 +135,7 @@ describe('SeriesService', () => {
         dto,
         {like__name: 'test'},
       );
-      expect(result.total).toEqual(1);
+      expect(result.info.total).toEqual(1);
       expect(result.data).toEqual([series.toDto()]);
     });
 
@@ -138,7 +150,12 @@ describe('SeriesService', () => {
 
       pagingService.getPagedResults.mockResolvedValue({
         data: [series],
-        total: 1,
+        info: {
+          total: 1,
+          current: dto.page,
+          take: dto.take,
+          last: 1,
+        },
       });
 
       const result = await seriesService.getSeries(dto);
@@ -148,7 +165,7 @@ describe('SeriesService', () => {
         dto,
         {where__topicId: 1},
       );
-      expect(result.total).toEqual(1);
+      expect(result.info.total).toEqual(1);
       expect(result.data).toEqual([series.toDto()]);
     });
 
@@ -164,7 +181,12 @@ describe('SeriesService', () => {
 
       pagingService.getPagedResults.mockResolvedValue({
         data: [series],
-        total: 1,
+        info: {
+          total: 1,
+          current: dto.page,
+          take: dto.take,
+          last: 1,
+        },
       });
 
       const result = await seriesService.getSeries(dto);
@@ -174,7 +196,7 @@ describe('SeriesService', () => {
         dto,
         {where__topicId: dto.where__topicId, like__name: dto.like__name},
       );
-      expect(result.total).toEqual(1);
+      expect(result.info.total).toEqual(1);
       expect(result.data).toEqual([series.toDto()]);
     });
   });

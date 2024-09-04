@@ -9,6 +9,17 @@ import {Topic} from 'src/domain/blog/domain/topic/topic.entity';
 export class PrismaSeriesRepository implements SeriesRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async findAllByTopicId(topicId: number) {
+    return this.prisma.series.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+      where: {topicId: topicId},
+      orderBy: {name: 'asc'},
+    });
+  }
+
   async findById(id: number): Promise<iSeries> {
     const series = await this.prisma.series.findUniqueOrThrow({
       where: {id},

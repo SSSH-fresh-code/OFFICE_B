@@ -7,6 +7,16 @@ import {Injectable} from '@nestjs/common';
 export class PrismaTopicRepository implements TopicRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async findAll() {
+    return this.prisma.topic.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+      orderBy: {name: 'asc'},
+    });
+  }
+
   async findById(id: number): Promise<Topic> {
     const topic = await this.prisma.topic.findUniqueOrThrow({
       where: {id},

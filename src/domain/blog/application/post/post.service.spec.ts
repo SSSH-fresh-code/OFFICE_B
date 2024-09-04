@@ -14,7 +14,7 @@ import {PostRepository} from '../../infrastructure/post/post.repository';
 import {iPostService} from './post.service.interface';
 import {PostService} from './post.service';
 import {Series} from '../../domain/series/series.entity';
-import {Post, ofPost} from '../../domain/post/post.entity';
+import {ofPost, Post} from '../../domain/post/post.entity';
 import {User} from 'src/domain/user/domain/user.entity';
 import {PagingPostDto} from '../../presentation/post/dto/paging-post.dto';
 import {CreatePostDto} from '../../presentation/post/dto/create-post.dto';
@@ -34,6 +34,7 @@ const mockPostRepository = (): PostRepository => ({
 const mockTopicRepository = (): TopicRepository => ({
   findById: jest.fn(),
   findByName: jest.fn(),
+  findAll: jest.fn(),
   save: jest.fn(),
   update: jest.fn(),
   delete: jest.fn(),
@@ -42,6 +43,7 @@ const mockTopicRepository = (): TopicRepository => ({
 const mockSeriesRepository = (): SeriesRepository => ({
   findById: jest.fn(),
   findByName: jest.fn(),
+  findAllByTopicId: jest.fn(),
   save: jest.fn(),
   update: jest.fn(),
   delete: jest.fn(),
@@ -186,13 +188,18 @@ describe('PostSerivce', () => {
 
       pagingService.getPagedResults.mockResolvedValue({
         data: [prismaPost],
-        total: 1,
+        info: {
+          total: 1,
+          current: dto.page,
+          take: dto.take,
+          last: 1,
+        },
       });
 
       const result = await postService.getPosts(dto);
 
       expect(pagingService.getPagedResults).toHaveBeenCalledWith('Post', dto);
-      expect(result.total).toEqual(1);
+      expect(result.info.total).toEqual(1);
       expect(result.data).toEqual([Post.of(prismaPost).toDto()]);
     });
   });

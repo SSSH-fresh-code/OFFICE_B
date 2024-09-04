@@ -1,10 +1,6 @@
 import {HttpStatus, Inject, Injectable} from '@nestjs/common';
-import {MessengerFactory} from './../infrastructure/messenger.factory';
-import {
-  CHATBOT_REPOSITORY,
-  CHAT_REPOSITORY,
-  MESSENGER_FACTORY,
-} from '../chatbot.const';
+import {MessengerFactory} from '../infrastructure/messenger.factory';
+import {CHATBOT_REPOSITORY, MESSENGER_FACTORY} from '../chatbot.const';
 import {IChatBotRepository} from '../infrastructure/chatbot.repository';
 import {CreateChatBotDto} from '../presentation/dto/create-chatbot.dto';
 import {ChatBot, MessengerType} from '../domain/chatbot.entity';
@@ -130,7 +126,7 @@ export class ChatBotService {
 
     return {
       data: pagingBots.data.map((bot) => ChatBot.of(bot).toDto()),
-      total: pagingBots.total,
+      info: pagingBots.info,
     };
   }
 
@@ -151,7 +147,7 @@ export class ChatBotService {
         {param: 'chat'},
       );
 
-    let isSuccess = false;
+    let isSuccess: boolean;
 
     const messengerService = this.messengerFactory.getMessengerService(
       bot.type,
