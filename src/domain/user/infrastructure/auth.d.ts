@@ -1,1 +1,1 @@
-export type UserInSession = {id: string; permissions: string[]};
+export type UserInSession = { id: string; permissions: string[] };
