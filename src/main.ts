@@ -16,7 +16,7 @@ async function bootstrap() {
 				db: "sessions.sqlite", // 여기에서 SQLite 파일 경로를 설정합니다.
 				dir: "./", // SQLite 파일이 저장될 디렉토리를 설정합니다.
 			}),
-			secret: "your_secret_key", // 적절한 비밀 키로 변경하세요
+			secret: process.env.SESSION_SECRET, // 적절한 비밀 키로 변경하세요
 			resave: false,
 			saveUninitialized: false,
 			cookie: {
@@ -37,7 +37,7 @@ async function bootstrap() {
 	app.useGlobalFilters(new PrismaClientExceptionFilter());
 
 	app.enableCors({
-		origin: ["http://localhost:5173"],
+		origin: process.env.CORS_URL,
 		credentials: true,
 		allowedHeaders: ["content-type", "Cookie"],
 	});

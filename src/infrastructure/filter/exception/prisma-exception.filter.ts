@@ -31,6 +31,8 @@ export class PrismaClientExceptionFilter implements ExceptionFilter {
 					param: exception.meta.target,
 				});
 				break;
+			default:
+				console.error(`에러코드 : ${exception.code}`);
 		}
 
 		response.status(status).json({
