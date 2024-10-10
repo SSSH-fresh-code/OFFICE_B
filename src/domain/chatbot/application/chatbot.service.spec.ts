@@ -39,6 +39,10 @@ const mockTelegramExternalService = () => ({
 	chat: jest.fn(),
 });
 
+const mockDiscordExternalService = () => ({
+	chat: jest.fn(),
+});
+
 describe("ChatBotService", () => {
 	let chatBotService: ChatBotService;
 	let chatBotRepository;
@@ -65,6 +69,10 @@ describe("ChatBotService", () => {
 				{
 					provide: MessengerType.TELEGRAM,
 					useFactory: mockTelegramExternalService,
+				},
+				{
+					provide: MessengerType.DISCORD,
+					useFactory: mockDiscordExternalService,
 				},
 				{ provide: CHATBOT_REPOSITORY, useFactory: mockChatBotRepository },
 				{ provide: PagingService, useFactory: mockPagingService },
