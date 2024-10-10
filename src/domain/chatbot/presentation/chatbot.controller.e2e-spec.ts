@@ -546,7 +546,7 @@ describe("ChatBotController (e2e)", () => {
 	});
 
 	describe("POST - /chat/bot/send", () => {
-		it("메세지 전송", async () => {
+		it("Telegram 메세지 전송", async () => {
 			const dto: CreateChatBotDto = {
 				botId: "6431728868:AAEX9arBErceKy2e5HfmGTpgXXVZPtho3gs",
 				token: "6431728868:AAEX9arBErceKy2e5HfmGTpgXXVZPtho3gs",
@@ -574,12 +574,53 @@ describe("ChatBotController (e2e)", () => {
 			});
 
 			const { statusCode, body } = await request(app.getHttpServer())
-				.post(`/chat/bot/send`)
+				.post("/chat/bot/send")
 				.set("Cookie", su)
 				.send({
 					botId: bot.id,
 					chatId: bot.chats[0].id,
-					message: "테스트 메세지 입니다.",
+					message: "TELEGRAM 테스트 메세지 입니다.",
+				});
+
+			expect(statusCode).toBe(201);
+			expect(body.isSuccess).toBeTruthy();
+		});
+
+		it("Discrod 메세지 전송", async () => {
+			const dto: CreateChatBotDto = {
+				botId:
+					"QZVUrXbCwhiZBVM6yoi_3lHqOl83CsWuHSZjU7APelJxJpufBFcpkwS6pAPlKerIYErN",
+				token: "1293778385260122212",
+				name: "테스트 챗봇",
+				description: "테스트용 챗봇입니다.",
+				type: MessengerType.DISCORD,
+			};
+
+			const createdChat = await prismaService.chat.create({
+				data: {
+					name: "테스트-알람",
+					chatId: "1",
+					type: MessengerType.DISCORD,
+				},
+			});
+
+			const bot = await prismaService.chatBot.create({
+				data: {
+					...dto,
+					chats: {
+						connect: { id: createdChat.id },
+					},
+				},
+				include: { chats: true },
+			});
+
+			const { statusCode, body } = await request(app.getHttpServer())
+				.post("/chat/bot/send")
+				.set("Cookie", su)
+				.send({
+					botId: bot.id,
+					chatId: bot.chats[0].id,
+					message: "DISCORD 테스트 메세지 입니다.",
 				});
 
 			expect(statusCode).toBe(201);
@@ -592,14 +633,14 @@ describe("ChatBotController (e2e)", () => {
 				token: "6431728868:AAEX9arBErceKy2e5HfmGTpgXXVZPtho3gs",
 				name: "테스트 챗봇",
 				description: "테스트용 챗봇입니다.",
-				type: MessengerType.DISCORD,
+				type: MessengerType.SLACK,
 			};
 
 			const createdChat = await prismaService.chat.create({
 				data: {
 					name: "테스트 챗봇",
 					chatId: "7370566612",
-					type: MessengerType.DISCORD,
+					type: MessengerType.SLACK,
 				},
 			});
 

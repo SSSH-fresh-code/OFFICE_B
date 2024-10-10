@@ -1,0 +1,49 @@
+import { Test, TestingModule } from "@nestjs/testing";
+import { LoggerModule } from "../../../infrastructure/module/logger.module";
+import { iMessengerExternalService } from "./messenger.external.interface";
+import { ChatBot, MessengerType } from "../domain/chatbot.entity";
+import { Chat } from "../domain/chat.entity";
+import { DiscordExternalService } from "./discord.external";
+
+/**
+ * Mock User Service
+ * 유저 서비스의 Mock 함수들을 정의합니다.
+ */
+
+global.fetch = jest.fn();
+
+describe("TelegramExternalService", () => {
+	let service: iMessengerExternalService;
+
+	beforeAll(async () => {
+		const module: TestingModule = await Test.createTestingModule({
+			imports: [LoggerModule],
+			providers: [DiscordExternalService],
+		}).compile();
+
+		service = module.get<iMessengerExternalService>(DiscordExternalService);
+	});
+
+	describe("chat", () => {
+		it("메세지를 정상적으로 전송해야합니다.", async () => {
+			const chatbot = new ChatBot(
+				0,
+				"QZVUrXbCwhiZBVM6yoi_3lHqOl83CsWuHSZjU7APelJxJpufBFcpkwS6pAPlKerIYErN",
+				"1293778385260122212",
+				"테스트봇",
+				"description",
+				MessengerType.DISCORD,
+			);
+
+			const chat = new Chat(0, "chatId", "테스트-알람", MessengerType.DISCORD);
+
+			(fetch as jest.Mock).mockResolvedValue({
+				ok: true,
+			});
+
+			const result = await service.chat(chatbot, chat, "테스트 메세지");
+
+			expect(result).toBe(true);
+		});
+	});
+});
