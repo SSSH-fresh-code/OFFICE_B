@@ -14,6 +14,7 @@ import { ChatBotController } from "./presentation/chatbot.controller";
 import { ChatBotService } from "./application/chatbot.service";
 import { ChatService } from "./application/chat.service";
 import { ChatController } from "./presentation/chat.controller";
+import { DiscordExternalService } from "./application/discord.external";
 
 @Module({
 	imports: [InfraModule],
@@ -27,6 +28,10 @@ import { ChatController } from "./presentation/chat.controller";
 		{
 			provide: MessengerType.TELEGRAM,
 			useClass: TelegramExternalService,
+		},
+		{
+			provide: MessengerType.DISCORD,
+			useClass: DiscordExternalService,
 		},
 		{
 			provide: CHATBOT_REPOSITORY,

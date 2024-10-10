@@ -9,12 +9,16 @@ export class MessengerFactory {
 	constructor(
 		@Inject(MessengerType.TELEGRAM)
 		private readonly telegramExternalService: iMessengerExternalService,
+		@Inject(MessengerType.DISCORD)
+		private readonly discordExternalService: iMessengerExternalService,
 	) {}
 
 	getMessengerService(type: MessengerType) {
 		switch (type) {
 			case MessengerType.TELEGRAM:
 				return this.telegramExternalService;
+			case MessengerType.DISCORD:
+				return this.discordExternalService;
 			default:
 				throw new SsshException(
 					ExceptionEnum.NOT_IMPLEMENTED,

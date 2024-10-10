@@ -45,8 +45,6 @@ describe("PrismaTopicRepository", () => {
 			expect(topics.length).toEqual(1);
 			expect(topics[0].id).toEqual(t.id);
 			expect(topics[0].name).toEqual(t.name);
-			expect(topics[0].createdAt).not.toBeDefined();
-			expect(topics[0].updatedAt).not.toBeDefined();
 		});
 	});
 

@@ -94,7 +94,6 @@ export class ChatBotService {
 	/**
 	 * 아이디로 챗봇을 조회합니다.
 	 * @param {number} id
-	 * @return {Promise<ReadChatBotDto>} 챗봇을 반환합니다.
 	 */
 	async getChatBotById(id: number) {
 		const bot = await this.chatBotRepository.findChatBotById(id);
@@ -109,10 +108,11 @@ export class ChatBotService {
 	async getChatBots(
 		pagingDto: ChatBotPagingDto,
 	): Promise<Page<ReadChatBotDto>> {
-		const where = {};
+		const where: Record<string, string> = {};
 		if (pagingDto.where__type) {
-			where["where__type"] = pagingDto.where__type;
+			where.where__type = pagingDto.where__type;
 		}
+
 		const orderBy = {};
 		if (pagingDto.orderby) {
 			orderBy[pagingDto.orderby] = pagingDto.direction;
