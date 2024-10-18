@@ -1,10 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { IChatBotRepository } from "../../../domain/chatbot/infrastructure/chatbot.repository";
 import { PrismaService } from "../prisma.service";
-import {
-	ChatBot,
-	MessengerType,
-} from "../../../domain/chatbot/domain/chatbot.entity";
+import { ChatBot } from "../../../domain/chatbot/domain/chatbot.entity";
 
 @Injectable()
 export class PrismaChatBotRepository implements IChatBotRepository {
