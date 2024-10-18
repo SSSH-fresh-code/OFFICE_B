@@ -87,4 +87,27 @@ describe("PrismaChatBotRepository", () => {
 			expect(chats.length).toBe(5);
 		});
 	});
+
+	describe("findChatById", () => {
+		it("id로 Chat을 조회합니다.", async () => {
+			const chat = await prisma.chat.create({
+				data: {
+					chatId: "test",
+					name: "name",
+					type: MessengerType.TELEGRAM,
+				},
+			});
+
+			const result = await repository.findChatById(chat.id);
+
+			expect(result).toBeInstanceOf(Chat);
+			expect(Chat.of(chat)).toEqual(result);
+		});
+
+		it("존재하지 않는 id를 조회하는 경우 에러를 반환합니다.", async () => {
+			expect(async () => await repository.findChatById(0)).rejects.toThrow(
+				Prisma.PrismaClientKnownRequestError,
+			);
+		});
+	});
 });

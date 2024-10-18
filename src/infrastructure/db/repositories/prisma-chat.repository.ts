@@ -1,9 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma.service";
-import {
-	ChatBot,
-	MessengerType,
-} from "../../../domain/chatbot/domain/chatbot.entity";
+import { MessengerType } from "../../../domain/chatbot/domain/chatbot.entity";
 import { IChatRepository } from "../../../domain/chatbot/infrastructure/chat.repository";
 import { Chat } from "../../../domain/chatbot/domain/chat.entity";
 
@@ -39,5 +36,13 @@ export class PrismaChatRepository implements IChatRepository {
 		});
 
 		return chats.map((chat) => Chat.of(chat));
+	}
+
+	async findChatById(id: number): Promise<Chat> {
+		const chat = await this.prisma.chat.findUniqueOrThrow({
+			where: { id },
+		});
+
+		return Chat.of(chat);
 	}
 }
