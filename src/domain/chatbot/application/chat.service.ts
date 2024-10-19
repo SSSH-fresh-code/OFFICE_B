@@ -78,7 +78,7 @@ export class ChatService {
 		const where: Record<string, string> = {};
 
 		if (dto.where__type) {
-			where.type = dto.where__type;
+			where.where__type = dto.where__type;
 		}
 
 		const orderBy = {};

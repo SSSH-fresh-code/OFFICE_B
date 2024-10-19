@@ -163,7 +163,7 @@ describe("ChatBotService", () => {
 			const chats = await chatService.getChatsByType(dto);
 
 			expect(pagingService.getPagedResults).toHaveBeenCalledWith("Chat", dto, {
-				type: MessengerType.DISCORD,
+				where__type: MessengerType.DISCORD,
 			});
 
 			expect(chats.info.total).toEqual(1);

@@ -134,6 +134,7 @@ export class PagingService<T> implements iPagingService {
 				}
 			}
 		}
+		console.log(result);
 
 		return result;
 	}
