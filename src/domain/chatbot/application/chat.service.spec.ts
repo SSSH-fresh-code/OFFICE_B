@@ -12,6 +12,7 @@ import { SsshException } from "../../../infrastructure/filter/exception/sssh.exc
 import { ExceptionEnum } from "../../../infrastructure/filter/exception/exception.enum";
 import { HttpStatus } from "@nestjs/common";
 import { ChatPagingDto } from "../presentation/dto/chat-paging.dto";
+import { PrismaChatRepository } from "src/infrastructure/db/repositories/prisma-chat.repository";
 
 /**
  * Mock User Repository
@@ -21,6 +22,7 @@ const mockChatRepository = () => ({
 	createChat: jest.fn(),
 	deleteChat: jest.fn(),
 	findChatsByType: jest.fn(),
+	findChatById: jest.fn(),
 });
 
 const mockMessengerFactory = () => ({
@@ -36,9 +38,9 @@ const mockPagingService = () => ({
 
 describe("ChatBotService", () => {
 	let chatService: ChatService;
-	let chatRepository;
-	let pagingService;
-	let messengerFactory;
+	let chatRepository: jest.Mocked<PrismaChatRepository>;
+	let pagingService: jest.Mocked<PagingService<Chat>>;
+	let messengerFactory: jest.Mocked<MessengerFactory>;
 
 	const chatId = "7370566619";
 	const name = "chatbot";
@@ -61,9 +63,15 @@ describe("ChatBotService", () => {
 		}).compile();
 
 		chatService = module.get<ChatService>(ChatService);
-		chatRepository = module.get<PrismaChatBotRepository>(CHAT_REPOSITORY);
-		pagingService = module.get<PagingService<ChatBot>>(PagingService);
-		messengerFactory = module.get<MessengerFactory>(MESSENGER_FACTORY);
+		chatRepository = module.get<PrismaChatRepository>(
+			CHAT_REPOSITORY,
+		) as jest.Mocked<PrismaChatRepository>;
+		pagingService = module.get<PagingService<Chat>>(
+			PagingService,
+		) as jest.Mocked<PagingService<Chat>>;
+		messengerFactory = module.get<MessengerFactory>(
+			MESSENGER_FACTORY,
+		) as jest.Mocked<MessengerFactory>;
 	});
 
 	beforeEach(() => {
@@ -146,6 +154,9 @@ describe("ChatBotService", () => {
 				data: [chat],
 				info: {
 					total: 1,
+					current: 1,
+					last: 1,
+					take: 10,
 				},
 			});
 
@@ -173,6 +184,19 @@ describe("ChatBotService", () => {
 					{ param: "type" },
 				),
 			);
+		});
+	});
+
+	describe("getChatBotById", () => {
+		it("id로 챗봇을 조회합니다.", async () => {
+			const chat = new Chat(1, chatId, name, type);
+
+			chatRepository.findChatById.mockResolvedValue(chat);
+
+			const selectedChat = await chatService.getChatById(1);
+
+			expect(selectedChat.id).toEqual(chat.id);
+			expect(chatRepository.findChatById).toHaveBeenCalledWith(1);
 		});
 	});
 });

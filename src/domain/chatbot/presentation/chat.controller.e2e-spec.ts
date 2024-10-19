@@ -12,7 +12,6 @@ import { CreateChatBotDto } from "./dto/create-chatbot.dto";
 import { MessengerType } from "../domain/chatbot.entity";
 import { formatMessage } from "../../../infrastructure/util/message.util";
 import { ExceptionEnum } from "../../../infrastructure/filter/exception/exception.enum";
-import { UpdateChatBotDto } from "./dto/update-chatbot.dto";
 import { CreateChatDto } from "./dto/create-chat.dto";
 
 describe("ChatController (e2e)", () => {
@@ -215,7 +214,7 @@ describe("ChatController (e2e)", () => {
 
 		it("존재 하지 않는 채팅 삭제", async () => {
 			const { statusCode, body } = await request(app.getHttpServer())
-				.delete(`/chat/0`)
+				.delete("/chat/0")
 				.set("Cookie", su);
 
 			expect(statusCode).toEqual(400);
@@ -223,7 +222,7 @@ describe("ChatController (e2e)", () => {
 		});
 		it("권한 없이 채팅 삭제", async () => {
 			const { statusCode, body } = await request(app.getHttpServer())
-				.delete(`/chat/0`)
+				.delete("/chat/0")
 				.set("Cookie", gu);
 
 			expect(statusCode).toEqual(403);
@@ -245,7 +244,7 @@ describe("ChatController (e2e)", () => {
 
 			const { statusCode, body } = await request(app.getHttpServer())
 				.get(
-					`/chat?page=1&take=10&orderby=name&direction=desc&where__type=TELEGRAM`,
+					"/chat?page=1&take=10&orderby=name&direction=desc&where__type=TELEGRAM",
 				)
 				.set("Cookie", su);
 
@@ -256,7 +255,7 @@ describe("ChatController (e2e)", () => {
 		it("빈 목록 조회", async () => {
 			const { statusCode, body } = await request(app.getHttpServer())
 				.get(
-					`/chat?page=1&take=10&orderby=name&direction=desc&where__type=TELEGRAM`,
+					"/chat?page=1&take=10&orderby=name&direction=desc&where__type=TELEGRAM",
 				)
 				.set("Cookie", su);
 
@@ -266,7 +265,7 @@ describe("ChatController (e2e)", () => {
 
 		it("타입 없이 목록 조회", async () => {
 			const { statusCode, body } = await request(app.getHttpServer())
-				.get(`/chat?page=1&take=10&orderby=name&direction=desc`)
+				.get("/chat?page=1&take=10&orderby=name&direction=desc")
 				.set("Cookie", su);
 
 			expect(statusCode).toEqual(400);
@@ -278,10 +277,62 @@ describe("ChatController (e2e)", () => {
 		it("권한 없이 목록 조회", async () => {
 			const { statusCode, body } = await request(app.getHttpServer())
 				.get(
-					`/chat?page=1&take=10&orderby=name&direction=desc&where__type=TELEGRAM`,
+					"/chat?page=1&take=10&orderby=name&direction=desc&where__type=TELEGRAM",
 				)
 				.set("Cookie", gu);
 
+			expect(statusCode).toEqual(403);
+			expect(body.message).toEqual(ExceptionEnum.FORBIDDEN);
+		});
+	});
+
+	describe("GET - /chat/:id", () => {
+		// 채팅방 단일 건 조회 테스트
+		it("채팅방 조회", async () => {
+			// 테스트용 채팅방 데이터 생성
+			const dto: CreateChatDto = {
+				chatId: "12345",
+				name: "테스트 채팅방",
+				type: MessengerType.TELEGRAM,
+			};
+
+			// Prisma를 사용하여 테스트 채팅방 생성
+			const createdChat = await prismaService.chat.create({
+				data: dto,
+			});
+
+			// API 요청을 보내고 응답 확인
+			const { statusCode, body } = await request(app.getHttpServer())
+				.get(`/chat/${createdChat.id}`)
+				.set("Cookie", su); // 인증 정보 설정
+
+			// 날짜 필드의 형식을 맞추기 위해 변환
+			body.createdAt = new Date(body.createdAt);
+			body.updatedAt = new Date(body.updatedAt);
+
+			// 응답 상태 코드와 반환된 데이터 확인
+			expect(statusCode).toEqual(200);
+			expect(body).toEqual(createdChat);
+		});
+
+		// 존재하지 않는 채팅방 조회 테스트
+		it("없는 채팅방 아이디 조회", async () => {
+			const { statusCode, body } = await request(app.getHttpServer())
+				.get("/chat/0")
+				.set("Cookie", su); // 인증 정보 설정
+
+			// 상태 코드 및 예외 메시지 확인
+			expect(statusCode).toEqual(400);
+			expect(body.message).toEqual(ExceptionEnum.NOT_FOUND);
+		});
+
+		// 권한 없이 채팅방 조회 테스트
+		it("권한 없이 채팅방 조회", async () => {
+			const { statusCode, body } = await request(app.getHttpServer())
+				.get("/chat/0")
+				.set("Cookie", gu); // 권한이 없는 사용자 정보 설정
+
+			// 상태 코드 및 예외 메시지 확인
 			expect(statusCode).toEqual(403);
 			expect(body.message).toEqual(ExceptionEnum.FORBIDDEN);
 		});
