@@ -5,6 +5,7 @@ import { PrismaUserRepository } from "./prisma-user.repository";
 import { User } from "../../../domain/user/domain/user.entity";
 import { v4 as uuidv4 } from "uuid";
 import { Prisma } from "@prisma/client";
+import { PermissionEnum } from "src/domain/permission/domain/permission.enum";
 
 describe("PrismaUserRepository", () => {
 	let repository: PrismaUserRepository;
@@ -23,7 +24,7 @@ describe("PrismaUserRepository", () => {
 	});
 
 	beforeEach(async () => {
-		await prisma.cleanDatabase(["Permission", "User"]);
+		await prisma.cleanDatabase(["User"]);
 	});
 
 	afterAll(async () => {
@@ -174,13 +175,6 @@ describe("PrismaUserRepository", () => {
 		it("해당 유저의 권한을 가져와야 합니다.", async () => {
 			const permissionName = "LOGIN001";
 
-			await prisma.permission.create({
-				data: {
-					name: permissionName,
-					description: "로그인 권한",
-				},
-			});
-
 			const user = new User(
 				uuidv4(),
 				"test@example.com",
@@ -212,7 +206,7 @@ describe("PrismaUserRepository", () => {
 			expect(hasPermissionUser.permissions).toEqual([permissionName]);
 		});
 
-		it("해당 유저의 권한이 없다면 빈 배열을 가진 유저를 반환합니다.", async () => {
+		it("해당 유저의 권한이 없어도 로그인 권한을 가진채로 생성됩니다.", async () => {
 			const user = new User(
 				uuidv4(),
 				"test@example.com",
@@ -231,7 +225,7 @@ describe("PrismaUserRepository", () => {
 					name: "TestUser",
 				}),
 			);
-			expect(hasPermissionUser.permissions).toEqual([]);
+			expect(hasPermissionUser.permissions).toEqual([PermissionEnum.CAN_LOGIN]);
 		});
 
 		it("해당 유저가 없다면 에러를 반환합니다.", async () => {
@@ -251,16 +245,6 @@ describe("PrismaUserRepository", () => {
 
 	describe("setPermission", () => {
 		it("권한이 없는 유저의 경우 권한을 그대로 추가합니다.", async () => {
-			const testPermission1 = "TEST0001";
-			const testPermission2 = "TEST0002";
-
-			await prisma.permission.createMany({
-				data: [testPermission1, testPermission2].map((p, idx) => ({
-					name: p,
-					description: `${idx}`,
-				})),
-			});
-
 			const user = new User(
 				uuidv4(),
 				"test@example.com",
@@ -269,7 +253,7 @@ describe("PrismaUserRepository", () => {
 			);
 			const savedUser = await repository.save(user);
 
-			savedUser.assignPermissions([testPermission1, testPermission2]);
+			savedUser.assignPermissions([PermissionEnum.CAN_USE_CHAT]);
 
 			const setPermissionUser = await repository.setPermission(savedUser);
 
@@ -278,16 +262,6 @@ describe("PrismaUserRepository", () => {
 		});
 
 		it("권한이 있는 유저의 경우 기존의 권한을 삭제 후 추가합니다.", async () => {
-			const testPermission1 = "TEST0001";
-			const testPermission2 = "TEST0002";
-
-			await prisma.permission.createMany({
-				data: [testPermission1, testPermission2].map((p, idx) => ({
-					name: p,
-					description: `${idx}`,
-				})),
-			});
-
 			const user = new User(
 				uuidv4(),
 				"test@example.com",
@@ -296,27 +270,24 @@ describe("PrismaUserRepository", () => {
 			);
 			const savedUser = await repository.save(user);
 
-			savedUser.assignPermissions([testPermission1]);
+			savedUser.assignPermissions([PermissionEnum.CAN_READ_BLOG]);
 
 			const setPermissionUser = await repository.setPermission(savedUser);
 
-			savedUser.assignPermissions([testPermission2]);
+			savedUser.assignPermissions([PermissionEnum.CAN_WRITE_CHAT]);
 
 			const setPermissionUser2 = await repository.setPermission(savedUser);
 
-			expect(setPermissionUser.permissions).toEqual([testPermission1]);
-			expect(setPermissionUser2.permissions).toEqual([testPermission2]);
+			expect(setPermissionUser.permissions).toEqual([
+				PermissionEnum.CAN_READ_BLOG,
+			]);
+			expect(setPermissionUser2.permissions).toEqual([
+				PermissionEnum.CAN_WRITE_CHAT,
+			]);
 		});
 
 		it("권한이 있는 유저에 빈 배열이 들어온 경우 초기화 합니다.", async () => {
 			const permissionName = "LOGIN001";
-
-			await prisma.permission.create({
-				data: {
-					name: permissionName,
-					description: "로그인 권한",
-				},
-			});
 
 			const user = new User(
 				uuidv4(),

@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma.service";
 import { UserRepository } from "../../../domain/user/infrastructure/user.repository";
 import { User } from "../../../domain/user/domain/user.entity";
+import { PermissionEnum } from "src/domain/permission/domain/permission.enum";
 
 @Injectable()
 export class PrismaUserRepository implements UserRepository {
@@ -87,6 +88,9 @@ export class PrismaUserRepository implements UserRepository {
 				email: user.email,
 				password: user.password,
 				name: user.name,
+				permissions: {
+					connect: [{ name: PermissionEnum.CAN_LOGIN }],
+				},
 			},
 		});
 
@@ -95,7 +99,7 @@ export class PrismaUserRepository implements UserRepository {
 			upsertUser.email,
 			upsertUser.password,
 			upsertUser.name,
-			[],
+			upsertUser.permissions.map((p) => p.name),
 			upsertUser.createdAt,
 			upsertUser.updatedAt,
 		);
