@@ -1,5 +1,4 @@
 import { ExceptionEnum } from "src/infrastructure/filter/exception/exception.enum";
-import { Post as PrismaPost } from "@prisma/client";
 import { formatMessage } from "src/infrastructure/util/message.util";
 import { Topic } from "../topic/topic.entity";
 import { iPost } from "./post.interface";

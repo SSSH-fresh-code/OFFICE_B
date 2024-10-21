@@ -11,11 +11,11 @@ model User {
   id          String       @id @default(uuid())
   email       String       @unique
   password    String
-  name        String @unique
+  name        String       @unique
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   permissions Permission[] @relation("UserPermissions")
-  posts Post[]
+  posts       Post[]
 }
 
 model Permission {
@@ -33,54 +33,61 @@ model ChatBot {
   name        String        @unique
   description String
   type        MessengerType
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
   chats       Chat[]        @relation("ChatBotChats")
 }
 
 model Chat {
-  id     Int           @id @default(autoincrement())
-  chatId String        @unique
-  name   String        @unique
-  type   MessengerType
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  bots   ChatBot[]     @relation("ChatBotChats")
+  id        Int           @id @default(autoincrement())
+  chatId    String        @unique
+  name      String        @unique
+  type      MessengerType
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  bots      ChatBot[]     @relation("ChatBotChats")
 }
 
-
 model Topic {
-  id     Int           @id @default(autoincrement())
-  name   String        @unique
-  series Series[]
-  posts Post[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  series    Series[]
+  posts     Post[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Series {
-  id     Int           @id @default(autoincrement())
-  name   String  @unique
-  topic   Topic @relation(fields: [topicId], references: [id])
-  topicId Int
-  posts Post[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  topic     Topic    @relation(fields: [topicId], references: [id])
+  topicId   Int
+  posts     Post[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Post {
-  id     Int           @id @default(autoincrement())
-  title String @unique
-  content String @db.Text
-  thumbnail String? 
-  author User @relation(fields: [authorName], references: [name])
+  id         Int      @id @default(autoincrement())
+  title      String   @unique
+  content    String   @db.Text
+  thumbnail  String?
+  author     User     @relation(fields: [authorName], references: [name])
   authorName String
-  topic Topic @relation(fields: [topicId], references: [id])
-  topicId Int
-  series Series? @relation(fields: [seriesId], references: [id])
-  seriesId Int?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  topic      Topic    @relation(fields: [topicId], references: [id])
+  topicId    Int
+  series     Series?  @relation(fields: [seriesId], references: [id])
+  seriesId   Int?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Log {
+  id           String   @id @default(uuid())
+  businessType String   
+  dataType     String   
+  data         String   
+  logDate      DateTime @default(now()) 
 }
 
 enum MessengerType {

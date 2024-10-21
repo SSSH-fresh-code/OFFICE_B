@@ -13,6 +13,9 @@ export enum PermissionEnum {
 	CAN_USE_BLOG = "BLOG0001",
 	CAN_READ_BLOG = "BLOG0002",
 	CAN_WRITE_BLOG = "BLOG0003",
+	CAN_USE_LOG = "LOG00001",
+	CAN_READ_LOG = "LOG00002",
+	CAN_WRITE_LOG = "LOG00003",
 }
 
 export enum PermissionDescriptionEnum {
@@ -30,4 +33,7 @@ export enum PermissionDescriptionEnum {
 	CAN_USE_BLOG = "블로그 관련 API 사용 권한",
 	CAN_READ_BLOG = "블로그 관련 API 사용 권한(R)",
 	CAN_WRITE_BLOG = "블로그 관련 API 사용 권한(W)",
+	CAN_USE_LOG = "로그 관련 API 사용 권한",
+	CAN_READ_LOG = "로그 관련 API 사용 권한(R)",
+	CAN_WRITE_LOG = "로그 관련 API 사용 권한(W)",
 }
