@@ -15,5 +15,6 @@ import { InfraModule } from "src/infrastructure/infra.module";
 		},
 	],
 	controllers: [LogController],
+	exports: [LogService],
 })
 export class LogModule {}

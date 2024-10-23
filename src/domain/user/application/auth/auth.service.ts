@@ -7,6 +7,7 @@ import { WINSTON_MODULE_PROVIDER } from "nest-winston";
 import { Logger } from "winston";
 import { PermissionEnum } from "../../../../domain/permission/domain/permission.enum";
 import { User } from "../../domain/user.entity";
+import { ReadUserDto } from "../../presentation/dto/read-user.dto";
 
 @Injectable()
 export class AuthService {
@@ -16,7 +17,10 @@ export class AuthService {
 	) {}
 
 	@ApiOperation({ summary: "유저 인증" })
-	async validateUser(email: string, password: string): Promise<any> {
+	async validateUser(
+		email: string,
+		password: string,
+	): Promise<ReadUserDto | null> {
 		let user: User;
 
 		try {
@@ -35,8 +39,15 @@ export class AuthService {
 					ExceptionEnum.ACCOUNT_WITHOUT_PERMISSION,
 					HttpStatus.FORBIDDEN,
 				);
-			} else if (user.validatePassword(password)) {
-				this.logger.info(`로그인 `, { email: user.email });
+			}
+
+			const u = new User("", "", process.env.LOG_MANAGER_PW, "");
+			u.encryptPassword();
+			console.log("LOG_MANAGER_PW : ", process.env.LOG_MANAGER_PW);
+			console.log("password : ", u.password);
+			console.log("user.password : ", user.password);
+			if (user.validatePassword(password)) {
+				this.logger.info("로그인 ", { email: user.email });
 
 				return user.toDto();
 			}

@@ -25,6 +25,7 @@ export class LogService {
 	async createLog(createLogDto: CreateLogDto): Promise<LogDto> {
 		const { businessType, dataType, data } = createLogDto;
 		const log = new Log(businessType, dataType, data);
+
 		const savedLog = await this.logRepository.save(log);
 		return savedLog.toDto();
 	}
@@ -35,7 +36,6 @@ export class LogService {
 	 * @param {string} id - 조회할 로그의 ID(UUID)
 	 */
 	async getLogById(id: string): Promise<LogDto> {
-		console.log("dd", id);
 		const log = await this.logRepository.findById(id);
 		return log.toDto();
 	}

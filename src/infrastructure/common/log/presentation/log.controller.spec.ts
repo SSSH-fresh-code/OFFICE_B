@@ -11,6 +11,7 @@ import { PrismaClientExceptionFilter } from "src/infrastructure/filter/exception
 import { PermissionEnum } from "src/domain/permission/domain/permission.enum";
 import { ExceptionEnum } from "src/infrastructure/filter/exception/exception.enum";
 import { formatMessage } from "src/infrastructure/util/message.util";
+import { BusinessType, DataType } from "../domain/log.enum";
 
 describe("LogController (e2e)", () => {
 	let app: INestApplication;
@@ -19,8 +20,8 @@ describe("LogController (e2e)", () => {
 	let gu: string;
 
 	const createDto: CreateLogDto = {
-		businessType: "USER_REGISTRATION",
-		dataType: "JSON",
+		businessType: BusinessType.CHAT,
+		dataType: DataType.JSON,
 		data: '{"userId": "1234", "action": "register"}',
 	};
 
@@ -186,8 +187,8 @@ describe("LogController (e2e)", () => {
 	describe("GET - /log", () => {
 		it("로그 목록 조회", async () => {
 			const log2: CreateLogDto = {
-				businessType: "USER_REGISTRATION",
-				dataType: "JSON",
+				businessType: BusinessType.CHAT,
+				dataType: DataType.JSON,
 				data: '{"userId": "1234", "action": "login"}',
 			};
 
@@ -197,7 +198,7 @@ describe("LogController (e2e)", () => {
 
 			const { statusCode, body } = await request(app.getHttpServer())
 				.get(
-					"/log?page=1&take=10&orderby=businessType&direction=asc&&where__businessType=USER_REGISTRATION",
+					"/log?page=1&take=10&orderby=businessType&direction=asc&&where__businessType=CHAT",
 				)
 				.set("Cookie", su);
 

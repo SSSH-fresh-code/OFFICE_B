@@ -1,11 +1,14 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { v4 as uuidv4 } from "uuid";
 import { PrismaLogRepository } from "./prisma-log.repository";
 import { PrismaService } from "../prisma.service";
 import { Log } from "src/infrastructure/common/log/domain/log.entity";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { LoggerModule } from "src/infrastructure/module/logger.module";
 import { Prisma } from "@prisma/client";
+import {
+	BusinessType,
+	DataType,
+} from "src/infrastructure/common/log/domain/log.enum";
 
 describe("PrismaLogRepository", () => {
 	let repository: PrismaLogRepository;
@@ -36,14 +39,18 @@ describe("PrismaLogRepository", () => {
 
 	describe("findById", () => {
 		it("로그를 성공적으로 조회해야 합니다.", async () => {
-			const log = new Log("SERVER_NOTIFY", "JSON", '{"action": "notify"}');
+			const log = new Log(
+				BusinessType.CHAT,
+				DataType.JSON,
+				'{"action": "notify"}',
+			);
 			await repository.save(log);
 
 			const foundLog = await repository.findById(log.id);
 			expect(foundLog).toEqual(
 				expect.objectContaining({
-					businessType: "SERVER_NOTIFY",
-					dataType: "JSON",
+					businessType: BusinessType.CHAT,
+					dataType: DataType.JSON,
 					data: '{"action": "notify"}',
 				}),
 			);
@@ -58,20 +65,28 @@ describe("PrismaLogRepository", () => {
 
 	describe("save", () => {
 		it("로그를 성공적으로 저장해야 합니다.", async () => {
-			const log = new Log("USER_REGISTRATION", "JSON", '{"userId": "1234"}');
+			const log = new Log(
+				BusinessType.CHAT,
+				DataType.JSON,
+				'{"userId": "1234"}',
+			);
 			const savedLog = await repository.save(log);
 
 			expect(savedLog).toEqual(
 				expect.objectContaining({
-					businessType: "USER_REGISTRATION",
-					dataType: "JSON",
+					businessType: BusinessType.CHAT,
+					dataType: DataType.JSON,
 					data: '{"userId": "1234"}',
 				}),
 			);
 		});
 
 		it("로그 저장 시 자동으로 UUID가 생성되어야 합니다.", async () => {
-			const log = new Log("USER_LOGIN", "JSON", '{"userId": "5678"}');
+			const log = new Log(
+				BusinessType.CHAT,
+				DataType.JSON,
+				'{"userId": "5678"}',
+			);
 			const savedLog = await repository.save(log);
 
 			expect(savedLog.id).toBeDefined();
@@ -79,12 +94,12 @@ describe("PrismaLogRepository", () => {
 		});
 
 		it("잘못된 데이터 타입으로 로그 저장 시 예외를 발생시켜야 합니다.", async () => {
-			const log = new Log("INVALID_TYPE", null, '{"invalid": "data"}');
+			const log = new Log(BusinessType.ERROR, null, '{"invalid": "data"}');
 			await expect(repository.save(log)).rejects.toThrow();
 		});
 
 		it("빈 데이터를 저장하려 할 경우 예외를 발생시켜야 합니다.", async () => {
-			const log = new Log("SERVER_NOTIFY", "JSON", null); // 데이터가 없음
+			const log = new Log(BusinessType.ERROR, DataType.JSON, null); // 데이터가 없음
 			await expect(repository.save(log)).rejects.toThrow();
 		});
 	});

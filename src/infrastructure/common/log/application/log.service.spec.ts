@@ -6,6 +6,7 @@ import { LOG_REPOSITORY } from "src/infrastructure/common/log/log.const";
 import { CreateLogDto } from "src/infrastructure/common/log/presentation/dto/create-log.dto";
 import { PrismaLogRepository } from "src/infrastructure/db/repositories/prisma-log.repository";
 import { PagingService } from "../../services/paging.service";
+import { BusinessType, DataType } from "../domain/log.enum";
 
 /**
  * Mock Log Repository
@@ -46,8 +47,8 @@ describe("LogService", () => {
 	describe("createLog", () => {
 		it("로그를 성공적으로 생성해야 합니다.", async () => {
 			const createLogDto: CreateLogDto = {
-				businessType: "USER_REGISTRATION",
-				dataType: "JSON",
+				businessType: BusinessType.CHAT,
+				dataType: DataType.JSON,
 				data: '{"userId": "1234"}',
 			};
 
@@ -68,7 +69,11 @@ describe("LogService", () => {
 
 	describe("getLogById", () => {
 		it("ID(UUID)로 로그를 성공적으로 조회해야 합니다.", async () => {
-			const log = new Log("SERVER_NOTIFY", "JSON", '{"action": "notify"}');
+			const log = new Log(
+				BusinessType.CHAT,
+				DataType.JSON,
+				'{"action": "notify"}',
+			);
 			logRepository.findById.mockResolvedValue(log);
 
 			const result = await logService.getLogById(log.id);

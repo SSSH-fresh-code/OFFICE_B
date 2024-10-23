@@ -84,8 +84,8 @@ model Post {
 
 model Log {
   id           String   @id @default(uuid())
-  businessType String   
-  dataType     String   
+  businessType BusinessType   
+  dataType     DataType   
   data         String   
   logDate      DateTime @default(now()) 
 }
@@ -94,4 +94,13 @@ enum MessengerType {
   TELEGRAM
   SLACK
   DISCORD
+}
+
+enum BusinessType {
+  CHAT
+  ERROR
+}
+
+enum DataType {
+  JSON
 }

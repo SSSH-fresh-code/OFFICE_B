@@ -2,17 +2,18 @@ import { v4 as uuidv4 } from "uuid";
 import { iLog } from "./log.interface";
 import { LogDto } from "../presentation/dto/log.dto";
 import { Log as PrismaLog } from "@prisma/client";
+import { BusinessType, DataType } from "./log.enum";
 
 export class Log implements iLog {
 	private readonly _id: string;
-	private readonly _businessType: string;
-	private readonly _dataType: string;
+	private readonly _businessType: BusinessType;
+	private readonly _dataType: DataType;
 	private readonly _data: string;
 	private readonly _logDate: Date;
 
 	constructor(
-		businessType: string,
-		dataType: string,
+		businessType: BusinessType,
+		dataType: DataType,
 		data: string,
 		id: string = uuidv4(),
 		logDate: Date = new Date(),
@@ -30,12 +31,12 @@ export class Log implements iLog {
 	}
 
 	// 업무 타입 getter
-	get businessType(): string {
+	get businessType(): BusinessType {
 		return this._businessType;
 	}
 
 	// 데이터 타입 getter
-	get dataType(): string {
+	get dataType(): DataType {
 		return this._dataType;
 	}
 
@@ -61,6 +62,8 @@ export class Log implements iLog {
 	}
 
 	static of({ id, businessType, dataType, data, logDate }: PrismaLog) {
-		return new Log(businessType, dataType, data, id, logDate);
+		const bt = BusinessType[businessType];
+		const dt = DataType[dataType];
+		return new Log(bt, dt, data, id, logDate);
 	}
 }

@@ -1,11 +1,12 @@
 import { LogDto } from "../presentation/dto/log.dto";
 import { Log } from "./log.entity";
+import { BusinessType, DataType } from "./log.enum";
 
 describe("Log Entity", () => {
 	let log: Log;
 
-	const businessType = "SERVER_NOTIFY";
-	const dataType = "JSON";
+	const businessType = BusinessType.CHAT;
+	const dataType = DataType.JSON;
 	const data = '{"userId": "1234", "action": "register"}';
 	const logDate = new Date();
 

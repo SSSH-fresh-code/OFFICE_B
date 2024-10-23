@@ -15,6 +15,12 @@ import { LoggerModule } from "../../../infrastructure/module/logger.module";
 import { HttpStatus } from "@nestjs/common";
 import { ExceptionEnum } from "../../../infrastructure/filter/exception/exception.enum";
 import { SsshException } from "../../../infrastructure/filter/exception/sssh.exception";
+import { LogService } from "src/infrastructure/common/log/application/log.service";
+import { CreateLogDto } from "src/infrastructure/common/log/presentation/dto/create-log.dto";
+import {
+	BusinessType,
+	DataType,
+} from "src/infrastructure/common/log/domain/log.enum";
 
 /**
  * Mock User Repository
@@ -43,8 +49,13 @@ const mockDiscordExternalService = () => ({
 	chat: jest.fn(),
 });
 
+const mockLogService = () => ({
+	createLog: jest.fn(),
+});
+
 describe("ChatBotService", () => {
 	let chatBotService: ChatBotService;
+	let logService: jest.Mocked<LogService>;
 	let chatBotRepository;
 	let pagingService;
 	let telegramExternalService;
@@ -76,11 +87,13 @@ describe("ChatBotService", () => {
 				},
 				{ provide: CHATBOT_REPOSITORY, useFactory: mockChatBotRepository },
 				{ provide: PagingService, useFactory: mockPagingService },
+				{ provide: LogService, useFactory: mockLogService },
 				ChatBotService,
 			],
 		}).compile();
 
 		chatBotService = module.get<ChatBotService>(ChatBotService);
+		logService = module.get<LogService>(LogService) as jest.Mocked<LogService>;
 		chatBotRepository = module.get<PrismaChatBotRepository>(CHATBOT_REPOSITORY);
 		pagingService = module.get<PagingService<ChatBot>>(PagingService);
 		messengerFactory = module.get<MessengerFactory>(MESSENGER_FACTORY);
@@ -256,6 +269,34 @@ describe("ChatBotService", () => {
 				chatbot: bot.toDto(),
 				chat: bot.chats[0].toDto(),
 			});
+		});
+
+		it("메세지 전송 - 로그 저장", async () => {
+			const dto: SendChatBotDto = {
+				botId: bot.id,
+				chatId: 1,
+				message: "테스트 메세지 입니다.",
+			};
+
+			const chat = new Chat(1, "id", "name", MessengerType.TELEGRAM);
+			bot.addChat(chat);
+
+			chatBotRepository.findChatBotById.mockResolvedValue(bot);
+
+			await chatBotService.sendMessage(dto);
+
+			const log: CreateLogDto = {
+				dataType: DataType.JSON,
+				businessType: BusinessType.CHAT,
+				data: JSON.stringify({
+					isSuccess: true,
+					bot: bot,
+					chat: chat,
+					message: dto.message,
+				}),
+			};
+
+			expect(logService.createLog).toHaveBeenCalledWith(log);
 		});
 
 		it("구현되지 않은 챗봇 타입 전송", async () => {

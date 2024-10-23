@@ -2,6 +2,10 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma.service";
 import { LogRepository } from "src/infrastructure/common/log/infrastructure/log.repository";
 import { Log } from "src/infrastructure/common/log/domain/log.entity";
+import {
+	BusinessType,
+	DataType,
+} from "src/infrastructure/common/log/domain/log.enum";
 
 @Injectable()
 export class PrismaLogRepository implements LogRepository {
@@ -19,8 +23,8 @@ export class PrismaLogRepository implements LogRepository {
 		});
 
 		return new Log(
-			log.businessType,
-			log.dataType,
+			BusinessType[log.businessType],
+			DataType[log.dataType],
 			log.data,
 			log.id,
 			log.logDate,
@@ -44,8 +48,8 @@ export class PrismaLogRepository implements LogRepository {
 		});
 
 		return new Log(
-			createdLog.businessType,
-			createdLog.dataType,
+			BusinessType[createdLog.businessType],
+			DataType[createdLog.dataType],
 			createdLog.data,
 			createdLog.id,
 			createdLog.logDate,

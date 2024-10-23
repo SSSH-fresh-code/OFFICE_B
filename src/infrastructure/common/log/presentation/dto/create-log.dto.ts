@@ -1,17 +1,18 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { BusinessType, DataType } from "../../domain/log.enum";
 
 export class CreateLogDto {
 	@ApiProperty({
 		description: "업무 타입",
-		example: "SERVER_NOTIFY",
+		example: BusinessType,
 	})
-	businessType: string;
+	businessType: BusinessType;
 
 	@ApiProperty({
 		description: "데이터 타입",
-		example: "JSON",
+		example: DataType.JSON,
 	})
-	dataType: string;
+	dataType: DataType;
 
 	@ApiProperty({
 		description: "로그 데이터",

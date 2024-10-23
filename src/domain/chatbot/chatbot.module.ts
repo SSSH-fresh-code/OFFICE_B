@@ -15,9 +15,10 @@ import { ChatBotService } from "./application/chatbot.service";
 import { ChatService } from "./application/chat.service";
 import { ChatController } from "./presentation/chat.controller";
 import { DiscordExternalService } from "./application/discord.external";
+import { LogModule } from "src/infrastructure/common/log/log.module";
 
 @Module({
-	imports: [InfraModule],
+	imports: [InfraModule, LogModule],
 	providers: [
 		ChatBotService,
 		ChatService,
