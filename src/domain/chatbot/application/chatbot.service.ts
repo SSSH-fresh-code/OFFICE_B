@@ -18,6 +18,12 @@ import { SsshException } from "../../../infrastructure/filter/exception/sssh.exc
 import { ExceptionEnum } from "../../../infrastructure/filter/exception/exception.enum";
 import { WINSTON_MODULE_PROVIDER } from "nest-winston";
 import { Logger } from "winston";
+import { LogService } from "src/infrastructure/common/log/application/log.service";
+import {
+	BusinessType,
+	DataType,
+} from "src/infrastructure/common/log/domain/log.enum";
+import { CreateLogDto } from "src/infrastructure/common/log/presentation/dto/create-log.dto";
 
 @Injectable()
 export class ChatBotService {
@@ -28,6 +34,7 @@ export class ChatBotService {
 		private readonly chatBotRepository: IChatBotRepository,
 		private readonly pagingService: PagingService<PrismaChatBot>,
 		@Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+		private readonly logService: LogService,
 	) {}
 
 	/**
@@ -161,6 +168,19 @@ export class ChatBotService {
 			this.logger.error(e);
 			isSuccess = false;
 		}
+
+		const log: CreateLogDto = {
+			dataType: DataType.JSON,
+			businessType: BusinessType.CHAT,
+			data: JSON.stringify({
+				isSuccess: isSuccess,
+				bot: bot,
+				chat: chat,
+				message: dto.message,
+			}),
+		};
+
+		this.logService.createLog(log);
 
 		return {
 			isSuccess,

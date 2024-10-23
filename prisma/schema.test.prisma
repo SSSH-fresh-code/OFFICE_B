@@ -81,3 +81,11 @@ model Post {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 }
+
+model Log {
+  id           String   @id @default(uuid())
+  businessType String   
+  dataType     String   
+  data         String   
+  logDate      DateTime @default(now()) 
+}

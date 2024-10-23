@@ -3,9 +3,6 @@ import { ApiTags, ApiOperation, ApiBody, ApiResponse } from "@nestjs/swagger";
 import { AuthService } from "../application/auth/auth.service";
 import { Request, Response } from "express";
 import { LocalAuthGuard } from "../application/auth/local-auth.guard";
-import { ReadUserDto } from "./dto/read-user.dto";
-import { User } from "../domain/user.entity";
-import { User as PrismaUser } from "@prisma/client";
 @ApiTags("auth")
 @Controller("auth")
 export class AuthController {
@@ -22,7 +19,10 @@ export class AuthController {
 	@ApiResponse({ status: 200, description: "로그인 성공" })
 	@ApiResponse({ status: 401, description: "인증 실패" })
 	async login(@Req() req: Request, @Res() res: Response) {
-		res.send({ user: req["user"] });
+		if (req.user.email === process.env.LOG_MANAGER_EMAIL) {
+			req.session.cookie.maxAge = 24 * 60 * 60 * 1000; // 24시간
+		}
+		res.send({ user: req.user });
 	}
 
 	@Post("logout")
