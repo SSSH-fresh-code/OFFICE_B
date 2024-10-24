@@ -41,11 +41,15 @@ export class PermissionGuard implements CanActivate {
 		if (!user) {
 			throw new SsshException(
 				ExceptionEnum.NOT_LOGGED_IN,
-				HttpStatus.FORBIDDEN,
+				HttpStatus.UNAUTHORIZED,
 			);
-		} else if (!user.permissions) {
+		}
+
+		if (!user.permissions) {
 			throw new ForbiddenException(ExceptionEnum.FORBIDDEN);
-		} else if (user.permissions.includes(PermissionEnum.SUPER_USER)) {
+		}
+
+		if (user.permissions.includes(PermissionEnum.SUPER_USER)) {
 			return true;
 		}
 
