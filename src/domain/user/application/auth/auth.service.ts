@@ -42,10 +42,9 @@ export class AuthService {
 			}
 
 			const u = new User("", "", process.env.LOG_MANAGER_PW, "");
+
 			u.encryptPassword();
-			console.log("LOG_MANAGER_PW : ", process.env.LOG_MANAGER_PW);
-			console.log("password : ", u.password);
-			console.log("user.password : ", user.password);
+
 			if (user.validatePassword(password)) {
 				this.logger.info("로그인 ", { email: user.email });
 

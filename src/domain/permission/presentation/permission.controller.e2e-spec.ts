@@ -157,7 +157,7 @@ describe("PermissionController (e2e)", () => {
 				.post("/permission")
 				.send(createDto);
 
-			expect(statusCode).toEqual(403);
+			expect(statusCode).toEqual(401);
 			expect(body.message).toEqual(ExceptionEnum.NOT_LOGGED_IN);
 
 			return;
@@ -274,7 +274,7 @@ describe("PermissionController (e2e)", () => {
 				`/permission`,
 			);
 
-			expect(statusCode).toEqual(403);
+			expect(statusCode).toEqual(401);
 			expect(body.message).toEqual(ExceptionEnum.NOT_LOGGED_IN);
 		});
 	});
@@ -317,7 +317,7 @@ describe("PermissionController (e2e)", () => {
 				`/permission/WRONG001`,
 			);
 
-			expect(statusCode).toEqual(403);
+			expect(statusCode).toEqual(401);
 			expect(body.message).toEqual(ExceptionEnum.NOT_LOGGED_IN);
 		});
 	});

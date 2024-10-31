@@ -149,7 +149,7 @@ describe("AppController (e2e)", () => {
 				`/user?page=1&take=10`,
 			);
 
-			expect(response.statusCode).toBe(403);
+			expect(response.statusCode).toBe(401);
 		});
 	});
 
@@ -232,7 +232,7 @@ describe("AppController (e2e)", () => {
 				name,
 			});
 
-			expect(response.statusCode).toBe(403);
+			expect(response.statusCode).toBe(401);
 		});
 	});
 
@@ -366,7 +366,7 @@ describe("AppController (e2e)", () => {
 					id: uuidv4(),
 				});
 
-			expect(response.statusCode).toBe(403);
+			expect(response.statusCode).toBe(401);
 		});
 	});
 
@@ -409,7 +409,7 @@ describe("AppController (e2e)", () => {
 				`/user/${uuidv4()}`,
 			);
 
-			expect(statusCode).toBe(403);
+			expect(statusCode).toBe(401);
 			expect(body.message).toEqual(ExceptionEnum.NOT_LOGGED_IN);
 		});
 	});

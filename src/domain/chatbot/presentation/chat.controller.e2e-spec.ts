@@ -160,7 +160,7 @@ describe("ChatController (e2e)", () => {
 				.post("/chat")
 				.send(createDto);
 
-			expect(statusCode).toEqual(403);
+			expect(statusCode).toEqual(401);
 			expect(body.message).toEqual(ExceptionEnum.NOT_LOGGED_IN);
 
 			return;

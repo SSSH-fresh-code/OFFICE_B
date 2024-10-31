@@ -52,12 +52,12 @@ describe("AuthController", () => {
 	describe("login", () => {
 		it("로그인을 성공적으로 수행해야 합니다.", async () => {
 			const req = {
-				body: { email: "1@1.com", password: "password" },
+				user: { email: "1@1.com", password: "password" },
 			} as Request;
 			const res = { send: jest.fn() } as unknown as Response;
 
 			await authController.login(req, res);
-			expect(res.send).toHaveBeenCalledWith({ user: undefined });
+			expect(res.send).toHaveBeenCalledWith({ user: { ...req.user } });
 		});
 	});
 

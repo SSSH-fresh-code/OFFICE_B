@@ -47,16 +47,18 @@ export class PagingService<T> implements iPagingService {
 		const take = Number(pagingDto.take);
 		const skip = (page - 1) * take;
 		const order = orderby ? { [orderby]: direction } : { id: "desc" };
-		const include = {};
+		const include: Record<string, unknown> = {};
 
 		where = this.parseWhereClause(pagingDto, where);
 
 		if (model === "Series") {
-			include["topic"] = true;
+			include.topic = true;
 		} else if (model === "Post") {
-			include["author"] = true;
-			include["topic"] = true;
-			include["series"] = true;
+			include.author = true;
+			include.topic = true;
+			include.series = true;
+		} else if (model === "ChatBot") {
+			include.chats = true;
 		}
 
 		const [data, total] = await this.prisma.$transaction([

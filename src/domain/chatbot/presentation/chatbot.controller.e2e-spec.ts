@@ -190,7 +190,7 @@ describe("ChatBotController (e2e)", () => {
 				.post("/chat/bot")
 				.send(dto);
 
-			expect(statusCode).toEqual(403);
+			expect(statusCode).toEqual(401);
 			expect(body.message).toEqual(ExceptionEnum.NOT_LOGGED_IN);
 
 			return;
@@ -681,7 +681,7 @@ describe("ChatBotController (e2e)", () => {
 				`/chat/bot/send`,
 			);
 
-			expect(statusCode).toBe(403);
+			expect(statusCode).toBe(401);
 			expect(body.message).toEqual(ExceptionEnum.NOT_LOGGED_IN);
 		});
 	});

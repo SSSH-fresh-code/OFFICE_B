@@ -142,7 +142,7 @@ describe("LogController (e2e)", () => {
 				.post("/log")
 				.send(createDto);
 
-			expect(statusCode).toEqual(403);
+			expect(statusCode).toEqual(401);
 			expect(body.message).toEqual(ExceptionEnum.NOT_LOGGED_IN);
 
 			return;

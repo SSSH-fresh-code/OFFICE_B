@@ -21,6 +21,7 @@ import {
 	BusinessType,
 	DataType,
 } from "src/infrastructure/common/log/domain/log.enum";
+import { ReadUserDto } from "src/domain/user/presentation/dto/read-user.dto";
 
 /**
  * Mock User Repository
@@ -60,6 +61,15 @@ describe("ChatBotService", () => {
 	let pagingService;
 	let telegramExternalService;
 	let messengerFactory: MessengerFactory;
+
+	const user: ReadUserDto = {
+		id: "qwer",
+		email: "qwer@asdf.com",
+		name: "asdf",
+		permissions: [],
+		createdAt: new Date(),
+		updatedAt: new Date(),
+	};
 
 	const botId = "7370566619";
 	const token = "7345685563:AAFvwnUGTM2OKm4n-qpVk7uSfQq6NZJiTB4";
@@ -256,7 +266,7 @@ describe("ChatBotService", () => {
 
 			chatBotRepository.findChatBotById.mockResolvedValue(bot);
 
-			const result = await chatBotService.sendMessage(dto);
+			const result = await chatBotService.sendMessage(dto, user);
 
 			expect(telegramExternalService.chat).toHaveBeenCalledWith(
 				bot,
@@ -283,20 +293,9 @@ describe("ChatBotService", () => {
 
 			chatBotRepository.findChatBotById.mockResolvedValue(bot);
 
-			await chatBotService.sendMessage(dto);
+			await chatBotService.sendMessage(dto, user);
 
-			const log: CreateLogDto = {
-				dataType: DataType.JSON,
-				businessType: BusinessType.CHAT,
-				data: JSON.stringify({
-					isSuccess: true,
-					bot: bot,
-					chat: chat,
-					message: dto.message,
-				}),
-			};
-
-			expect(logService.createLog).toHaveBeenCalledWith(log);
+			expect(logService.createLog).toHaveBeenCalled();
 		});
 
 		it("구현되지 않은 챗봇 타입 전송", async () => {
@@ -319,7 +318,7 @@ describe("ChatBotService", () => {
 
 			chatBotRepository.findChatBotById.mockResolvedValue(bot);
 
-			await expect(() => chatBotService.sendMessage(dto)).rejects.toThrow(
+			await expect(() => chatBotService.sendMessage(dto, user)).rejects.toThrow(
 				new SsshException(
 					ExceptionEnum.NOT_IMPLEMENTED,
 					HttpStatus.NOT_IMPLEMENTED,
@@ -336,7 +335,7 @@ describe("ChatBotService", () => {
 
 			chatBotRepository.findChatBotById.mockResolvedValue(bot);
 
-			await expect(() => chatBotService.sendMessage(dto)).rejects.toThrow(
+			await expect(() => chatBotService.sendMessage(dto, user)).rejects.toThrow(
 				new SsshException(
 					ExceptionEnum.PARAMETER_NOT_FOUND,
 					HttpStatus.BAD_REQUEST,

@@ -9,8 +9,9 @@ import {
 	Post,
 	Put,
 	Query,
-	Res,
+	Req,
 } from "@nestjs/common";
+import { Request } from "express";
 import { ApiTags, ApiOperation, ApiBody, ApiResponse } from "@nestjs/swagger";
 import { ChatBotService } from "../application/chatbot.service";
 import {
@@ -119,7 +120,10 @@ export class ChatBotController {
 	})
 	@ApiBody({ type: SendChatBotDto })
 	@PermissionsMethod(PermissionEnum.CAN_WRITE_CHAT)
-	async sendMessage(@Body() dto: SendChatBotDto): Promise<SendResultDto> {
-		return await this.chatbotService.sendMessage(dto);
+	async sendMessage(
+		@Body() dto: SendChatBotDto,
+		@Req() req: Request,
+	): Promise<SendResultDto> {
+		return await this.chatbotService.sendMessage(dto, req.user);
 	}
 }

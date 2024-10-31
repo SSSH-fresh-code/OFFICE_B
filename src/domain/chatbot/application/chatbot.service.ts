@@ -24,6 +24,7 @@ import {
 	DataType,
 } from "src/infrastructure/common/log/domain/log.enum";
 import { CreateLogDto } from "src/infrastructure/common/log/presentation/dto/create-log.dto";
+import { ReadUserDto } from "src/domain/user/presentation/dto/read-user.dto";
 
 @Injectable()
 export class ChatBotService {
@@ -142,7 +143,10 @@ export class ChatBotService {
 	 * @param {SendChatBotDto} dto
 	 * @returns {Promise<SendResultDto>}
 	 */
-	async sendMessage(dto: SendChatBotDto): Promise<SendResultDto> {
+	async sendMessage(
+		dto: SendChatBotDto,
+		user: ReadUserDto,
+	): Promise<SendResultDto> {
 		const bot = await this.chatBotRepository.findChatBotById(dto.botId);
 
 		const chat = bot.chats.find((c) => c.id === dto.chatId);
@@ -174,8 +178,9 @@ export class ChatBotService {
 			businessType: BusinessType.CHAT,
 			data: JSON.stringify({
 				isSuccess: isSuccess,
-				bot: bot,
-				chat: chat,
+				user: user,
+				bot: bot.toDto(),
+				chat: chat.toDto(),
 				message: dto.message,
 			}),
 		};
