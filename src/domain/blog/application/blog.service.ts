@@ -9,8 +9,11 @@ import { PagingDto } from "../../../infrastructure/common/dto/paging.dto";
 import { SsshException } from "../../../infrastructure/filter/exception/sssh.exception";
 import { ExceptionEnum } from "../../../infrastructure/filter/exception/exception.enum";
 import { PagingLogDto } from "src/infrastructure/common/log/presentation/dto/paging-log.dto";
-import { BusinessType, DataType } from "@prisma/client";
 import { LogService } from "src/infrastructure/common/log/application/log.service";
+import {
+	BusinessType,
+	DataType,
+} from "src/infrastructure/common/log/domain/log.enum";
 
 @Injectable()
 export class BlogService implements iBlogService {

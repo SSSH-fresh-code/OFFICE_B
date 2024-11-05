@@ -2,7 +2,7 @@ import { iPostService } from "./post/post.service.interface";
 import { Test, TestingModule } from "@nestjs/testing";
 import { BlogService } from "./blog.service";
 import { iBlogService } from "./blog.service.interface";
-import { BLOG_SERVICE, POST_SERVICE } from "../blog.const";
+import { BLOG_SERVICE, LOG_SERVICE, POST_SERVICE } from "../blog.const";
 import { v4 as uuidv4 } from "uuid";
 import { PermissionEnum } from "../../permission/domain/permission.enum";
 import { PagingDto } from "../../../infrastructure/common/dto/paging.dto";
@@ -13,6 +13,8 @@ import { User } from "../../user/domain/user.entity";
 import { Topic } from "../domain/topic/topic.entity";
 import { Series } from "../domain/series/series.entity";
 import { ExceptionEnum } from "../../../infrastructure/filter/exception/exception.enum";
+import { LogService } from "src/infrastructure/common/log/application/log.service";
+import { LogDto } from "src/infrastructure/common/log/presentation/dto/log.dto";
 
 const mockPostService = (): iPostService => ({
 	getPostById: jest.fn(),
@@ -23,9 +25,14 @@ const mockPostService = (): iPostService => ({
 	deletePost: jest.fn(),
 });
 
+const mockLogService = () => ({
+	getLogs: jest.fn(),
+});
+
 describe("BlogService", () => {
 	let blogService: iBlogService;
 	let postService: jest.Mocked<iPostService>;
+	let logService: jest.Mocked<LogService>;
 
 	const loginPerm = [PermissionEnum.CAN_LOGIN];
 	// const SuPerm = [PermissionEnum.SUPER_USER];
@@ -63,11 +70,13 @@ describe("BlogService", () => {
 			providers: [
 				{ provide: POST_SERVICE, useFactory: mockPostService },
 				{ provide: BLOG_SERVICE, useClass: BlogService },
+				{ provide: LOG_SERVICE, useFactory: mockLogService },
 			],
 		}).compile();
 
 		blogService = module.get<iBlogService>(BLOG_SERVICE);
 		postService = module.get<jest.Mocked<iPostService>>(POST_SERVICE);
+		logService = module.get<jest.Mocked<LogService>>(LOG_SERVICE);
 	});
 
 	describe("getMain", () => {
@@ -90,7 +99,18 @@ describe("BlogService", () => {
 				},
 			};
 
+			const logPage: Page<LogDto> = {
+				data: [],
+				info: {
+					total: 1,
+					current: 1,
+					take: 5,
+					last: 1,
+				},
+			};
+
 			postService.getPosts.mockResolvedValue(postPage);
+			logService.getLogs.mockResolvedValue(logPage);
 
 			for (let i = 0; i < blogPermissions.length; i++) {
 				const mainPageDto = await blogService.getMain({
@@ -100,7 +120,6 @@ describe("BlogService", () => {
 
 				expect(mainPageDto).toBeDefined();
 				expect(mainPageDto).toEqual({
-					favoritesMenu: [],
 					recentPosts: postPage,
 				});
 				expect(postService.getPosts).toHaveBeenCalledWith(pagingDto);
@@ -114,9 +133,6 @@ describe("BlogService", () => {
 			});
 
 			expect(mainPageDto).toBeDefined();
-			expect(mainPageDto).toEqual({
-				favoritesMenu: [],
-			});
 		});
 
 		it("로그인 권한 없이 Main 데이터 조회", async () => {
