@@ -51,7 +51,7 @@ describe("BlogController (e2e)", () => {
 		await app.init();
 		prismaService = moduleFixture.get<PrismaService>(PrismaService);
 
-		const createUser = await prismaService.user.create({
+		await prismaService.user.create({
 			data: {
 				...superUser,
 				permissions: {
@@ -107,7 +107,7 @@ describe("BlogController (e2e)", () => {
 			},
 		});
 
-		const createPost = await prismaService.post.create({
+		await prismaService.post.create({
 			data: {
 				title: "post test",
 				content: "test content",

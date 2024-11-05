@@ -3,6 +3,7 @@ import { InfraModule } from "src/infrastructure/infra.module";
 import { TopicService } from "./application/topic/topic.service";
 import {
 	BLOG_SERVICE,
+	LOG_SERVICE,
 	POST_REPOSITORY,
 	POST_SERVICE,
 	SERIES_REPOSITORY,
@@ -21,6 +22,9 @@ import { PrismaUserRepository } from "src/infrastructure/db/repositories/prisma-
 import { PostController } from "./presentation/post/post.controller";
 import { BlogService } from "./application/blog.service";
 import { BlogController } from "./presentation/blog.controller";
+import { LogService } from "src/infrastructure/common/log/application/log.service";
+import { LOG_REPOSITORY } from "src/infrastructure/common/log/log.const";
+import { PrismaLogRepository } from "src/infrastructure/db/repositories/prisma-log.repository";
 
 @Module({
 	imports: [InfraModule],
@@ -43,6 +47,10 @@ import { BlogController } from "./presentation/blog.controller";
 			useClass: PrismaPostRepository,
 		},
 		{
+			provide: LOG_REPOSITORY,
+			useClass: PrismaLogRepository,
+		},
+		{
 			provide: SERIES_SERVICE,
 			useClass: SeriesService,
 		},
@@ -53,6 +61,10 @@ import { BlogController } from "./presentation/blog.controller";
 		{
 			provide: BLOG_SERVICE,
 			useClass: BlogService,
+		},
+		{
+			provide: LOG_SERVICE,
+			useClass: LogService,
 		},
 	],
 	controllers: [

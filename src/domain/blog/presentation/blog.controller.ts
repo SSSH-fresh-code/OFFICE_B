@@ -2,17 +2,16 @@ import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Controller, Get, Inject, Logger, Req } from "@nestjs/common";
 import { BLOG_SERVICE } from "../blog.const";
 import { iBlogService } from "../application/blog.service.interface";
-import { WINSTON_MODULE_PROVIDER } from "nest-winston";
 import { MainPageDto } from "./dto/MainPageDto";
 import { PermissionsMethod } from "../../../infrastructure/decorator/permissions.decorator";
 import { PermissionEnum } from "../../permission/domain/permission.enum";
+import { Request } from "express";
 
 @ApiTags("blog")
 @Controller("blog")
 export class BlogController {
 	constructor(
 		@Inject(BLOG_SERVICE) private readonly blogService: iBlogService,
-		@Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
 	) {}
 
 	@Get("/")
@@ -23,6 +22,6 @@ export class BlogController {
 	})
 	@PermissionsMethod(PermissionEnum.CAN_LOGIN)
 	async getPostByTitle(@Req() req: Request): Promise<MainPageDto> {
-		return await this.blogService.getMain(req["user"]);
+		return await this.blogService.getMain(req.user);
 	}
 }
