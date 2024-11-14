@@ -27,7 +27,6 @@ import { UpdateTopicDto } from "./dto/update-topic.dto";
 
 @ApiTags("blog")
 @Controller("topic")
-@PermissionsClass(PermissionEnum.CAN_USE_BLOG)
 export class TopicController {
 	constructor(
 		private readonly topicService: TopicService,
@@ -40,7 +39,7 @@ export class TopicController {
 		status: 200,
 		description: "주제들이 정상적으로 조회됨",
 	})
-	@PermissionsMethod(PermissionEnum.CAN_WRITE_BLOG)
+	@PermissionsMethod(PermissionEnum.CAN_WRITE_BLOG, PermissionEnum.CAN_USE_BLOG)
 	async getTopicForSelect(): Promise<Pick<ReadTopicDto, "name" | "id">[]> {
 		return await this.topicService.getTopicForSelect();
 	}
@@ -51,7 +50,7 @@ export class TopicController {
 		status: 200,
 		description: "주제가 정상적으로 조회됨",
 	})
-	@PermissionsMethod(PermissionEnum.CAN_READ_BLOG)
+	@PermissionsMethod(PermissionEnum.CAN_READ_BLOG, PermissionEnum.CAN_USE_BLOG)
 	async getTopicByName(@Param("name") name: string): Promise<ReadTopicDto> {
 		return await this.topicService.getTopicByName(name);
 	}
@@ -62,7 +61,6 @@ export class TopicController {
 		status: 200,
 		description: "주제들이 정상적으로 조회됨",
 	})
-	@PermissionsMethod(PermissionEnum.CAN_READ_BLOG)
 	async getTopics(@Query() dto: PagingTopicDto): Promise<Page<ReadTopicDto>> {
 		return await this.topicService.getTopics(dto);
 	}
@@ -75,7 +73,7 @@ export class TopicController {
 	})
 	@ApiResponse({ status: 400, description: "잘못된 파라미터 값" })
 	@ApiBody({ type: CreateTopicDto })
-	@PermissionsMethod(PermissionEnum.CAN_WRITE_BLOG)
+	@PermissionsMethod(PermissionEnum.CAN_WRITE_BLOG, PermissionEnum.CAN_USE_BLOG)
 	async createTopic(@Body() dto: CreateTopicDto): Promise<ReadTopicDto> {
 		return await this.topicService.createTopic(dto);
 	}
@@ -88,7 +86,7 @@ export class TopicController {
 	})
 	@ApiResponse({ status: 400, description: "잘못된 파라미터 값" })
 	@ApiBody({ type: UpdateTopicDto })
-	@PermissionsMethod(PermissionEnum.CAN_WRITE_BLOG)
+	@PermissionsMethod(PermissionEnum.CAN_WRITE_BLOG, PermissionEnum.CAN_USE_BLOG)
 	async updateTopic(@Body() dto: UpdateTopicDto): Promise<ReadTopicDto> {
 		return await this.topicService.updateTopic(dto);
 	}
@@ -100,7 +98,7 @@ export class TopicController {
 		description: "주제 단건 삭제",
 	})
 	@ApiResponse({ status: 404, description: "존재하지 않는 주제" })
-	@PermissionsMethod(PermissionEnum.CAN_WRITE_BLOG)
+	@PermissionsMethod(PermissionEnum.CAN_WRITE_BLOG, PermissionEnum.CAN_USE_BLOG)
 	async deleteTopic(@Param("id", ParseIntPipe) id: number): Promise<void> {
 		try {
 			await this.topicService.deleteTopic(id);

@@ -37,7 +37,7 @@ async function bootstrap() {
 	app.useGlobalFilters(new PrismaClientExceptionFilter());
 
 	app.enableCors({
-		origin: process.env.CORS_URL,
+		origin: [process.env.CORS_URL, process.env.CORS_URL2],
 		credentials: true,
 		allowedHeaders: ["content-type", "Cookie"],
 	});
