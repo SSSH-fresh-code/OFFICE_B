@@ -1,11 +1,11 @@
-import * as request from "supertest";
-import * as session from "express-session";
-import * as bcrypt from "bcrypt";
-import * as passport from "passport";
 import { INestApplication, ValidationPipe } from "@nestjs/common";
-import { PrismaService } from "../../../infrastructure/db/prisma.service";
 import { Test, TestingModule } from "@nestjs/testing";
+import * as bcrypt from "bcrypt";
+import * as session from "express-session";
+import * as passport from "passport";
+import * as request from "supertest";
 import { AppModule } from "../../../app.module";
+import { PrismaService } from "../../../infrastructure/db/prisma.service";
 import { PrismaClientExceptionFilter } from "../../../infrastructure/filter/exception/prisma-exception.filter";
 import { PermissionEnum } from "../../permission/domain/permission.enum";
 
@@ -94,6 +94,7 @@ describe("BlogController (e2e)", () => {
 	});
 
 	beforeEach(async () => {
+		await prismaService.cleanDatabase(["Topic", "Series", "Post"]);
 		const createTopic = await prismaService.topic.create({
 			data: {
 				name: "topic",
@@ -128,6 +129,21 @@ describe("BlogController (e2e)", () => {
 			expect(statusCode).toEqual(200);
 			expect(body.recentPosts).toBeDefined();
 			expect(body.recentPosts.info.total).toBe(1);
+
+			return;
+		});
+	});
+
+	describe("GET - /sitemap", () => {
+		it("사이트맵 추출", async () => {
+			const { statusCode, body, headers } = await request(app.getHttpServer())
+				.get("/blog/sitemap")
+				.set("Cookie", su);
+
+			console.log(headers);
+			expect(statusCode).toEqual(200);
+			expect(body).toBeDefined();
+			expect(headers["content-type"].includes("application/xml")).toBeTruthy();
 
 			return;
 		});
