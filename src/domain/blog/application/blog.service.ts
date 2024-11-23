@@ -1,19 +1,20 @@
-import { iBlogService } from "./blog.service.interface";
 import { HttpStatus, Inject, Injectable, Logger } from "@nestjs/common";
-import { PostService } from "./post/post.service";
 import { UserInSession } from "src/domain/user/infrastructure/auth";
-import { MainPageDto } from "../presentation/dto/MainPageDto";
-import { LOG_SERVICE, POST_SERVICE } from "../blog.const";
-import { PermissionEnum } from "../../permission/domain/permission.enum";
-import { PagingDto } from "../../../infrastructure/common/dto/paging.dto";
-import { SsshException } from "../../../infrastructure/filter/exception/sssh.exception";
-import { ExceptionEnum } from "../../../infrastructure/filter/exception/exception.enum";
-import { PagingLogDto } from "src/infrastructure/common/log/presentation/dto/paging-log.dto";
 import { LogService } from "src/infrastructure/common/log/application/log.service";
 import {
 	BusinessType,
 	DataType,
 } from "src/infrastructure/common/log/domain/log.enum";
+import { PagingLogDto } from "src/infrastructure/common/log/presentation/dto/paging-log.dto";
+import { PagingDto } from "../../../infrastructure/common/dto/paging.dto";
+import { ExceptionEnum } from "../../../infrastructure/filter/exception/exception.enum";
+import { SsshException } from "../../../infrastructure/filter/exception/sssh.exception";
+import { PermissionEnum } from "../../permission/domain/permission.enum";
+import { LOG_SERVICE, POST_SERVICE } from "../blog.const";
+import { MainPageDto } from "../presentation/dto/MainPageDto";
+import { PagingPostDto } from "../presentation/post/dto/paging-post.dto";
+import { iBlogService } from "./blog.service.interface";
+import { PostService } from "./post/post.service";
 
 @Injectable()
 export class BlogService implements iBlogService {
@@ -100,5 +101,39 @@ export class BlogService implements iBlogService {
 		}
 
 		return dto;
+	}
+
+	async extractSiteMapFromPosts(): Promise<string> {
+		const pagingPost: PagingPostDto = {
+			page: 1,
+			take: 9999,
+			orderby: "title",
+			direction: "asc",
+		};
+
+		const { data, info } = await this.postService.getPosts(pagingPost);
+
+		let sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+		sitemap += `
+				<url>
+					<loc>https://blog.limc.dev</loc>
+					<priority>1.0</priority>
+				</url>`;
+
+		if (info.total > 0 && data) {
+			for (const post of data) {
+				sitemap += `
+					<url>
+						<loc>https://blog.limc.dev/post/${post.title}</loc>
+						<lastmod>${post.updatedAt}</lastmod>
+						<changefreq>daily</changefreq>
+						<priority>0.8</priority>
+					</url>`;
+			}
+		}
+
+		sitemap += "\n</urlset>";
+
+		return sitemap;
 	}
 }
